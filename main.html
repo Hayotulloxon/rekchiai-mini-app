@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RekchiAI Bot</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .screen {
+            display: none;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Loading */
+        #loading {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .balance {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .balance-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 15px;
+        }
+
+        /* Menu Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .menu-item {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .menu-item:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-5px);
+        }
+
+        .menu-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .menu-text {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Service Content */
+        .service-content {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .package-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .package {
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .package.selected {
+            border-color: #ffd700;
+            background: rgba(255,215,0,0.2);
+        }
+
+        .package-amount {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .package-price {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* Buttons */
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+
+        /* Inputs */
+        .custom-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .custom-input input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.9);
+            font-size: 16px;
+        }
+
+        .custom-input button {
+            background: #4ECDC4;
+            border: none;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Result */
+        .result {
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-info {
+            margin-bottom: 15px;
+        }
+
+        .result-info div {
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        /* Shop */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .shop-item {
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .shop-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .shop-icon {
+            font-size: 24px;
+        }
+
+        .shop-details h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .shop-details p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .shop-price {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Profile */
+        .profile-card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Referral */
+        .referral-card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .referral-link {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            word-break: break-all;
+            font-family: monospace;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .screen.active {
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading" class="screen active">
+        <div class="loader"></div>
+        <p>RekchiAI yuklanmoqda...</p>
+    </div>
+
+    <!-- Asosiy Menyu -->
+    <div id="main-menu" class="screen">
+        <div class="header">
+            <h1>🤖 RekchiAI</h1>
+            <div class="balance">
+                <div class="balance-item">
+                    <span>💎</span>
+                    <span id="diamonds-balance">0</span>
+                </div>
+                <div class="balance-item">
+                    <span>🪙</span>
+                    <span id="coins-balance">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-grid">
+            <div class="menu-item" onclick="showScreen('views-service')">
+                <div class="menu-icon">👁</div>
+                <div class="menu-text">Ko'rishlar</div>
+            </div>
+            
+            <div class="menu-item" onclick="showScreen('likes-service')">
+                <div class="menu-icon">❤️</div>
+                <div class="menu-text">Likelar</div>
+            </div>
+            
+            <div class="menu-item" onclick="showScreen('shipments-service')">
+                <div class="menu-icon">🚀</div>
+                <div class="menu-text">Jo'natishlar</div>
+            </div>
+            
+            <div class="menu-item" onclick="showScreen('shop')">
+                <div class="menu-icon">🛒</div>
+                <div class="menu-text">Do'kon</div>
+            </div>
+            
+            <div class="menu-item" onclick="showScreen('earn-diamonds')">
+                <div class="menu-icon">💎</div>
+                <div class="menu-text">Olmos yeg'ish</div>
+            </div>
+            
+            <div class="menu-item" onclick="showScreen('promocode')">
+                <div class="menu-icon">🎁</div>
+                <div class="menu-text">Promokod</div>
+            </div>
+            
+            <div class="menu-item" onclick="showScreen('tutorials')">
+                <div class="menu-icon">🎬</div>
+                <div class="menu-text">Qo'llanma</div>
+            </div>
+            
+            <div class="menu-item" onclick="showScreen('profile')">
+                <div class="menu-icon">👤</div>
+                <div class="menu-text">Profil</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ko'rishlar Xizmati -->
+    <div id="views-service" class="screen">
+        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
+        <div class="header">
+            <h2>👁 Ko'rishlar xizmati</h2>
+        </div>
+
+        <div class="service-content">
+            <div class="package-grid">
+                <div class="package" onclick="selectPackage('views', 1000, 10)">
+                    <div class="package-amount">1,000</div>
+                    <div class="package-price">10 💎</div>
+                </div>
+                <div class="package" onclick="selectPackage('views', 5000, 45)">
+                    <div class="package-amount">5,000</div>
+                    <div class="package-price">45 💎</div>
+                </div>
+                <div class="package" onclick="selectPackage('views', 10000, 90)">
+                    <div class="package-amount">10,000</div>
+                    <div class="package-price">90 💎</div>
+                </div>
+                <div class="package" onclick="selectPackage('views', 20000, 170)">
+                    <div class="package-amount">20,000</div>
+                    <div class="package-price">170 💎</div>
+                </div>
+            </div>
+
+            <div class="custom-input">
+                <input type="number" id="custom-views" placeholder="Boshqa miqdor (min: 1000)">
+                <button onclick="calculateCustomViews()">Hisoblash</button>
+            </div>
+
+            <div id="views-result" class="result" style="display: none;">
+                <div class="result-info">
+                    <div>Ko'rishlar: <span id="result-views">0</span> ta</div>
+                    <div>Narxi: <span id="result-price">0</span> 💎</div>
+                    <div>Yetkazish: <span id="delivery-time">45 daqiqa</span></div>
+                </div>
+                <button class="btn-primary" onclick="confirmOrder('views')">✅ Buyurtma berish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Like Xizmati -->
+    <div id="likes-service" class="screen">
+        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
+        <div class="header">
+            <h2>❤️ Like xizmati</h2>
+        </div>
+
+        <div class="service-content">
+            <div class="package-grid">
+                <div class="package" onclick="selectPackage('likes', 100, 10)">
+                    <div class="package-amount">100</div>
+                    <div class="package-price">10 🪙</div>
+                </div>
+                <div class="package" onclick="selectPackage('likes', 500, 45)">
+                    <div class="package-amount">500</div>
+                    <div class="package-price">45 🪙</div>
+                </div>
+                <div class="package" onclick="selectPackage('likes', 1000, 80)">
+                    <div class="package-amount">1,000</div>
+                    <div class="package-price">80 🪙</div>
+                </div>
+            </div>
+
+            <div class="custom-input">
+                <input type="number" id="custom-likes" placeholder="Boshqa miqdor (min: 50)">
+                <button onclick="calculateCustomLikes()">Hisoblash</button>
+            </div>
+
+            <div id="likes-result" class="result" style="display: none;">
+                <div class="result-info">
+                    <div>Likelar: <span id="result-likes">0</span> ta</div>
+                    <div>Narxi: <span id="result-likes-price">0</span> 🪙</div>
+                    <div>Yetkazish: <span>1 soat</span></div>
+                </div>
+                <button class="btn-primary" onclick="confirmOrder('likes')">✅ Buyurtma berish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Jo'natishlar Xizmati -->
+    <div id="shipments-service" class="screen">
+        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
+        <div class="header">
+            <h2>🚀 Jo'natishlar</h2>
+        </div>
+
+        <div class="service-content">
+            <div class="package-grid">
+                <div class="package" onclick="selectPackage('shipments', 100, 3)">
+                    <div class="package-amount">100</div>
+                    <div class="package-price">3 🪙</div>
+                </div>
+                <div class="package" onclick="selectPackage('shipments', 500, 12)">
+                    <div class="package-amount">500</div>
+                    <div class="package-price">12 🪙</div>
+                </div>
+                <div class="package" onclick="selectPackage('shipments', 1000, 20)">
+                    <div class="package-amount">1,000</div>
+                    <div class="package-price">20 🪙</div>
+                </div>
+            </div>
+
+            <div class="custom-input">
+                <input type="number" id="custom-shipments" placeholder="Boshqa miqdor (min: 100)">
+                <button onclick="calculateCustomShipments()">Hisoblash</button>
+            </div>
+
+            <div id="shipments-result" class="result" style="display: none;">
+                <div class="result-info">
+                    <div>Jo'natishlar: <span id="result-shipments">0</span> ta</div>
+                    <div>Narxi: <span id="result-shipments-price">0</span> 🪙</div>
+                    <div>Yetkazish: <span>2 soat</span></div>
+                </div>
+                <button class="btn-primary" onclick="confirmOrder('shipments')">✅ Buyurtma berish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Do'kon -->
+    <div id="shop" class="screen">
+        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
+        <div class="header">
+            <h2>🛒 Do'kon</h2>
+        </div>
+
+        <div class="shop-grid">
+            <div class="shop-item">
+                <div class="shop-info">
+                    <div class="shop-icon">💎</div>
+                    <div class="shop-details">
+                        <h3>50 Olmos</h3>
+                        <p>Instagram ko'rishlar uchun</p>
+                    </div>
+                </div>
+                <div class="shop-price">5,000 so'm</div>
+            </div>
+            
+            <div class="shop-item">
+                <div class="shop-info">
+                    <div class="shop-icon">💎</div>
+                    <div class="shop-details">
+                        <h3>100 Olmos</h3>
+                        <p>Instagram ko'rishlar uchun</p>
+                    </div>
+                </div>
+                <div class="shop-price">9,000 so'm</div>
+            </div>
+            
+            <div class="shop-item">
+                <div class="shop-info">
+                    <div class="shop-icon">💎</div>
+                    <div class="shop-details">
+                        <h3>300 Olmos</h3>
+                        <p>Instagram ko'rishlar uchun</p>
+                    </div>
+                </div>
+                <div class="shop-price">25,000 so'm</div>
+            </div>
+            
+            <div class="shop-item">
+                <div class="shop-info">
+                    <div class="shop-icon">🪙</div>
+                    <div class="shop-details">
+                        <h3>50 Tanga</h3>
+                        <p>Like va obunachilar uchun</p>
+                    </div>
+                </div>
+                <div class="shop-price">6,000 so'm</div>
+            </div>
+            
+            <div class="shop-item">
+                <div class="shop-info">
+                    <div class="shop-icon">🪙</div>
+                    <div class="shop-details">
+                        <h3>100 Tanga</h3>
+                        <p>Like va obunachilar uchun</p>
+                    </div>
+                </div>
+                <div class="shop-price">11,000 so'm</div>
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="showScreen('payment')">💳 To'lov qilish</button>
+    </div>
+
+    <!-- Olmos Yeg'ish -->
+    <div id="earn-diamonds" class="screen">
+        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
+        <div class="header">
+            <h2>💎 Olmos yeg'ish</h2>
+        </div>
+
+        <div class="referral-card">
+            <h3>👫 Do'stlarni taklif qiling</h3>
+            <p>Har bir do'stingiz uchun +15 💎 olmos oling!</p>
+            
+            <div class="referral-link" id="referral-link">
+                https://t.me/RekchiAi_bot?start=123456
+            </div>
+            
+            <button class="btn-primary" onclick="copyReferralLink()">📋 Nusxalash</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="total-refs">0</div>
+                <div class="stat-label">Jami taklif</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="confirmed-refs">0</div>
+                <div class="stat-label">Tasdiqlangan</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Promokod -->
+    <div id="promocode" class="screen">
+        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
+        <div class="header">
+            <h2>🎁 Promokod</h2>
+        </div>
+
+        <div class="service-content">
+            <div class="custom-input">
+                <input type="text" id="promo-code" placeholder="Promokodni kiriting" style="text-transform: uppercase;">
+                <button onclick="activatePromo()">Faollashtirish</button>
+            </div>
+            
+            <div id="promo-result" class="result" style="display: none;">
+                <div class="result-info" id="promo-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profil -->
+    <div id="profile" class="screen">
+        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
+        <div class="header">
+            <h2>👤 Profil</h2>
+        </div>
+
+        <div class="profile-card">
+            <div class="profile-avatar">👤</div>
+            <h3 id="profile-username">Foydalanuvchi</h3>
+            <p id="profile-id">ID: 123456789</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="profile-diamonds">0</div>
+                <div class="stat-label">Olmos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="profile-coins">0</div>
+                <div class="stat-label">Tanga</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="profile-orders">0</div>
+                <div class="stat-label">Buyurtma</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="profile-refs">0</div>
+                <div class="stat-label">Referal</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Telegram Web App initialization
+        let tg = window.Telegram.WebApp;
+        let currentOrder = null;
+
+        // Initialize the app
+        tg.expand();
+        tg.ready();
+
+        // Mock user data (aslida serverdan keladi)
+        const userData = {
+            diamonds: 150,
+            coins: 80,
+            username: "foydalanuvchi",
+            userId: 123456789,
+            totalOrders: 5,
+            totalRefs: 3,
+            confirmedRefs: 2
+        };
+
+        // App initialization
+        function initApp() {
+            // Hide loading screen after 2 seconds
+            setTimeout(() => {
+                document.getElementById('loading').classList.remove('active');
+                showScreen('main-menu');
+                updateBalances();
+                updateProfile();
+            }, 2000);
+        }
+
+        // Screen navigation
+        function showScreen(screenId) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show target screen
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Update balances
+        function updateBalances() {
+            document.getElementById('diamonds-balance').textContent = userData.diamonds;
+            document.getElementById('coins-balance').textContent = userData.coins;
+        }
+
+        // Update profile
+        function updateProfile() {
+            document.getElementById('profile-username').textContent = userData.username;
+            document.getElementById('profile-id').textContent = `ID: ${userData.userId}`;
+            document.getElementById('profile-diamonds').textContent = userData.diamonds;
+            document.getElementById('profile-coins').textContent = userData.coins;
+            document.getElementById('profile-orders').textContent = userData.totalOrders;
+            document.getElementById('profile-refs').textContent = userData.totalRefs;
+            document.getElementById('total-refs').textContent = userData.totalRefs;
+            document.getElementById('confirmed-refs').textContent = userData.confirmedRefs;
+        }
+
+        // Package selection
+        function selectPackage(type, amount, price) {
+            currentOrder = { type, amount, price };
+            
+            // Remove selected class from all packages
+            document.querySelectorAll('.package').forEach(pkg => {
+                pkg.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked package
+            event.currentTarget.classList.add('selected');
+            
+            // Show result section
+            const resultDiv = document.getElementById(`${type}-result`);
+            resultDiv.style.display = 'block';
+            
+            // Update result info
+            document.getElementById(`result-${type}`).textContent = amount.toLocaleString();
+            document.getElementById(`result-price`).textContent = price;
+            
+            // Calculate delivery time
+            const deliveryTime = calculateDeliveryTime(amount);
+            document.getElementById('delivery-time').textContent = deliveryTime;
+        }
+
+        // Custom calculations
+        function calculateCustomViews() {
+            const amount = parseInt(document.getElementById('custom-views').value);
+            if (amount < 1000) {
+                alert('Minimal miqdor: 1000 ta');
+                return;
+            }
+            
+            const price = Math.ceil(amount * 0.01); // 1000 ta = 10 olmos
+            selectPackage('views', amount, price);
+        }
+
+        function calculateCustomLikes() {
+            const amount = parseInt(document.getElementById('custom-likes').value);
+            if (amount < 50) {
+                alert('Minimal miqdor: 50 ta');
+                return;
+            }
+            
+            const price = Math.ceil(amount / 10); // 10 like = 1 tanga
+            selectPackage('likes', amount, price);
+        }
+
+        function calculateCustomShipments() {
+            const amount = parseInt(document.getElementById('custom-shipments').value);
+            if (amount < 100) {
+                alert('Minimal miqdor: 100 ta');
+                return;
+            }
+            
+            const price = Math.ceil(amount * 3 / 100); // 100 ta = 3 tanga
+            selectPackage('shipments', amount, price);
+        }
+
+        // Delivery time calculation
+        function calculateDeliveryTime(amount) {
+            const viewsPerHour = 13000;
+            const hours = Math.ceil(amount / viewsPerHour);
+            
+            if (hours <= 1) {
+                return "45 daqiqa ichida";
+            } else {
+                return `${hours} soat ichida`;
+            }
+        }
+
+        // Order confirmation
+        function confirmOrder(type) {
+            if (!currentOrder) {
+                alert('Iltimos, avval miqdorni tanlang!');
+                return;
+            }
+            
+            const balance = type === 'views' ? userData.diamonds : userData.coins;
+            
+            if (balance < currentOrder.price) {
+                alert('Yetarli mablag\' mavjud emas!');
+                return;
+            }
+            
+            // Send order to bot (mock)
+            tg.showPopup({
+                title: 'Buyurtma tasdiqlash',
+                message: `Siz ${currentOrder.amount.toLocaleString()} ta ${getServiceName(type)} sotib olmoqchisiz?\nNarxi: ${currentOrder.price} ${type === 'views' ? '💎' : '🪙'}`,
+                buttons: [
+                    {id: 'confirm', type: 'ok', text: '✅ Tasdiqlash'},
+                    {id: 'cancel', type: 'cancel', text: '❌ Bekor qilish'}
+                ]
+            }, (buttonId) => {
+                if (buttonId === 'confirm') {
+                    // Mock successful order
+                    if (type === 'views') {
+                        userData.diamonds -= currentOrder.price;
+                    } else {
+                        userData.coins -= currentOrder.price;
+                    }
+                    userData.totalOrders++;
+                    
+                    updateBalances();
+                    updateProfile();
+                    
+                    alert('✅ Buyurtma muvaffaqiyatli qabul qilindi!');
+                    showScreen('main-menu');
+                }
+            });
+        }
+
+        function getServiceName(type) {
+            const names = {
+                'views': 'ko\'rish',
+                'likes': 'like',
+                'shipments': 'jo\'natish'
+            };
+            return names[type] || 'xizmat';
+        }
+
+        // Referral link copy
+        function copyReferralLink() {
+            const link = document.getElementById('referral-link').textContent;
+            navigator.clipboard.writeText(link).then(() => {
+                alert('Havola nusxalandi!');
+            });
+        }
+
+        // Promo code activation
+        function activatePromo() {
+            const code = document.getElementById('promo-code').value.toUpperCase();
+            if (!code) {
+                alert('Iltimos, promokodni kiriting!');
+                return;
+            }
+            
+            // Mock promo activation
+            const resultDiv = document.getElementById('promo-result');
+            const messageDiv = document.getElementById('promo-message');
+            
+            resultDiv.style.display = 'block';
+            
+            if (code === 'SALOM2024') {
+                userData.diamonds += 25;
+                messageDiv.innerHTML = '🎉 Tabriklaymiz!<br>+25 💎 olmos berildi!';
+                updateBalances();
+                updateProfile();
+            } else if (code === 'TANGA50') {
+                userData.coins += 50;
+                messageDiv.innerHTML = '🎉 Tabriklaymiz!<br>+50 🪙 tanga berildi!';
+                updateBalances();
+                updateProfile();
+            } else {
+                messageDiv.innerHTML = '❌ Noto\'g\'ri promokod!';
+            }
+        }
+
+        // Initialize app when page loads
+        window.onload = initApp;
+    </script>
+</body>
+</html>

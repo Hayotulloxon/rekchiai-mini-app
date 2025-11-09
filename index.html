@@ -5,16 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RekchiAI Bot</title>
     <style>
-        :root {
-            --primary: #8e44ad;
-            --secondary: #3498db;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
-        }
-        
         * {
             margin: 0;
             padding: 0;
@@ -26,1774 +16,1695 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            color: #333;
         }
         
         .container {
             max-width: 400px;
             margin: 0 auto;
             background: white;
-            border-radius: 15px;
-            overflow: hidden;
+            border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
         }
         
         .header {
-            background: var(--primary);
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             color: white;
             padding: 20px;
             text-align: center;
             position: relative;
         }
         
-        .header h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
+        .language-selector {
+            position: absolute;
+            top: 15px;
+            right: 15px;
         }
         
-        .header p {
-            opacity: 0.8;
-            font-size: 14px;
+        .language-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
         }
         
-        .user-info {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px;
-            background: var(--light);
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--secondary);
+        .profile {
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 20px;
+            margin-bottom: 15px;
         }
         
-        .user-details {
-            flex: 1;
-            margin-left: 15px;
-        }
-        
-        .user-details h3 {
-            margin-bottom: 5px;
-            color: var(--dark);
-        }
-        
-        .user-balance {
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: white;
             display: flex;
-            gap: 15px;
-            margin-top: 5px;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin-right: 15px;
+            color: #6a11cb;
+        }
+        
+        .user-info h1 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .balance {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
         }
         
         .balance-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 14px;
+            text-align: center;
         }
         
-        .diamond {
-            color: #3498db;
+        .balance-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
         
-        .coin {
-            color: #f39c12;
+        .balance-label {
+            font-size: 12px;
+            opacity: 0.8;
         }
         
         .menu {
-            padding: 15px;
+            padding: 20px;
         }
         
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
         }
         
         .menu-item {
-            background: var(--light);
-            border-radius: 10px;
-            padding: 15px 10px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-            font-size: 14px;
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
         }
         
         .menu-item:hover {
-            transform: translateY(-3px);
+            transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background: #e9ecef;
         }
         
-        .menu-item.primary {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .menu-item.secondary {
-            background: var(--secondary);
-            color: white;
-        }
-        
-        .menu-item.success {
-            background: var(--success);
-            color: white;
-        }
-        
-        .menu-item.warning {
-            background: var(--warning);
-            color: white;
-        }
-        
-        .menu-item.danger {
-            background: var(--danger);
-            color: white;
-        }
-        
-        .menu-item i {
-            font-size: 20px;
-            margin-bottom: 5px;
-            display: block;
-        }
-        
-        .content {
-            padding: 15px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .card h3 {
+        .menu-icon {
+            font-size: 30px;
             margin-bottom: 10px;
-            color: var(--dark);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
         }
         
-        .form-group {
-            margin-bottom: 15px;
+        .menu-text {
+            font-weight: 600;
+            font-size: 14px;
         }
         
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: var(--dark);
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s;
-            text-align: center;
-            width: 100%;
-        }
-        
-        .btn:hover {
-            background: #7d3c98;
-        }
-        
-        .btn-secondary {
-            background: var(--secondary);
-        }
-        
-        .btn-secondary:hover {
-            background: #2980b9;
-        }
-        
-        .btn-success {
-            background: var(--success);
-        }
-        
-        .btn-success:hover {
-            background: #219653;
-        }
-        
-        .btn-danger {
-            background: var(--danger);
-        }
-        
-        .btn-danger:hover {
-            background: #c0392b;
-        }
-        
-        .btn-warning {
-            background: var(--warning);
-        }
-        
-        .btn-warning:hover {
-            background: #e67e22;
-        }
-        
-        .btn-group {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .btn-group .btn {
-            flex: 1;
-        }
-        
-        .hidden {
+        .section {
+            padding: 20px;
             display: none;
         }
         
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            background: var(--success);
-            color: white;
-            border-radius: 5px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            transform: translateX(150%);
-            transition: transform 0.3s;
+        .section.active {
+            display: block;
         }
         
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification.error {
-            background: var(--danger);
-        }
-        
-        .notification.warning {
-            background: var(--warning);
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #6a11cb;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
         }
         
         .back-btn {
             background: none;
             border: none;
-            color: white;
-            font-size: 18px;
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
+            color: #6a11cb;
+            font-size: 16px;
             cursor: pointer;
-        }
-        
-        .tab-container {
-            margin-top: 15px;
-        }
-        
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid #ddd;
             margin-bottom: 15px;
-        }
-        
-        .tab {
-            padding: 10px 15px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-        }
-        
-        .tab.active {
-            border-bottom: 2px solid var(--primary);
-            color: var(--primary);
-            font-weight: bold;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .service-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
         }
         
-        .service-info {
-            flex: 1;
+        .back-btn i {
+            margin-right: 5px;
         }
         
-        .service-name {
-            font-weight: 500;
+        .service-option {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        
+        .service-option:hover {
+            background: #e9ecef;
+        }
+        
+        .service-title {
+            font-weight: 600;
             margin-bottom: 5px;
         }
         
         .service-desc {
-            font-size: 14px;
-            color: #666;
+            font-size: 12px;
+            color: #6c757d;
         }
         
-        .service-price {
-            font-weight: bold;
-            color: var(--primary);
+        .input-group {
+            margin-bottom: 15px;
         }
         
-        .order-item {
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
+        .input-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
         }
         
-        .order-header {
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .price-list {
+            margin-top: 20px;
+        }
+        
+        .price-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
         }
         
-        .order-type {
-            font-weight: 500;
+        .price-name {
+            font-weight: 600;
         }
         
-        .order-status {
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-        }
-        
-        .status-completed {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
-        .status-failed {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .order-details {
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        
-        .stat-card {
-            background: var(--light);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            color: #666;
+        .price-value {
+            color: #6a11cb;
         }
         
         .admin-panel {
             background: #f8f9fa;
             border-radius: 10px;
             padding: 15px;
-            margin-top: 15px;
+            margin-top: 20px;
         }
         
-        .admin-menu {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+        .admin-title {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #6a11cb;
         }
         
-        .admin-item {
+        .admin-option {
             background: white;
             border-radius: 8px;
-            padding: 15px 10px;
-            text-align: center;
+            padding: 10px;
+            margin-bottom: 10px;
             cursor: pointer;
-            transition: all 0.3s;
-            border: 1px solid #eee;
+            border: 1px solid #e9ecef;
         }
         
-        .admin-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
         }
         
         .loading {
+            display: none;
             text-align: center;
             padding: 20px;
         }
         
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: var(--primary);
+            border-left-color: #6a11cb;
             border-radius: 50%;
             width: 30px;
             height: 30px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            margin: 0 auto 10px;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        /* RTL support for Arabic */
+        .rtl {
+            direction: rtl;
+            text-align: right;
+        }
+        
+        .rtl .back-btn i {
+            margin-right: 0;
+            margin-left: 5px;
+        }
+        
+        .rtl .language-btn {
+            right: auto;
+            left: 15px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <button class="back-btn hidden" id="backBtn">←</button>
-            <h1 id="pageTitle">RekchiAI Bot</h1>
-            <p id="pageSubtitle">Instagram video reklama platformasi</p>
-        </div>
-        
-        <div class="user-info">
-            <div class="user-avatar" id="userAvatar">U</div>
-            <div class="user-details">
-                <h3 id="userName">Foydalanuvchi</h3>
-                <div class="user-balance">
-                    <div class="balance-item">
-                        <span class="diamond">💎</span>
-                        <span id="diamondBalance">0</span>
-                    </div>
-                    <div class="balance-item">
-                        <span class="coin">🪙</span>
-                        <span id="coinBalance">0</span>
-                    </div>
+            <div class="language-selector">
+                <button class="language-btn" id="lang-btn">UZ</button>
+            </div>
+            <div class="profile">
+                <div class="avatar">👤</div>
+                <div class="user-info">
+                    <h1 id="username">Foydalanuvchi</h1>
+                    <p id="user-id">ID: 123456789</p>
+                </div>
+            </div>
+            <div class="balance">
+                <div class="balance-item">
+                    <div class="balance-value" id="diamonds">0</div>
+                    <div class="balance-label" id="diamonds-label">Olmos</div>
+                </div>
+                <div class="balance-item">
+                    <div class="balance-value" id="coins">0</div>
+                    <div class="balance-label" id="coins-label">Tanga</div>
+                </div>
+                <div class="balance-item">
+                    <div class="balance-value" id="refs">0</div>
+                    <div class="balance-label" id="refs-label">Referal</div>
                 </div>
             </div>
         </div>
         
         <div class="menu">
-            <div class="menu-grid" id="mainMenu">
-                <button class="menu-item primary" data-page="views">
-                    <i>👁</i>
-                    Ko'rishlar
-                </button>
-                <button class="menu-item secondary" data-page="services">
-                    <i>👑</i>
-                    Xizmatlar
-                </button>
-                <button class="menu-item success" data-page="shop">
-                    <i>🛒</i>
-                    Do'kon
-                </button>
-                <button class="menu-item warning" data-page="balance">
-                    <i>💰</i>
-                    Balans
-                </button>
-                <button class="menu-item" data-page="earn">
-                    <i>💎</i>
-                    Olmos Yeg'ish
-                </button>
-                <button class="menu-item" data-page="promo">
-                    <i>🎁</i>
-                    Promokod
-                </button>
-                <button class="menu-item" data-page="tutorial">
-                    <i>🎬</i>
-                    Video Qo'llanma
-                </button>
-                <button class="menu-item danger" data-page="admin" id="adminBtn" style="display: none;">
-                    <i>⚙️</i>
-                    Admin Panel
-                </button>
-                <button class="menu-item" data-page="stats" id="statsBtn" style="display: none;">
-                    <i>📊</i>
-                    Statistika
-                </button>
+            <div class="menu-grid">
+                <div class="menu-item" data-section="views">
+                    <div class="menu-icon">👁️</div>
+                    <div class="menu-text" id="menu-views">Ko'rishlar</div>
+                </div>
+                <div class="menu-item" data-section="likes">
+                    <div class="menu-icon">❤️</div>
+                    <div class="menu-text" id="menu-likes">Likelar</div>
+                </div>
+                <div class="menu-item" data-section="shipments">
+                    <div class="menu-icon">🚀</div>
+                    <div class="menu-text" id="menu-shipments">Jo'natishlar</div>
+                </div>
+                <div class="menu-item" data-section="earn">
+                    <div class="menu-icon">💎</div>
+                    <div class="menu-text" id="menu-earn">Olmos yeg'ish</div>
+                </div>
+                <div class="menu-item" data-section="shop">
+                    <div class="menu-icon">🛒</div>
+                    <div class="menu-text" id="menu-shop">Do'kon</div>
+                </div>
+                <div class="menu-item" data-section="promo">
+                    <div class="menu-icon">🎁</div>
+                    <div class="menu-text" id="menu-promo">Promokod</div>
+                </div>
+                <div class="menu-item" data-section="tutorial">
+                    <div class="menu-icon">🎬</div>
+                    <div class="menu-text" id="menu-tutorial">Video qo'llanma</div>
+                </div>
+                <div class="menu-item" data-section="channels">
+                    <div class="menu-icon">📢</div>
+                    <div class="menu-text" id="menu-channels">Bonus kanallar</div>
+                </div>
             </div>
         </div>
         
-        <div class="content">
-            <!-- Asosiy menyu -->
-            <div id="mainContent" class="tab-content active">
-                <div class="card">
-                    <h3>Xush kelibsiz!</h3>
-                    <p>RekchiAI bot orqali Instagram videolaringizga ko'rishlar, likelar va jo'natishlar sotib oling.</p>
+        <!-- Views Section -->
+        <div class="section" id="views-section">
+            <button class="back-btn" id="back-from-views">← <span id="back-views">Orqaga</span></button>
+            <h2 class="section-title" id="views-title">Ko'rishlar xizmati</h2>
+            
+            <div class="service-option" data-views="1000">
+                <div class="service-title">👁 1,000 <span id="views-1k-label">ko'rish</span></div>
+                <div class="service-desc" id="views-1k-price">Narxi: 10 olmos</div>
+            </div>
+            
+            <div class="service-option" data-views="5000">
+                <div class="service-title">👁 5,000 <span id="views-5k-label">ko'rish</span></div>
+                <div class="service-desc" id="views-5k-price">Narxi: 45 olmos</div>
+            </div>
+            
+            <div class="service-option" data-views="10000">
+                <div class="service-title">👁 10,000 <span id="views-10k-label">ko'rish</span></div>
+                <div class="service-desc" id="views-10k-price">Narxi: 90 olmos</div>
+            </div>
+            
+            <div class="service-option" data-views="custom">
+                <div class="service-title" id="views-custom-title">Boshqa miqdor</div>
+                <div class="service-desc" id="views-custom-desc">Minimal: 1,000 ko'rish</div>
+            </div>
+            
+            <div class="input-group" id="custom-views-input" style="display: none;">
+                <label class="input-label" for="views-count" id="views-count-label">Ko'rishlar soni:</label>
+                <input type="number" class="input-field" id="views-count" min="1000" placeholder="1000">
+                <div class="service-desc" id="calculated-price"></div>
+                <button class="btn" id="confirm-views" style="margin-top: 10px;"><span id="confirm-views-text">Tasdiqlash</span></button>
+            </div>
+        </div>
+        
+        <!-- Likes Section -->
+        <div class="section" id="likes-section">
+            <button class="back-btn" id="back-from-likes">← <span id="back-likes">Orqaga</span></button>
+            <h2 class="section-title" id="likes-title">Like xizmati</h2>
+            
+            <div class="input-group">
+                <label class="input-label" for="likes-count" id="likes-count-label">Like soni:</label>
+                <input type="number" class="input-field" id="likes-count" min="50" placeholder="50">
+                <div class="service-desc" id="likes-calculated-price"></div>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label" for="likes-link" id="likes-link-label">Video havolasi:</label>
+                <input type="text" class="input-field" id="likes-link" placeholder="https://instagram.com/p/...">
+            </div>
+            
+            <button class="btn" id="confirm-likes"><span id="confirm-likes-text">Tasdiqlash</span></button>
+        </div>
+        
+        <!-- Shipments Section -->
+        <div class="section" id="shipments-section">
+            <button class="back-btn" id="back-from-shipments">← <span id="back-shipments">Orqaga</span></button>
+            <h2 class="section-title" id="shipments-title">Jo'natishlar xizmati</h2>
+            
+            <div class="input-group">
+                <label class="input-label" for="shipments-count" id="shipments-count-label">Jo'natishlar soni:</label>
+                <input type="number" class="input-field" id="shipments-count" min="100" placeholder="100">
+                <div class="service-desc" id="shipments-calculated-price"></div>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label" for="shipments-link" id="shipments-link-label">Video havolasi:</label>
+                <input type="text" class="input-field" id="shipments-link" placeholder="https://instagram.com/p/...">
+            </div>
+            
+            <button class="btn" id="confirm-shipments"><span id="confirm-shipments-text">Tasdiqlash</span></button>
+        </div>
+        
+        <!-- Earn Diamonds Section -->
+        <div class="section" id="earn-section">
+            <button class="back-btn" id="back-from-earn">← <span id="back-earn">Orqaga</span></button>
+            <h2 class="section-title" id="earn-title">Olmos yeg'ish</h2>
+            
+            <div class="service-option" id="invite-friends">
+                <div class="service-title" id="invite-title">👫 Do'stlarni taklif qilish</div>
+                <div class="service-desc" id="invite-desc">Har bir do'stingiz uchun +15 olmos</div>
+            </div>
+            
+            <div class="service-option" id="watch-tutorial">
+                <div class="service-title" id="tutorial-title">🎬 Video qo'llanmani ko'rish</div>
+                <div class="service-desc" id="tutorial-desc">+12 olmos bonus</div>
+            </div>
+            
+            <div class="service-option" id="bonus-channels">
+                <div class="service-title" id="channels-title">📢 Kanalga obuna bo'lish</div>
+                <div class="service-desc" id="channels-desc">Har bir kanal uchun +5-15 olmos</div>
+            </div>
+            
+            <div class="input-group" style="margin-top: 20px;">
+                <label class="input-label" id="ref-link-label">Sizning referal havolangiz:</label>
+                <div style="background: #f8f9fa; padding: 10px; border-radius: 10px; font-size: 12px; word-break: break-all;" id="ref-link">https://t.me/RekchiAi_bot?start=123456789</div>
+                <button class="btn-secondary" style="margin-top: 10px;" id="copy-ref"><span id="copy-ref-text">Nusxalash</span></button>
+            </div>
+        </div>
+        
+        <!-- Shop Section -->
+        <div class="section" id="shop-section">
+            <button class="back-btn" id="back-from-shop">← <span id="back-shop">Orqaga</span></button>
+            <h2 class="section-title" id="shop-title">Do'kon</h2>
+            
+            <div class="service-option" id="buy-diamonds">
+                <div class="service-title" id="buy-diamonds-title">💎 Olmos sotib olish</div>
+                <div class="service-desc" id="buy-diamonds-desc">Narxlarni ko'rish</div>
+            </div>
+            
+            <div class="service-option" id="buy-coins">
+                <div class="service-title" id="buy-coins-title">🪙 Tanga sotib olish</div>
+                <div class="service-desc" id="buy-coins-desc">Narxlarni ko'rish</div>
+            </div>
+            
+            <div class="price-list" id="diamonds-prices" style="display: none;">
+                <h3 style="margin-bottom: 10px;" id="diamonds-prices-title">Olmos narxlari:</h3>
+                <div class="price-item">
+                    <span class="price-name">50 olmos</span>
+                    <span class="price-value" id="price-50-diamonds">5,000 so'm</span>
+                </div>
+                <div class="price-item">
+                    <span class="price-name">100 olmos</span>
+                    <span class="price-value" id="price-100-diamonds">9,000 so'm</span>
+                </div>
+                <div class="price-item">
+                    <span class="price-name">300 olmos</span>
+                    <span class="price-value" id="price-300-diamonds">25,000 so'm</span>
                 </div>
                 
-                <div class="card">
-                    <h3>Tezkor xizmatlar</h3>
-                    <div class="btn-group">
-                        <button class="btn btn-secondary" data-views="1000">👁 1k</button>
-                        <button class="btn btn-secondary" data-views="5000">👁 5k</button>
-                        <button class="btn btn-secondary" data-views="10000">👁 10k</button>
-                    </div>
+                <div class="input-group" style="margin-top: 15px;">
+                    <label class="input-label" id="custom-diamonds-label">Boshqa miqdor:</label>
+                    <input type="number" class="input-field" id="custom-diamonds" min="10" placeholder="10">
+                    <div class="service-desc" id="custom-diamonds-price"></div>
+                    <button class="btn" id="buy-custom-diamonds" style="margin-top: 10px;"><span id="buy-diamonds-text">Sotib olish</span></button>
                 </div>
             </div>
             
-            <!-- Ko'rishlar sahifasi -->
-            <div id="viewsContent" class="tab-content hidden">
-                <div class="card">
-                    <h3>Ko'rishlar xizmati</h3>
-                    <div class="form-group">
-                        <label for="viewsCount">Ko'rishlar soni:</label>
-                        <input type="number" id="viewsCount" class="form-control" placeholder="Masalan: 15000" min="1000">
-                    </div>
-                    <div class="form-group">
-                        <label for="videoLink">Video havolasi:</label>
-                        <input type="url" id="videoLink" class="form-control" placeholder="https://instagram.com/p/...">
-                    </div>
-                    <button class="btn btn-primary" id="calculateViews">Hisoblash</button>
-                    
-                    <div id="viewsResult" class="hidden" style="margin-top: 15px;">
-                        <div class="card">
-                            <h4>Xizmat tafsilotlari</h4>
-                            <p>Ko'rishlar: <span id="resultViews">0</span> ta</p>
-                            <p>Narxi: <span id="resultDiamonds">0</span> 💎</p>
-                            <p>Yetkazib berish: <span id="resultDelivery">45 daqiqa</span></p>
-                            <button class="btn btn-success" id="confirmViews">✅ Tasdiqlash</button>
-                        </div>
-                    </div>
+            <div class="price-list" id="coins-prices" style="display: none;">
+                <h3 style="margin-bottom: 10px;" id="coins-prices-title">Tanga narxlari:</h3>
+                <div class="price-item">
+                    <span class="price-name">50 tanga</span>
+                    <span class="price-value" id="price-50-coins">6,000 so'm</span>
                 </div>
-            </div>
-            
-            <!-- Xizmatlar sahifasi -->
-            <div id="servicesContent" class="tab-content hidden">
-                <div class="card">
-                    <h3>Xizmatlar</h3>
-                    
-                    <div class="tab-container">
-                        <div class="tabs">
-                            <div class="tab active" data-tab="likes">❤️ Like</div>
-                            <div class="tab" data-tab="shipments">🚀 Jo'natishlar</div>
-                        </div>
-                        
-                        <div id="likesTab" class="tab-content active">
-                            <div class="form-group">
-                                <label for="likesCount">Like soni:</label>
-                                <input type="number" id="likesCount" class="form-control" placeholder="Masalan: 100" min="50">
-                            </div>
-                            <div class="form-group">
-                                <label for="likesLink">Video havolasi:</label>
-                                <input type="url" id="likesLink" class="form-control" placeholder="https://instagram.com/p/...">
-                            </div>
-                            <button class="btn btn-primary" id="calculateLikes">Hisoblash</button>
-                            
-                            <div id="likesResult" class="hidden" style="margin-top: 15px;">
-                                <div class="card">
-                                    <h4>Like xizmati</h4>
-                                    <p>Likelar: <span id="resultLikes">0</span> ta</p>
-                                    <p>Narxi: <span id="resultLikesCoins">0</span> 🪙</p>
-                                    <p>Yetkazib berish: <span id="resultLikesDelivery">45 daqiqa</span></p>
-                                    <button class="btn btn-success" id="confirmLikes">✅ Tasdiqlash</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="shipmentsTab" class="tab-content">
-                            <div class="form-group">
-                                <label for="shipmentsCount">Jo'natishlar soni:</label>
-                                <input type="number" id="shipmentsCount" class="form-control" placeholder="Masalan: 1000" min="100">
-                            </div>
-                            <div class="form-group">
-                                <label for="shipmentsLink">Video havolasi:</label>
-                                <input type="url" id="shipmentsLink" class="form-control" placeholder="https://instagram.com/p/...">
-                            </div>
-                            <button class="btn btn-primary" id="calculateShipments">Hisoblash</button>
-                            
-                            <div id="shipmentsResult" class="hidden" style="margin-top: 15px;">
-                                <div class="card">
-                                    <h4>Jo'natishlar xizmati</h4>
-                                    <p>Jo'natishlar: <span id="resultShipments">0</span> ta</p>
-                                    <p>Narxi: <span id="resultShipmentsCoins">0</span> 🪙</p>
-                                    <p>Yetkazib berish: <span id="resultShipmentsDelivery">45 daqiqa</span></p>
-                                    <button class="btn btn-success" id="confirmShipments">✅ Tasdiqlash</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="price-item">
+                    <span class="price-name">100 tanga</span>
+                    <span class="price-value" id="price-100-coins">11,000 so'm</span>
                 </div>
-            </div>
-            
-            <!-- Do'kon sahifasi -->
-            <div id="shopContent" class="tab-content hidden">
-                <div class="card">
-                    <h3>Do'kon</h3>
-                    
-                    <div class="tab-container">
-                        <div class="tabs">
-                            <div class="tab active" data-tab="diamondsShop">💎 Olmos</div>
-                            <div class="tab" data-tab="coinsShop">🪙 Tanga</div>
-                        </div>
-                        
-                        <div id="diamondsShopTab" class="tab-content active">
-                            <div class="service-item">
-                                <div class="service-info">
-                                    <div class="service-name">50 Olmos</div>
-                                    <div class="service-desc">5,000 so'm</div>
-                                </div>
-                                <button class="btn btn-primary" data-diamonds="50" data-price="5000">Sotib olish</button>
-                            </div>
-                            
-                            <div class="service-item">
-                                <div class="service-info">
-                                    <div class="service-name">100 Olmos</div>
-                                    <div class="service-desc">9,000 so'm</div>
-                                </div>
-                                <button class="btn btn-primary" data-diamonds="100" data-price="9000">Sotib olish</button>
-                            </div>
-                            
-                            <div class="service-item">
-                                <div class="service-info">
-                                    <div class="service-name">300 Olmos</div>
-                                    <div class="service-desc">25,000 so'm</div>
-                                </div>
-                                <button class="btn btn-primary" data-diamonds="300" data-price="25000">Sotib olish</button>
-                            </div>
-                            
-                            <div class="form-group" style="margin-top: 15px;">
-                                <label for="customDiamonds">Boshqa miqdor:</label>
-                                <input type="number" id="customDiamonds" class="form-control" placeholder="Olmos miqdori">
-                                <button class="btn btn-secondary" id="buyCustomDiamonds" style="margin-top: 10px;">Hisoblash</button>
-                            </div>
-                        </div>
-                        
-                        <div id="coinsShopTab" class="tab-content">
-                            <div class="service-item">
-                                <div class="service-info">
-                                    <div class="service-name">50 Tanga</div>
-                                    <div class="service-desc">6,000 so'm</div>
-                                </div>
-                                <button class="btn btn-primary" data-coins="50" data-price="6000">Sotib olish</button>
-                            </div>
-                            
-                            <div class="service-item">
-                                <div class="service-info">
-                                    <div class="service-name">100 Tanga</div>
-                                    <div class="service-desc">11,000 so'm</div>
-                                </div>
-                                <button class="btn btn-primary" data-coins="100" data-price="11000">Sotib olish</button>
-                            </div>
-                            
-                            <div class="service-item">
-                                <div class="service-info">
-                                    <div class="service-name">500 Tanga</div>
-                                    <div class="service-desc">47,000 so'm</div>
-                                </div>
-                                <button class="btn btn-primary" data-coins="500" data-price="47000">Sotib olish</button>
-                            </div>
-                            
-                            <div class="service-item">
-                                <div class="service-info">
-                                    <div class="service-name">1000 Tanga</div>
-                                    <div class="service-desc">79,000 so'm</div>
-                                </div>
-                                <button class="btn btn-primary" data-coins="1000" data-price="79000">Sotib olish</button>
-                            </div>
-                            
-                            <div class="form-group" style="margin-top: 15px;">
-                                <label for="customCoins">Boshqa miqdor:</label>
-                                <input type="number" id="customCoins" class="form-control" placeholder="Tanga miqdori">
-                                <button class="btn btn-secondary" id="buyCustomCoins" style="margin-top: 10px;">Hisoblash</button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="price-item">
+                    <span class="price-name">500 tanga</span>
+                    <span class="price-value" id="price-500-coins">47,000 so'm</span>
+                </div>
+                <div class="price-item">
+                    <span class="price-name">1000 tanga</span>
+                    <span class="price-value" id="price-1000-coins">79,000 so'm</span>
                 </div>
                 
-                <div id="paymentContent" class="card hidden">
-                    <h3>To'lov</h3>
-                    <p>Miqdor: <span id="paymentAmount">0</span> <span id="paymentCurrency">olmos</span></p>
-                    <p>Narxi: <span id="paymentPrice">0</span> so'm</p>
-                    <p>Karta raqami: <strong>9860 6067 4039 1457</strong></p>
-                    
-                    <div class="form-group">
-                        <label for="receipt">To'lov cheki (foto yoki skrinshot):</label>
-                        <input type="file" id="receipt" class="form-control" accept="image/*">
-                    </div>
-                    
-                    <button class="btn btn-success" id="submitPayment">Yuborish</button>
-                </div>
-            </div>
-            
-            <!-- Balans sahifasi -->
-            <div id="balanceContent" class="tab-content hidden">
-                <div class="card">
-                    <h3>Balans</h3>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value diamond">💎 <span id="balanceDiamonds">0</span></div>
-                            <div class="stat-label">Olmoslar</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value coin">🪙 <span id="balanceCoins">0</span></div>
-                            <div class="stat-label">Tanga</div>
-                        </div>
-                    </div>
-                    
-                    <div class="btn-group" style="margin-top: 15px;">
-                        <button class="btn btn-primary" data-page="shop">🛒 Do'kon</button>
-                        <button class="btn btn-secondary" data-page="earn">💎 Olmos Yeg'ish</button>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <h3>So'nggi buyurtmalar</h3>
-                    <div id="recentOrders">
-                        <div class="loading">
-                            <div class="spinner"></div>
-                            <p>Yuklanmoqda...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Olmos yeg'ish sahifasi -->
-            <div id="earnContent" class="tab-content hidden">
-                <div class="card">
-                    <h3>Olmos yeg'ish</h3>
-                    
-                    <div class="service-item">
-                        <div class="service-info">
-                            <div class="service-name">👫 Do'stlarni taklif qilish</div>
-                            <div class="service-desc">Har bir do'stingiz uchun +15 💎 olmos</div>
-                        </div>
-                        <button class="btn btn-primary" id="inviteFriends">Ulashish</button>
-                    </div>
-                    
-                    <div class="service-item">
-                        <div class="service-info">
-                            <div class="service-name">🎬 Video qo'llanmani ko'rish</div>
-                            <div class="service-desc">Video ko'rib +5 💎 olmos oling</div>
-                        </div>
-                        <button class="btn btn-primary" id="watchTutorial">Ko'rish</button>
-                    </div>
-                    
-                    <div class="service-item">
-                        <div class="service-info">
-                            <div class="service-name">📢 Kanalga obuna bo'lish</div>
-                            <div class="service-desc">Kanalga obuna bo'lib +10 💎 olmos oling</div>
-                        </div>
-                        <button class="btn btn-primary" id="subscribeChannel">Obuna bo'lish</button>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <h3>Referal statistikasi</h3>
-                    <p>Jami taklif qilganlar: <span id="totalRefs">0</span> ta</p>
-                    <p>Tasdiqlangan referallar: <span id="confirmedRefs">0</span> ta</p>
-                    <p>Bonus olmoslar: <span id="bonusRefs">0</span> 💎</p>
-                    
-                    <div class="form-group" style="margin-top: 15px;">
-                        <label>Sizning referal havolangiz:</label>
-                        <input type="text" id="refLink" class="form-control" readonly>
-                        <button class="btn btn-secondary" id="copyRefLink" style="margin-top: 10px;">Nusxalash</button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Promokod sahifasi -->
-            <div id="promoContent" class="tab-content hidden">
-                <div class="card">
-                    <h3>Promokod</h3>
-                    <div class="form-group">
-                        <label for="promoCode">Promokodni kiriting:</label>
-                        <input type="text" id="promoCode" class="form-control" placeholder="Masalan: WELCOME100">
-                    </div>
-                    <button class="btn btn-primary" id="applyPromo">Qo'llash</button>
-                </div>
-                
-                <div class="card">
-                    <h3>Faol promokodlar</h3>
-                    <div id="activePromos">
-                        <div class="loading">
-                            <div class="spinner"></div>
-                            <p>Yuklanmoqda...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Video qo'llanma sahifasi -->
-            <div id="tutorialContent" class="tab-content hidden">
-                <div class="card">
-                    <h3>Video qo'llanmalar</h3>
-                    <div id="tutorialList">
-                        <div class="loading">
-                            <div class="spinner"></div>
-                            <p>Yuklanmoqda...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Admin panel sahifasi -->
-            <div id="adminContent" class="tab-content hidden">
-                <div class="card">
-                    <h3>Admin Panel</h3>
-                    
-                    <div class="admin-panel">
-                        <div class="admin-menu">
-                            <div class="admin-item" data-admin="users">
-                                <div>👥</div>
-                                <div>Foydalanuvchilar</div>
-                            </div>
-                            <div class="admin-item" data-admin="orders">
-                                <div>📦</div>
-                                <div>Buyurtmalar</div>
-                            </div>
-                            <div class="admin-item" data-admin="promocodes">
-                                <div>🎁</div>
-                                <div>Promokodlar</div>
-                            </div>
-                            <div class="admin-item" data-admin="broadcast">
-                                <div>📢</div>
-                                <div>Reklama</div>
-                            </div>
-                            <div class="admin-item" data-admin="channels">
-                                <div>🔔</div>
-                                <div>Kanallar</div>
-                            </div>
-                            <div class="admin-item" data-admin="balance">
-                                <div>💰</div>
-                                <div>Balans boshqarish</div>
-                            </div>
-                            <div class="admin-item" data-admin="stats">
-                                <div>📊</div>
-                                <div>Statistika</div>
-                            </div>
-                            <div class="admin-item" data-admin="settings">
-                                <div>⚙️</div>
-                                <div>Sozlamalar</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="adminSubContent">
-                    <!-- Admin sub-content will be loaded here -->
-                </div>
-            </div>
-            
-            <!-- Statistika sahifasi -->
-            <div id="statsContent" class="tab-content hidden">
-                <div class="card">
-                    <h3>Umumiy statistika</h3>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value"><span id="totalUsers">0</span></div>
-                            <div class="stat-label">Foydalanuvchilar</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value"><span id="totalOrders">0</span></div>
-                            <div class="stat-label">Buyurtmalar</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value diamond">💎 <span id="totalDiamonds">0</span></div>
-                            <div class="stat-label">Jami olmoslar</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value coin">🪙 <span id="totalCoins">0</span></div>
-                            <div class="stat-label">Jami tangalar</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <h3>Buyurtmalar statistikasi</h3>
-                    <div id="ordersStats">
-                        <div class="loading">
-                            <div class="spinner"></div>
-                            <p>Yuklanmoqda...</p>
-                        </div>
-                    </div>
+                <div class="input-group" style="margin-top: 15px;">
+                    <label class="input-label" id="custom-coins-label">Boshqa miqdor:</label>
+                    <input type="number" class="input-field" id="custom-coins" min="10" placeholder="10">
+                    <div class="service-desc" id="custom-coins-price"></div>
+                    <button class="btn" id="buy-custom-coins" style="margin-top: 10px;"><span id="buy-coins-text">Sotib olish</span></button>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div class="notification" id="notification">
-        Xabar
+        
+        <!-- Promo Code Section -->
+        <div class="section" id="promo-section">
+            <button class="back-btn" id="back-from-promo">← <span id="back-promo">Orqaga</span></button>
+            <h2 class="section-title" id="promo-title">Promokod</h2>
+            
+            <div class="input-group">
+                <label class="input-label" for="promo-code" id="promo-code-label">Promokodni kiriting:</label>
+                <input type="text" class="input-field" id="promo-code" placeholder="MASALAN: BONUS2024">
+            </div>
+            
+            <button class="btn" id="activate-promo"><span id="activate-promo-text">Faollashtirish</span></button>
+        </div>
+        
+        <!-- Tutorial Section -->
+        <div class="section" id="tutorial-section">
+            <button class="back-btn" id="back-from-tutorial">← <span id="back-tutorial">Orqaga</span></button>
+            <h2 class="section-title" id="tutorial-section-title">Video qo'llanma</h2>
+            
+            <div class="service-option">
+                <div class="service-title" id="tutorial-video-title">Botdan foydalanish bo'yicha video</div>
+                <div class="service-desc" id="tutorial-video-desc">Botning barcha funksiyalari haqida batafsil</div>
+                <button class="btn" style="margin-top: 10px;" id="watch-tutorial-btn"><span id="watch-tutorial-text">Ko'rish</span></button>
+            </div>
+        </div>
+        
+        <!-- Channels Section -->
+        <div class="section" id="channels-section">
+            <button class="back-btn" id="back-from-channels">← <span id="back-channels">Orqaga</span></button>
+            <h2 class="section-title" id="channels-section-title">Bonus kanallar</h2>
+            
+            <div id="channels-list">
+                <!-- Channels will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Admin Panel (only for admins) -->
+        <div class="admin-panel" id="admin-panel" style="display: none;">
+            <div class="admin-title" id="admin-title">Admin panel</div>
+            
+            <div class="admin-option" id="admin-stats">
+                <div class="service-title" id="admin-stats-title">📊 Statistika</div>
+            </div>
+            
+            <div class="admin-option" id="admin-users">
+                <div class="service-title" id="admin-users-title">👥 Foydalanuvchilar</div>
+            </div>
+            
+            <div class="admin-option" id="admin-orders">
+                <div class="service-title" id="admin-orders-title">📦 Buyurtmalar</div>
+            </div>
+            
+            <div class="admin-option" id="admin-promo">
+                <div class="service-title" id="admin-promo-title">🎁 Promokodlar</div>
+            </div>
+            
+            <div class="admin-option" id="admin-prices">
+                <div class="service-title" id="admin-prices-title">💰 Narxlarni sozlash</div>
+            </div>
+            
+            <div class="admin-option" id="admin-channels">
+                <div class="service-title" id="admin-channels-title">📢 Kanallarni boshqarish</div>
+            </div>
+            
+            <div class="admin-option" id="admin-tutorials">
+                <div class="service-title" id="admin-tutorials-title">🎬 Video qo'llanmalar</div>
+            </div>
+            
+            <div class="admin-option" id="admin-broadcast">
+                <div class="service-title" id="admin-broadcast-title">📢 Xabar yuborish</div>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div id="loading-text">Yuklanmoqda...</div>
+        </div>
+        
+        <div class="notification" id="notification"></div>
     </div>
 
     <script>
-        // Asosiy o'zgaruvchilar
-        let currentUser = {
-            id: null,
+        // Multi-language support
+        const translations = {
+            'uz': {
+                // Header
+                'diamonds-label': 'Olmos',
+                'coins-label': 'Tanga',
+                'refs-label': 'Referal',
+                
+                // Menu
+                'menu-views': 'Ko\'rishlar',
+                'menu-likes': 'Likelar',
+                'menu-shipments': 'Jo\'natishlar',
+                'menu-earn': 'Olmos yeg\'ish',
+                'menu-shop': 'Do\'kon',
+                'menu-promo': 'Promokod',
+                'menu-tutorial': 'Video qo\'llanma',
+                'menu-channels': 'Bonus kanallar',
+                
+                // Views section
+                'back-views': 'Orqaga',
+                'views-title': 'Ko\'rishlar xizmati',
+                'views-1k-label': 'ko\'rish',
+                'views-1k-price': 'Narxi: 10 olmos',
+                'views-5k-label': 'ko\'rish',
+                'views-5k-price': 'Narxi: 45 olmos',
+                'views-10k-label': 'ko\'rish',
+                'views-10k-price': 'Narxi: 90 olmos',
+                'views-custom-title': 'Boshqa miqdor',
+                'views-custom-desc': 'Minimal: 1,000 ko\'rish',
+                'views-count-label': 'Ko\'rishlar soni:',
+                'confirm-views-text': 'Tasdiqlash',
+                
+                // Likes section
+                'back-likes': 'Orqaga',
+                'likes-title': 'Like xizmati',
+                'likes-count-label': 'Like soni:',
+                'likes-link-label': 'Video havolasi:',
+                'confirm-likes-text': 'Tasdiqlash',
+                
+                // Shipments section
+                'back-shipments': 'Orqaga',
+                'shipments-title': 'Jo\'natishlar xizmati',
+                'shipments-count-label': 'Jo\'natishlar soni:',
+                'shipments-link-label': 'Video havolasi:',
+                'confirm-shipments-text': 'Tasdiqlash',
+                
+                // Earn section
+                'back-earn': 'Orqaga',
+                'earn-title': 'Olmos yeg\'ish',
+                'invite-title': '👫 Do\'stlarni taklif qilish',
+                'invite-desc': 'Har bir do\'stingiz uchun +15 olmos',
+                'tutorial-title': '🎬 Video qo\'llanmani ko\'rish',
+                'tutorial-desc': '+12 olmos bonus',
+                'channels-title': '📢 Kanalga obuna bo\'lish',
+                'channels-desc': 'Har bir kanal uchun +5-15 olmos',
+                'ref-link-label': 'Sizning referal havolangiz:',
+                'copy-ref-text': 'Nusxalash',
+                
+                // Shop section
+                'back-shop': 'Orqaga',
+                'shop-title': 'Do\'kon',
+                'buy-diamonds-title': '💎 Olmos sotib olish',
+                'buy-diamonds-desc': 'Narxlarni ko\'rish',
+                'buy-coins-title': '🪙 Tanga sotib olish',
+                'buy-coins-desc': 'Narxlarni ko\'rish',
+                'diamonds-prices-title': 'Olmos narxlari:',
+                'price-50-diamonds': '5,000 so\'m',
+                'price-100-diamonds': '9,000 so\'m',
+                'price-300-diamonds': '25,000 so\'m',
+                'custom-diamonds-label': 'Boshqa miqdor:',
+                'buy-diamonds-text': 'Sotib olish',
+                'coins-prices-title': 'Tanga narxlari:',
+                'price-50-coins': '6,000 so\'m',
+                'price-100-coins': '11,000 so\'m',
+                'price-500-coins': '47,000 so\'m',
+                'price-1000-coins': '79,000 so\'m',
+                'custom-coins-label': 'Boshqa miqdor:',
+                'buy-coins-text': 'Sotib olish',
+                
+                // Promo section
+                'back-promo': 'Orqaga',
+                'promo-title': 'Promokod',
+                'promo-code-label': 'Promokodni kiriting:',
+                'activate-promo-text': 'Faollashtirish',
+                
+                // Tutorial section
+                'back-tutorial': 'Orqaga',
+                'tutorial-section-title': 'Video qo\'llanma',
+                'tutorial-video-title': 'Botdan foydalanish bo\'yicha video',
+                'tutorial-video-desc': 'Botning barcha funksiyalari haqida batafsil',
+                'watch-tutorial-text': 'Ko\'rish',
+                
+                // Channels section
+                'back-channels': 'Orqaga',
+                'channels-section-title': 'Bonus kanallar',
+                
+                // Admin panel
+                'admin-title': 'Admin panel',
+                'admin-stats-title': '📊 Statistika',
+                'admin-users-title': '👥 Foydalanuvchilar',
+                'admin-orders-title': '📦 Buyurtmalar',
+                'admin-promo-title': '🎁 Promokodlar',
+                'admin-prices-title': '💰 Narxlarni sozlash',
+                'admin-channels-title': '📢 Kanallarni boshqarish',
+                'admin-tutorials-title': '🎬 Video qo\'llanmalar',
+                'admin-broadcast-title': '📢 Xabar yuborish',
+                
+                // Notifications
+                'loading-text': 'Yuklanmoqda...',
+                'success-copy': 'Nusxalandi!',
+                'success-order': 'Buyurtma qabul qilindi!',
+                'error-balance': 'Yetarli mablag\' yo\'q!',
+                'error-link': 'Havola noto\'g\'ri!',
+                'success-promo': 'Promokod faollashtirildi!',
+                'error-promo': 'Promokod noto\'g\'ri yoki muddati tugagan!'
+            },
+            'en': {
+                // Header
+                'diamonds-label': 'Diamonds',
+                'coins-label': 'Coins',
+                'refs-label': 'Referrals',
+                
+                // Menu
+                'menu-views': 'Views',
+                'menu-likes': 'Likes',
+                'menu-shipments': 'Shipments',
+                'menu-earn': 'Earn Diamonds',
+                'menu-shop': 'Shop',
+                'menu-promo': 'Promo Code',
+                'menu-tutorial': 'Video Tutorial',
+                'menu-channels': 'Bonus Channels',
+                
+                // Views section
+                'back-views': 'Back',
+                'views-title': 'Views Service',
+                'views-1k-label': 'views',
+                'views-1k-price': 'Price: 10 diamonds',
+                'views-5k-label': 'views',
+                'views-5k-price': 'Price: 45 diamonds',
+                'views-10k-label': 'views',
+                'views-10k-price': 'Price: 90 diamonds',
+                'views-custom-title': 'Custom Amount',
+                'views-custom-desc': 'Minimum: 1,000 views',
+                'views-count-label': 'Number of views:',
+                'confirm-views-text': 'Confirm',
+                
+                // Likes section
+                'back-likes': 'Back',
+                'likes-title': 'Likes Service',
+                'likes-count-label': 'Number of likes:',
+                'likes-link-label': 'Video URL:',
+                'confirm-likes-text': 'Confirm',
+                
+                // Shipments section
+                'back-shipments': 'Back',
+                'shipments-title': 'Shipments Service',
+                'shipments-count-label': 'Number of shipments:',
+                'shipments-link-label': 'Video URL:',
+                'confirm-shipments-text': 'Confirm',
+                
+                // Earn section
+                'back-earn': 'Back',
+                'earn-title': 'Earn Diamonds',
+                'invite-title': '👫 Invite Friends',
+                'invite-desc': '+15 diamonds for each friend',
+                'tutorial-title': '🎬 Watch Tutorial',
+                'tutorial-desc': '+12 diamonds bonus',
+                'channels-title': '📢 Subscribe to Channels',
+                'channels-desc': '+5-15 diamonds for each channel',
+                'ref-link-label': 'Your referral link:',
+                'copy-ref-text': 'Copy',
+                
+                // Shop section
+                'back-shop': 'Back',
+                'shop-title': 'Shop',
+                'buy-diamonds-title': '💎 Buy Diamonds',
+                'buy-diamonds-desc': 'View prices',
+                'buy-coins-title': '🪙 Buy Coins',
+                'buy-coins-desc': 'View prices',
+                'diamonds-prices-title': 'Diamond Prices:',
+                'price-50-diamonds': '5,000 UZS',
+                'price-100-diamonds': '9,000 UZS',
+                'price-300-diamonds': '25,000 UZS',
+                'custom-diamonds-label': 'Custom amount:',
+                'buy-diamonds-text': 'Buy',
+                'coins-prices-title': 'Coin Prices:',
+                'price-50-coins': '6,000 UZS',
+                'price-100-coins': '11,000 UZS',
+                'price-500-coins': '47,000 UZS',
+                'price-1000-coins': '79,000 UZS',
+                'custom-coins-label': 'Custom amount:',
+                'buy-coins-text': 'Buy',
+                
+                // Promo section
+                'back-promo': 'Back',
+                'promo-title': 'Promo Code',
+                'promo-code-label': 'Enter promo code:',
+                'activate-promo-text': 'Activate',
+                
+                // Tutorial section
+                'back-tutorial': 'Back',
+                'tutorial-section-title': 'Video Tutorial',
+                'tutorial-video-title': 'Bot usage tutorial',
+                'tutorial-video-desc': 'Detailed information about all bot functions',
+                'watch-tutorial-text': 'Watch',
+                
+                // Channels section
+                'back-channels': 'Back',
+                'channels-section-title': 'Bonus Channels',
+                
+                // Admin panel
+                'admin-title': 'Admin Panel',
+                'admin-stats-title': '📊 Statistics',
+                'admin-users-title': '👥 Users',
+                'admin-orders-title': '📦 Orders',
+                'admin-promo-title': '🎁 Promo Codes',
+                'admin-prices-title': '💰 Price Settings',
+                'admin-channels-title': '📢 Channel Management',
+                'admin-tutorials-title': '🎬 Video Tutorials',
+                'admin-broadcast-title': '📢 Send Message',
+                
+                // Notifications
+                'loading-text': 'Loading...',
+                'success-copy': 'Copied!',
+                'success-order': 'Order accepted!',
+                'error-balance': 'Insufficient funds!',
+                'error-link': 'Invalid URL!',
+                'success-promo': 'Promo code activated!',
+                'error-promo': 'Invalid or expired promo code!'
+            },
+            'ru': {
+                // Header
+                'diamonds-label': 'Алмазы',
+                'coins-label': 'Монеты',
+                'refs-label': 'Рефералы',
+                
+                // Menu
+                'menu-views': 'Просмотры',
+                'menu-likes': 'Лайки',
+                'menu-shipments': 'Отправки',
+                'menu-earn': 'Заработать алмазы',
+                'menu-shop': 'Магазин',
+                'menu-promo': 'Промокод',
+                'menu-tutorial': 'Видео обучение',
+                'menu-channels': 'Бонусные каналы',
+                
+                // Views section
+                'back-views': 'Назад',
+                'views-title': 'Сервис просмотров',
+                'views-1k-label': 'просмотров',
+                'views-1k-price': 'Цена: 10 алмазов',
+                'views-5k-label': 'просмотров',
+                'views-5k-price': 'Цена: 45 алмазов',
+                'views-10k-label': 'просмотров',
+                'views-10k-price': 'Цена: 90 алмазов',
+                'views-custom-title': 'Другое количество',
+                'views-custom-desc': 'Минимум: 1,000 просмотров',
+                'views-count-label': 'Количество просмотров:',
+                'confirm-views-text': 'Подтвердить',
+                
+                // Likes section
+                'back-likes': 'Назад',
+                'likes-title': 'Сервис лайков',
+                'likes-count-label': 'Количество лайков:',
+                'likes-link-label': 'Ссылка на видео:',
+                'confirm-likes-text': 'Подтвердить',
+                
+                // Shipments section
+                'back-shipments': 'Назад',
+                'shipments-title': 'Сервис отправок',
+                'shipments-count-label': 'Количество отправок:',
+                'shipments-link-label': 'Ссылка на видео:',
+                'confirm-shipments-text': 'Подтвердить',
+                
+                // Earn section
+                'back-earn': 'Назад',
+                'earn-title': 'Заработать алмазы',
+                'invite-title': '👫 Пригласить друзей',
+                'invite-desc': '+15 алмазов за каждого друга',
+                'tutorial-title': '🎬 Смотреть обучение',
+                'tutorial-desc': '+12 алмазов бонус',
+                'channels-title': '📢 Подписаться на каналы',
+                'channels-desc': '+5-15 алмазов за каждый канал',
+                'ref-link-label': 'Ваша реферальная ссылка:',
+                'copy-ref-text': 'Копировать',
+                
+                // Shop section
+                'back-shop': 'Назад',
+                'shop-title': 'Магазин',
+                'buy-diamonds-title': '💎 Купить алмазы',
+                'buy-diamonds-desc': 'Посмотреть цены',
+                'buy-coins-title': '🪙 Купить монеты',
+                'buy-coins-desc': 'Посмотреть цены',
+                'diamonds-prices-title': 'Цены на алмазы:',
+                'price-50-diamonds': '5,000 UZS',
+                'price-100-diamonds': '9,000 UZS',
+                'price-300-diamonds': '25,000 UZS',
+                'custom-diamonds-label': 'Другое количество:',
+                'buy-diamonds-text': 'Купить',
+                'coins-prices-title': 'Цены на монеты:',
+                'price-50-coins': '6,000 UZS',
+                'price-100-coins': '11,000 UZS',
+                'price-500-coins': '47,000 UZS',
+                'price-1000-coins': '79,000 UZS',
+                'custom-coins-label': 'Другое количество:',
+                'buy-coins-text': 'Купить',
+                
+                // Promo section
+                'back-promo': 'Назад',
+                'promo-title': 'Промокод',
+                'promo-code-label': 'Введите промокод:',
+                'activate-promo-text': 'Активировать',
+                
+                // Tutorial section
+                'back-tutorial': 'Назад',
+                'tutorial-section-title': 'Видео обучение',
+                'tutorial-video-title': 'Обучение использованию бота',
+                'tutorial-video-desc': 'Подробная информация о всех функциях бота',
+                'watch-tutorial-text': 'Смотреть',
+                
+                // Channels section
+                'back-channels': 'Назад',
+                'channels-section-title': 'Бонусные каналы',
+                
+                // Admin panel
+                'admin-title': 'Админ панель',
+                'admin-stats-title': '📊 Статистика',
+                'admin-users-title': '👥 Пользователи',
+                'admin-orders-title': '📦 Заказы',
+                'admin-promo-title': '🎁 Промокоды',
+                'admin-prices-title': '💰 Настройка цен',
+                'admin-channels-title': '📢 Управление каналами',
+                'admin-tutorials-title': '🎬 Видео обучение',
+                'admin-broadcast-title': '📢 Отправить сообщение',
+                
+                // Notifications
+                'loading-text': 'Загрузка...',
+                'success-copy': 'Скопировано!',
+                'success-order': 'Заказ принят!',
+                'error-balance': 'Недостаточно средств!',
+                'error-link': 'Неверная ссылка!',
+                'success-promo': 'Промокод активирован!',
+                'error-promo': 'Неверный или просроченный промокод!'
+            },
+            'ar': {
+                // Header
+                'diamonds-label': 'الماس',
+                'coins-label': 'العملات',
+                'refs-label': 'الإحالات',
+                
+                // Menu
+                'menu-views': 'المشاهدات',
+                'menu-likes': 'الإعجابات',
+                'menu-shipments': 'الشحنات',
+                'menu-earn': 'كسب الماس',
+                'menu-shop': 'المتجر',
+                'menu-promo': 'الرمز الترويجي',
+                'menu-tutorial': 'فيديو تعليمي',
+                'menu-channels': 'قنوات المكافآت',
+                
+                // Views section
+                'back-views': 'رجوع',
+                'views-title': 'خدمة المشاهدات',
+                'views-1k-label': 'مشاهدة',
+                'views-1k-price': 'السعر: 10 ماس',
+                'views-5k-label': 'مشاهدة',
+                'views-5k-price': 'السعر: 45 ماس',
+                'views-10k-label': 'مشاهدة',
+                'views-10k-price': 'السعر: 90 ماس',
+                'views-custom-title': 'كمية مخصصة',
+                'views-custom-desc': 'الحد الأدنى: 1,000 مشاهدة',
+                'views-count-label': 'عدد المشاهدات:',
+                'confirm-views-text': 'تأكيد',
+                
+                // Likes section
+                'back-likes': 'رجوع',
+                'likes-title': 'خدمة الإعجابات',
+                'likes-count-label': 'عدد الإعجابات:',
+                'likes-link-label': 'رابط الفيديو:',
+                'confirm-likes-text': 'تأكيد',
+                
+                // Shipments section
+                'back-shipments': 'رجوع',
+                'shipments-title': 'خدمة الشحنات',
+                'shipments-count-label': 'عدد الشحنات:',
+                'shipments-link-label': 'رابط الفيديو:',
+                'confirm-shipments-text': 'تأكيد',
+                
+                // Earn section
+                'back-earn': 'رجوع',
+                'earn-title': 'كسب الماس',
+                'invite-title': '👫 دعوة الأصدقاء',
+                'invite-desc': '+15 ماس لكل صديق',
+                'tutorial-title': '🎬 مشاهدة البرنامج التعليمي',
+                'tutorial-desc': '+12 ماس مكافأة',
+                'channels-title': '📢 الاشتراك في القنوات',
+                'channels-desc': '+5-15 ماس لكل قناة',
+                'ref-link-label': 'رابط الإحالة الخاص بك:',
+                'copy-ref-text': 'نسخ',
+                
+                // Shop section
+                'back-shop': 'رجوع',
+                'shop-title': 'المتجر',
+                'buy-diamonds-title': '💎 شراء الماس',
+                'buy-diamonds-desc': 'عرض الأسعار',
+                'buy-coins-title': '🪙 شراء العملات',
+                'buy-coins-desc': 'عرض الأسعار',
+                'diamonds-prices-title': 'أسعار الماس:',
+                'price-50-diamonds': '5,000 UZS',
+                'price-100-diamonds': '9,000 UZS',
+                'price-300-diamonds': '25,000 UZS',
+                'custom-diamonds-label': 'كمية مخصصة:',
+                'buy-diamonds-text': 'شراء',
+                'coins-prices-title': 'أسعار العملات:',
+                'price-50-coins': '6,000 UZS',
+                'price-100-coins': '11,000 UZS',
+                'price-500-coins': '47,000 UZS',
+                'price-1000-coins': '79,000 UZS',
+                'custom-coins-label': 'كمية مخصصة:',
+                'buy-coins-text': 'شراء',
+                
+                // Promo section
+                'back-promo': 'رجوع',
+                'promo-title': 'الرمز الترويجي',
+                'promo-code-label': 'أدخل الرمز الترويجي:',
+                'activate-promo-text': 'تفعيل',
+                
+                // Tutorial section
+                'back-tutorial': 'رجوع',
+                'tutorial-section-title': 'فيديو تعليمي',
+                'tutorial-video-title': 'برنامج تعليمي لاستخدام البوت',
+                'tutorial-video-desc': 'معلومات مفصلة عن جميع وظائف البوت',
+                'watch-tutorial-text': 'مشاهدة',
+                
+                // Channels section
+                'back-channels': 'رجوع',
+                'channels-section-title': 'قنوات المكافآت',
+                
+                // Admin panel
+                'admin-title': 'لوحة الإدارة',
+                'admin-stats-title': '📊 الإحصائيات',
+                'admin-users-title': '👥 المستخدمين',
+                'admin-orders-title': '📦 الطلبات',
+                'admin-promo-title': '🎁 الرموز الترويجية',
+                'admin-prices-title': '💰 إعدادات الأسعار',
+                'admin-channels-title': '📢 إدارة القنوات',
+                'admin-tutorials-title': '🎬 مقاطع فيديو تعليمية',
+                'admin-broadcast-title': '📢 إرسال رسالة',
+                
+                // Notifications
+                'loading-text': 'جار التحميل...',
+                'success-copy': 'تم النسخ!',
+                'success-order': 'تم قبول الطلب!',
+                'error-balance': 'رصيد غير كاف!',
+                'error-link': 'رابط غير صالح!',
+                'success-promo': 'تم تفعيل الرمز الترويجي!',
+                'error-promo': 'الرمز الترويجي غير صالح أو منتهي الصلاحية!'
+            },
+            'hi': {
+                // Header
+                'diamonds-label': 'हीरे',
+                'coins-label': 'सिक्के',
+                'refs-label': 'रेफरल',
+                
+                // Menu
+                'menu-views': 'दृश्य',
+                'menu-likes': 'लाइक',
+                'menu-shipments': 'शिपमेंट',
+                'menu-earn': 'हीरे कमाएं',
+                'menu-shop': 'दुकान',
+                'menu-promo': 'प्रोमो कोड',
+                'menu-tutorial': 'वीडियो ट्यूटोरियल',
+                'menu-channels': 'बोनस चैनल',
+                
+                // Views section
+                'back-views': 'वापस',
+                'views-title': 'दृश्य सेवा',
+                'views-1k-label': 'दृश्य',
+                'views-1k-price': 'मूल्य: 10 हीरे',
+                'views-5k-label': 'दृश्य',
+                'views-5k-price': 'मूल्य: 45 हीरे',
+                'views-10k-label': 'दृश्य',
+                'views-10k-price': 'मूल्य: 90 हीरे',
+                'views-custom-title': 'अन्य राशि',
+                'views-custom-desc': 'न्यूनतम: 1,000 दृश्य',
+                'views-count-label': 'दृश्यों की संख्या:',
+                'confirm-views-text': 'पुष्टि करें',
+                
+                // Likes section
+                'back-likes': 'वापस',
+                'likes-title': 'लाइक सेवा',
+                'likes-count-label': 'लाइक की संख्या:',
+                'likes-link-label': 'वीडियो यूआरएल:',
+                'confirm-likes-text': 'पुष्टि करें',
+                
+                // Shipments section
+                'back-shipments': 'वापस',
+                'shipments-title': 'शिपमेंट सेवा',
+                'shipments-count-label': 'शिपमेंट की संख्या:',
+                'shipments-link-label': 'वीडियो यूआरएल:',
+                'confirm-shipments-text': 'पुष्टि करें',
+                
+                // Earn section
+                'back-earn': 'वापस',
+                'earn-title': 'हीरे कमाएं',
+                'invite-title': '👫 दोस्तों को आमंत्रित करें',
+                'invite-desc': 'प्रत्येक दोस्त के लिए +15 हीरे',
+                'tutorial-title': '🎬 ट्यूटोरियल देखें',
+                'tutorial-desc': '+12 हीरे बोनस',
+                'channels-title': '📢 चैनलों की सदस्यता लें',
+                'channels-desc': 'प्रत्येक चैनल के लिए +5-15 हीरे',
+                'ref-link-label': 'आपका रेफरल लिंक:',
+                'copy-ref-text': 'कॉपी करें',
+                
+                // Shop section
+                'back-shop': 'वापस',
+                'shop-title': 'दुकान',
+                'buy-diamonds-title': '💎 हीरे खरीदें',
+                'buy-diamonds-desc': 'मूल्य देखें',
+                'buy-coins-title': '🪙 सिक्के खरीदें',
+                'buy-coins-desc': 'मूल्य देखें',
+                'diamonds-prices-title': 'हीरे की कीमतें:',
+                'price-50-diamonds': '5,000 UZS',
+                'price-100-diamonds': '9,000 UZS',
+                'price-300-diamonds': '25,000 UZS',
+                'custom-diamonds-label': 'अन्य राशि:',
+                'buy-diamonds-text': 'खरीदें',
+                'coins-prices-title': 'सिक्के की कीमतें:',
+                'price-50-coins': '6,000 UZS',
+                'price-100-coins': '11,000 UZS',
+                'price-500-coins': '47,000 UZS',
+                'price-1000-coins': '79,000 UZS',
+                'custom-coins-label': 'अन्य राशि:',
+                'buy-coins-text': 'खरीदें',
+                
+                // Promo section
+                'back-promo': 'वापस',
+                'promo-title': 'प्रोमो कोड',
+                'promo-code-label': 'प्रोमो कोड दर्ज करें:',
+                'activate-promo-text': 'सक्रिय करें',
+                
+                // Tutorial section
+                'back-tutorial': 'वापस',
+                'tutorial-section-title': 'वीडियो ट्यूटोरियल',
+                'tutorial-video-title': 'बॉट उपयोग ट्यूटोरियल',
+                'tutorial-video-desc': 'सभी बॉट कार्यों के बारे में विस्तृत जानकारी',
+                'watch-tutorial-text': 'देखें',
+                
+                // Channels section
+                'back-channels': 'वापस',
+                'channels-section-title': 'बोनस चैनल',
+                
+                // Admin panel
+                'admin-title': 'एडमिन पैनल',
+                'admin-stats-title': '📊 आंकड़े',
+                'admin-users-title': '👥 उपयोगकर्ता',
+                'admin-orders-title': '📦 आदेश',
+                'admin-promo-title': '🎁 प्रोमो कोड',
+                'admin-prices-title': '💰 मूल्य सेटिंग्स',
+                'admin-channels-title': '📢 चैनल प्रबंधन',
+                'admin-tutorials-title': '🎬 वीडियो ट्यूटोरियल',
+                'admin-broadcast-title': '📢 संदेश भेजें',
+                
+                // Notifications
+                'loading-text': 'लोड हो रहा है...',
+                'success-copy': 'कॉपी किया गया!',
+                'success-order': 'आदेश स्वीकार किया गया!',
+                'error-balance': 'पर्याप्त धन नहीं!',
+                'error-link': 'अमान्य यूआरएल!',
+                'success-promo': 'प्रोमो कोड सक्रिय किया गया!',
+                'error-promo': 'अमान्य या समाप्त प्रोमो कोड!'
+            }
+        };
+
+        // Current language
+        let currentLang = 'uz';
+        
+        // User data
+        let userData = {
+            id: 123456789,
             username: 'Foydalanuvchi',
-            diamonds: 0,
-            coins: 0,
-            isAdmin: false
+            diamonds: 150,
+            coins: 75,
+            refs: 3,
+            isAdmin: true
         };
         
-        let currentPage = 'main';
-        let currentAdminPage = null;
-        
-        // Sahifalarni boshqarish
-        function showPage(page) {
-            // Barcha sahifalarni yashirish
-            document.querySelectorAll('.tab-content').forEach(el => {
-                el.classList.add('hidden');
-            });
-            
-            // Tanlangan sahifani ko'rsatish
-            document.getElementById(page + 'Content').classList.remove('hidden');
-            
-            // Sarlavhani o'zgartirish
-            const titles = {
-                'main': 'RekchiAI Bot',
-                'views': 'Ko\'rishlar Xizmati',
-                'services': 'Xizmatlar',
-                'shop': 'Do\'kon',
-                'balance': 'Balans',
-                'earn': 'Olmos Yeg\'ish',
-                'promo': 'Promokod',
-                'tutorial': 'Video Qo\'llanma',
-                'admin': 'Admin Panel',
-                'stats': 'Statistika'
-            };
-            
-            const subtitles = {
-                'main': 'Instagram video reklama platformasi',
-                'views': 'Videoingizga ko\'rishlar qo\'shing',
-                'services': 'Qo\'shimcha xizmatlar',
-                'shop': 'Valyuta sotib olish',
-                'balance': 'Hisobingizni ko\'ring',
-                'earn': 'Bepul olmos yeg\'ing',
-                'promo': 'Promokodlardan foydalaning',
-                'tutorial': 'Botdan foydalanish bo\'yicha qo\'llanma',
-                'admin': 'Botni boshqarish',
-                'stats': 'Bot statistikasi'
-            };
-            
-            document.getElementById('pageTitle').textContent = titles[page] || 'RekchiAI Bot';
-            document.getElementById('pageSubtitle').textContent = subtitles[page] || 'Instagram video reklama platformasi';
-            
-            // Orqaga tugmasini ko'rsatish/yashirish
-            if (page === 'main') {
-                document.getElementById('backBtn').classList.add('hidden');
-            } else {
-                document.getElementById('backBtn').classList.remove('hidden');
+        // Prices (can be changed by admin)
+        let prices = {
+            diamonds: {
+                50: 5000,
+                100: 9000,
+                300: 25000
+            },
+            coins: {
+                50: 6000,
+                100: 11000,
+                500: 47000,
+                1000: 79000
+            },
+            views: {
+                1000: 10,
+                5000: 45,
+                10000: 90,
+                20000: 170,
+                50000: 400,
+                100000: 750
             }
+        };
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load user data
+            loadUserData();
             
-            currentPage = page;
+            // Set up event listeners
+            setupEventListeners();
             
-            // Sahifa o'zgarganida ma'lumotlarni yangilash
-            if (page === 'balance') {
-                updateBalanceInfo();
-                loadRecentOrders();
-            } else if (page === 'earn') {
-                updateReferralInfo();
-            } else if (page === 'promo') {
-                loadActivePromos();
-            } else if (page === 'tutorial') {
-                loadTutorials();
-            } else if (page === 'stats') {
-                loadStats();
-            } else if (page === 'admin') {
-                loadAdminPanel();
+            // Apply current language
+            applyLanguage(currentLang);
+        });
+        
+        // Load user data (simulate API call)
+        function loadUserData() {
+            // In a real app, this would be an API call to your backend
+            document.getElementById('username').textContent = userData.username;
+            document.getElementById('user-id').textContent = 'ID: ' + userData.id;
+            document.getElementById('diamonds').textContent = userData.diamonds;
+            document.getElementById('coins').textContent = userData.coins;
+            document.getElementById('refs').textContent = userData.refs;
+            document.getElementById('ref-link').textContent = `https://t.me/RekchiAi_bot?start=${userData.id}`;
+            
+            // Show admin panel if user is admin
+            if (userData.isAdmin) {
+                document.getElementById('admin-panel').style.display = 'block';
             }
         }
         
-        // Orqaga tugmasi
-        document.getElementById('backBtn').addEventListener('click', () => {
-            if (currentAdminPage) {
-                // Admin sub-sahifadan chiqish
-                currentAdminPage = null;
-                document.getElementById('adminSubContent').innerHTML = '';
-                showPage('admin');
-            } else {
-                // Asosiy menyuga qaytish
-                showPage('main');
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Language selector
+            document.getElementById('lang-btn').addEventListener('click', toggleLanguage);
+            
+            // Menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                });
+            });
+            
+            // Back buttons
+            document.querySelectorAll('.back-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showMainMenu();
+                });
+            });
+            
+            // Views section
+            document.querySelectorAll('.service-option[data-views]').forEach(option => {
+                option.addEventListener('click', function() {
+                    const views = this.getAttribute('data-views');
+                    if (views === 'custom') {
+                        document.getElementById('custom-views-input').style.display = 'block';
+                    } else {
+                        document.getElementById('custom-views-input').style.display = 'none';
+                        confirmViews(parseInt(views));
+                    }
+                });
+            });
+            
+            document.getElementById('views-count').addEventListener('input', function() {
+                const views = parseInt(this.value) || 0;
+                if (views >= 1000) {
+                    const diamonds = calculateDiamondsForViews(views);
+                    document.getElementById('calculated-price').textContent = 
+                        `${getTranslation('views-1k-price', currentLang).split(':')[0]}: ${diamonds} ${getTranslation('diamonds-label', currentLang)}`;
+                } else {
+                    document.getElementById('calculated-price').textContent = '';
+                }
+            });
+            
+            document.getElementById('confirm-views').addEventListener('click', function() {
+                const views = parseInt(document.getElementById('views-count').value) || 0;
+                if (views >= 1000) {
+                    confirmViews(views);
+                } else {
+                    showNotification(getTranslation('error-link', currentLang), 'error');
+                }
+            });
+            
+            // Likes section
+            document.getElementById('likes-count').addEventListener('input', function() {
+                const likes = parseInt(this.value) || 0;
+                if (likes >= 50) {
+                    const coins = calculateCoinsForLikes(likes);
+                    document.getElementById('likes-calculated-price').textContent = 
+                        `${getTranslation('buy-coins-text', currentLang)}: ${coins} ${getTranslation('coins-label', currentLang)}`;
+                } else {
+                    document.getElementById('likes-calculated-price').textContent = '';
+                }
+            });
+            
+            document.getElementById('confirm-likes').addEventListener('click', function() {
+                const likes = parseInt(document.getElementById('likes-count').value) || 0;
+                const link = document.getElementById('likes-link').value;
+                
+                if (likes >= 50 && isValidUrl(link)) {
+                    confirmLikes(likes, link);
+                } else {
+                    showNotification(getTranslation('error-link', currentLang), 'error');
+                }
+            });
+            
+            // Shipments section
+            document.getElementById('shipments-count').addEventListener('input', function() {
+                const shipments = parseInt(this.value) || 0;
+                if (shipments >= 100) {
+                    const coins = calculateCoinsForShipments(shipments);
+                    document.getElementById('shipments-calculated-price').textContent = 
+                        `${getTranslation('buy-coins-text', currentLang)}: ${coins} ${getTranslation('coins-label', currentLang)}`;
+                } else {
+                    document.getElementById('shipments-calculated-price').textContent = '';
+                }
+            });
+            
+            document.getElementById('confirm-shipments').addEventListener('click', function() {
+                const shipments = parseInt(document.getElementById('shipments-count').value) || 0;
+                const link = document.getElementById('shipments-link').value;
+                
+                if (shipments >= 100 && isValidUrl(link)) {
+                    confirmShipments(shipments, link);
+                } else {
+                    showNotification(getTranslation('error-link', currentLang), 'error');
+                }
+            });
+            
+            // Earn section
+            document.getElementById('invite-friends').addEventListener('click', function() {
+                // In a real app, this would open Telegram sharing dialog
+                showNotification('Referral link copied!', 'success');
+            });
+            
+            document.getElementById('watch-tutorial').addEventListener('click', function() {
+                // In a real app, this would open a video
+                showNotification('Tutorial video opened!', 'success');
+            });
+            
+            document.getElementById('bonus-channels').addEventListener('click', function() {
+                showSection('channels');
+            });
+            
+            document.getElementById('copy-ref').addEventListener('click', function() {
+                const refLink = document.getElementById('ref-link').textContent;
+                navigator.clipboard.writeText(refLink).then(() => {
+                    showNotification(getTranslation('success-copy', currentLang), 'success');
+                });
+            });
+            
+            // Shop section
+            document.getElementById('buy-diamonds').addEventListener('click', function() {
+                document.getElementById('diamonds-prices').style.display = 'block';
+                document.getElementById('coins-prices').style.display = 'none';
+            });
+            
+            document.getElementById('buy-coins').addEventListener('click', function() {
+                document.getElementById('coins-prices').style.display = 'block';
+                document.getElementById('diamonds-prices').style.display = 'none';
+            });
+            
+            document.getElementById('custom-diamonds').addEventListener('input', function() {
+                const amount = parseInt(this.value) || 0;
+                if (amount >= 10) {
+                    const price = amount * 100; // 100 so'm per diamond
+                    document.getElementById('custom-diamonds-price').textContent = 
+                        `${getTranslation('buy-diamonds-text', currentLang)}: ${price.toLocaleString()} UZS`;
+                } else {
+                    document.getElementById('custom-diamonds-price').textContent = '';
+                }
+            });
+            
+            document.getElementById('custom-coins').addEventListener('input', function() {
+                const amount = parseInt(this.value) || 0;
+                if (amount >= 10) {
+                    const price = amount * 120; // 120 so'm per coin
+                    document.getElementById('custom-coins-price').textContent = 
+                        `${getTranslation('buy-coins-text', currentLang)}: ${price.toLocaleString()} UZS`;
+                } else {
+                    document.getElementById('custom-coins-price').textContent = '';
+                }
+            });
+            
+            document.getElementById('buy-custom-diamonds').addEventListener('click', function() {
+                const amount = parseInt(document.getElementById('custom-diamonds').value) || 0;
+                if (amount >= 10) {
+                    showNotification('Diamond purchase initiated!', 'success');
+                } else {
+                    showNotification('Please enter a valid amount!', 'error');
+                }
+            });
+            
+            document.getElementById('buy-custom-coins').addEventListener('click', function() {
+                const amount = parseInt(document.getElementById('custom-coins').value) || 0;
+                if (amount >= 10) {
+                    showNotification('Coin purchase initiated!', 'success');
+                } else {
+                    showNotification('Please enter a valid amount!', 'error');
+                }
+            });
+            
+            // Promo section
+            document.getElementById('activate-promo').addEventListener('click', function() {
+                const promoCode = document.getElementById('promo-code').value.trim().toUpperCase();
+                if (promoCode) {
+                    activatePromoCode(promoCode);
+                } else {
+                    showNotification(getTranslation('error-promo', currentLang), 'error');
+                }
+            });
+            
+            // Tutorial section
+            document.getElementById('watch-tutorial-btn').addEventListener('click', function() {
+                // In a real app, this would open a video
+                showNotification('Tutorial video opened!', 'success');
+            });
+            
+            // Admin panel
+            if (userData.isAdmin) {
+                document.getElementById('admin-stats').addEventListener('click', function() {
+                    showNotification('Admin statistics opened!', 'success');
+                });
+                
+                document.getElementById('admin-users').addEventListener('click', function() {
+                    showNotification('User management opened!', 'success');
+                });
+                
+                document.getElementById('admin-orders').addEventListener('click', function() {
+                    showNotification('Order management opened!', 'success');
+                });
+                
+                document.getElementById('admin-promo').addEventListener('click', function() {
+                    showNotification('Promo code management opened!', 'success');
+                });
+                
+                document.getElementById('admin-prices').addEventListener('click', function() {
+                    showNotification('Price settings opened!', 'success');
+                });
+                
+                document.getElementById('admin-channels').addEventListener('click', function() {
+                    showNotification('Channel management opened!', 'success');
+                });
+                
+                document.getElementById('admin-tutorials').addEventListener('click', function() {
+                    showNotification('Video tutorial management opened!', 'success');
+                });
+                
+                document.getElementById('admin-broadcast').addEventListener('click', function() {
+                    showNotification('Broadcast message opened!', 'success');
+                });
             }
-        });
+        }
         
-        // Asosiy menyu tugmalari
-        document.querySelectorAll('.menu-item[data-page]').forEach(button => {
-            button.addEventListener('click', () => {
-                const page = button.getAttribute('data-page');
-                showPage(page);
+        // Show a specific section
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
             });
-        });
+            
+            // Show the selected section
+            document.getElementById(sectionId + '-section').classList.add('active');
+        }
         
-        // Tezkor ko'rishlar tugmalari
-        document.querySelectorAll('[data-views]').forEach(button => {
-            button.addEventListener('click', () => {
-                const views = parseInt(button.getAttribute('data-views'));
-                document.getElementById('viewsCount').value = views;
-                showPage('views');
-                calculateViews();
+        // Show main menu
+        function showMainMenu() {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
             });
-        });
+        }
         
-        // Xabarlarni ko'rsatish
-        function showNotification(message, type = 'success') {
+        // Toggle language
+        function toggleLanguage() {
+            const languages = ['uz', 'en', 'ru', 'ar', 'hi'];
+            const currentIndex = languages.indexOf(currentLang);
+            const nextIndex = (currentIndex + 1) % languages.length;
+            currentLang = languages[nextIndex];
+            
+            document.getElementById('lang-btn').textContent = currentLang.toUpperCase();
+            applyLanguage(currentLang);
+            
+            // Apply RTL for Arabic
+            if (currentLang === 'ar') {
+                document.body.classList.add('rtl');
+            } else {
+                document.body.classList.remove('rtl');
+            }
+        }
+        
+        // Apply language to the interface
+        function applyLanguage(lang) {
+            // Update all elements with data-lang attributes
+            Object.keys(translations[lang]).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+            
+            // Update prices with current language
+            updatePricesDisplay(lang);
+        }
+        
+        // Get translation for a key
+        function getTranslation(key, lang) {
+            return translations[lang][key] || key;
+        }
+        
+        // Update prices display based on language
+        function updatePricesDisplay(lang) {
+            // Update view prices
+            document.getElementById('views-1k-price').textContent = 
+                `${getTranslation('views-1k-price', lang).split(':')[0]}: ${prices.views[1000]} ${getTranslation('diamonds-label', lang)}`;
+            
+            document.getElementById('views-5k-price').textContent = 
+                `${getTranslation('views-5k-price', lang).split(':')[0]}: ${prices.views[5000]} ${getTranslation('diamonds-label', lang)}`;
+            
+            document.getElementById('views-10k-price').textContent = 
+                `${getTranslation('views-10k-price', lang).split(':')[0]}: ${prices.views[10000]} ${getTranslation('diamonds-label', lang)}`;
+            
+            // Update diamond prices
+            document.getElementById('price-50-diamonds').textContent = 
+                `${prices.diamonds[50].toLocaleString()} UZS`;
+            
+            document.getElementById('price-100-diamonds').textContent = 
+                `${prices.diamonds[100].toLocaleString()} UZS`;
+            
+            document.getElementById('price-300-diamonds').textContent = 
+                `${prices.diamonds[300].toLocaleString()} UZS`;
+            
+            // Update coin prices
+            document.getElementById('price-50-coins').textContent = 
+                `${prices.coins[50].toLocaleString()} UZS`;
+            
+            document.getElementById('price-100-coins').textContent = 
+                `${prices.coins[100].toLocaleString()} UZS`;
+            
+            document.getElementById('price-500-coins').textContent = 
+                `${prices.coins[500].toLocaleString()} UZS`;
+            
+            document.getElementById('price-1000-coins').textContent = 
+                `${prices.coins[1000].toLocaleString()} UZS`;
+        }
+        
+        // Calculate diamonds needed for views
+        function calculateDiamondsForViews(views) {
+            if (views >= 100000) return Math.floor(views * 0.0075);
+            else if (views >= 50000) return Math.floor(views * 0.008);
+            else if (views >= 20000) return Math.floor(views * 0.0085);
+            else if (views >= 10000) return Math.floor(views * 0.009);
+            else if (views >= 5000) return Math.floor(views * 0.009);
+            else if (views >= 1000) return Math.floor(views * 0.01);
+            else return -1;
+        }
+        
+        // Calculate coins needed for likes
+        function calculateCoinsForLikes(likes) {
+            return Math.max(1, Math.ceil(likes / 10));
+        }
+        
+        // Calculate coins needed for shipments
+        function calculateCoinsForShipments(shipments) {
+            return Math.max(1, Math.ceil(shipments * 3 / 100));
+        }
+        
+        // Confirm views order
+        function confirmViews(views) {
+            const diamonds = calculateDiamondsForViews(views);
+            
+            if (userData.diamonds >= diamonds) {
+                // In a real app, this would send a request to your backend
+                showNotification(getTranslation('success-order', currentLang), 'success');
+                
+                // Update user balance
+                userData.diamonds -= diamonds;
+                document.getElementById('diamonds').textContent = userData.diamonds;
+                
+                showMainMenu();
+            } else {
+                showNotification(getTranslation('error-balance', currentLang), 'error');
+            }
+        }
+        
+        // Confirm likes order
+        function confirmLikes(likes, link) {
+            const coins = calculateCoinsForLikes(likes);
+            
+            if (userData.coins >= coins) {
+                // In a real app, this would send a request to your backend
+                showNotification(getTranslation('success-order', currentLang), 'success');
+                
+                // Update user balance
+                userData.coins -= coins;
+                document.getElementById('coins').textContent = userData.coins;
+                
+                showMainMenu();
+            } else {
+                showNotification(getTranslation('error-balance', currentLang), 'error');
+            }
+        }
+        
+        // Confirm shipments order
+        function confirmShipments(shipments, link) {
+            const coins = calculateCoinsForShipments(shipments);
+            
+            if (userData.coins >= coins) {
+                // In a real app, this would send a request to your backend
+                showNotification(getTranslation('success-order', currentLang), 'success');
+                
+                // Update user balance
+                userData.coins -= coins;
+                document.getElementById('coins').textContent = userData.coins;
+                
+                showMainMenu();
+            } else {
+                showNotification(getTranslation('error-balance', currentLang), 'error');
+            }
+        }
+        
+        // Activate promo code
+        function activatePromoCode(code) {
+            // In a real app, this would send a request to your backend
+            // For demo, we'll just show a success message for any code that starts with "BONUS"
+            if (code.startsWith('BONUS')) {
+                showNotification(getTranslation('success-promo', currentLang), 'success');
+                
+                // Add some diamonds or coins
+                userData.diamonds += 25;
+                document.getElementById('diamonds').textContent = userData.diamonds;
+                
+                document.getElementById('promo-code').value = '';
+                showMainMenu();
+            } else {
+                showNotification(getTranslation('error-promo', currentLang), 'error');
+            }
+        }
+        
+        // Check if URL is valid
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
             const notification = document.getElementById('notification');
             notification.textContent = message;
-            notification.className = 'notification ' + type;
-            notification.classList.add('show');
+            notification.style.background = type === 'success' ? '#28a745' : '#dc3545';
+            notification.style.display = 'block';
             
             setTimeout(() => {
-                notification.classList.remove('show');
+                notification.style.display = 'none';
             }, 3000);
         }
         
-        // Foydalanuvchi ma'lumotlarini yangilash
-        function updateUserInfo() {
-            document.getElementById('userName').textContent = currentUser.username;
-            document.getElementById('userAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
-            document.getElementById('diamondBalance').textContent = currentUser.diamonds;
-            document.getElementById('coinBalance').textContent = currentUser.coins;
-            
-            // Admin tugmalarini ko'rsatish/yashirish
-            if (currentUser.isAdmin) {
-                document.getElementById('adminBtn').style.display = 'block';
-                document.getElementById('statsBtn').style.display = 'block';
-            }
+        // Show loading
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
         }
-        
-        // Balans ma'lumotlarini yangilash
-        function updateBalanceInfo() {
-            document.getElementById('balanceDiamonds').textContent = currentUser.diamonds;
-            document.getElementById('balanceCoins').textContent = currentUser.coins;
-        }
-        
-        // Referal ma'lumotlarini yangilash
-        function updateReferralInfo() {
-            // Bu yerda API orqali ma'lumotlarni olish kerak
-            document.getElementById('refLink').value = `https://t.me/RekchiAi_bot?start=${currentUser.id}`;
-        }
-        
-        // Ko'rishlar narxini hisoblash
-        function calculateViews() {
-            const views = parseInt(document.getElementById('viewsCount').value);
-            
-            if (isNaN(views) || views < 1000) {
-                showNotification('Iltimos, 1000 dan katta son kiriting!', 'error');
-                return;
-            }
-            
-            // Narxni hisoblash logikasi
-            let diamonds = 0;
-            if (views >= 100000) diamonds = Math.floor(views * 0.0075);
-            else if (views >= 50000) diamonds = Math.floor(views * 0.008);
-            else if (views >= 20000) diamonds = Math.floor(views * 0.0085);
-            else if (views >= 10000) diamonds = Math.floor(views * 0.009);
-            else if (views >= 5000) diamonds = Math.floor(views * 0.009);
-            else if (views >= 1000) diamonds = Math.floor(views * 0.01);
-            
-            // Yetkazib berish vaqtini hisoblash
-            let deliveryTime = "45 daqiqa ichida";
-            const hours = Math.ceil(views / 13000);
-            if (hours > 1) {
-                deliveryTime = `${hours} soat ichida`;
-            }
-            
-            // Natijalarni ko'rsatish
-            document.getElementById('resultViews').textContent = views.toLocaleString();
-            document.getElementById('resultDiamonds').textContent = diamonds;
-            document.getElementById('resultDelivery').textContent = deliveryTime;
-            document.getElementById('viewsResult').classList.remove('hidden');
-        }
-        
-        // Like narxini hisoblash
-        function calculateLikes() {
-            const likes = parseInt(document.getElementById('likesCount').value);
-            
-            if (isNaN(likes) || likes < 50) {
-                showNotification('Iltimos, 50 dan katta son kiriting!', 'error');
-                return;
-            }
-            
-            // Narxni hisoblash (100 like = 10 tanga)
-            const coins = Math.max(1, Math.ceil(likes / 10));
-            
-            // Yetkazib berish vaqtini hisoblash
-            let deliveryTime = "45 daqiqa ichida";
-            const hours = Math.ceil(likes / 13000);
-            if (hours > 1) {
-                deliveryTime = `${hours} soat ichida`;
-            }
-            
-            // Natijalarni ko'rsatish
-            document.getElementById('resultLikes').textContent = likes.toLocaleString();
-            document.getElementById('resultLikesCoins').textContent = coins;
-            document.getElementById('resultLikesDelivery').textContent = deliveryTime;
-            document.getElementById('likesResult').classList.remove('hidden');
-        }
-        
-        // Jo'natishlar narxini hisoblash
-        function calculateShipments() {
-            const shipments = parseInt(document.getElementById('shipmentsCount').value);
-            
-            if (isNaN(shipments) || shipments < 100) {
-                showNotification('Iltimos, 100 dan katta son kiriting!', 'error');
-                return;
-            }
-            
-            // Narxni hisoblash (100 tashish = 3 tanga)
-            const coins = Math.max(1, Math.ceil(shipments * 3 / 100));
-            
-            // Yetkazib berish vaqtini hisoblash
-            let deliveryTime = "45 daqiqa ichida";
-            const hours = Math.ceil(shipments / 13000);
-            if (hours > 1) {
-                deliveryTime = `${hours} soat ichida`;
-            }
-            
-            // Natijalarni ko'rsatish
-            document.getElementById('resultShipments').textContent = shipments.toLocaleString();
-            document.getElementById('resultShipmentsCoins').textContent = coins;
-            document.getElementById('resultShipmentsDelivery').textContent = deliveryTime;
-            document.getElementById('shipmentsResult').classList.remove('hidden');
-        }
-        
-        // Tab boshqaruvi
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabName = tab.getAttribute('data-tab');
-                
-                // Barcha tablarni deaktiv qilish
-                document.querySelectorAll('.tab').forEach(t => {
-                    t.classList.remove('active');
-                });
-                
-                // Barcha tab kontentlarini yashirish
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                
-                // Tanlangan tabni aktiv qilish
-                tab.classList.add('active');
-                document.getElementById(tabName + 'Tab').classList.add('active');
-            });
-        });
-        
-        // Do'kon tab boshqaruvi
-        document.querySelectorAll('.tab[data-tab$="Shop"]').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabName = tab.getAttribute('data-tab');
-                
-                // Barcha tablarni deaktiv qilish
-                document.querySelectorAll('.tab[data-tab$="Shop"]').forEach(t => {
-                    t.classList.remove('active');
-                });
-                
-                // Barcha tab kontentlarini yashirish
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                
-                // Tanlangan tabni aktiv qilish
-                tab.classList.add('active');
-                document.getElementById(tabName + 'Tab').classList.add('active');
-            });
-        });
-        
-        // Do'kon mahsulotlarini sotib olish
-        document.querySelectorAll('[data-diamonds]').forEach(button => {
-            button.addEventListener('click', () => {
-                const diamonds = parseInt(button.getAttribute('data-diamonds'));
-                const price = parseInt(button.getAttribute('data-price'));
-                
-                showPaymentForm(diamonds, price, 'diamonds');
-            });
-        });
-        
-        document.querySelectorAll('[data-coins]').forEach(button => {
-            button.addEventListener('click', () => {
-                const coins = parseInt(button.getAttribute('data-coins'));
-                const price = parseInt(button.getAttribute('data-price'));
-                
-                showPaymentForm(coins, price, 'coins');
-            });
-        });
-        
-        // Maxsus miqdor sotib olish
-        document.getElementById('buyCustomDiamonds').addEventListener('click', () => {
-            const diamonds = parseInt(document.getElementById('customDiamonds').value);
-            
-            if (isNaN(diamonds) || diamonds < 10) {
-                showNotification('Iltimos, 10 dan katta son kiriting!', 'error');
-                return;
-            }
-            
-            const price = diamonds * 100; // 1 olmos = 100 so'm
-            showPaymentForm(diamonds, price, 'diamonds');
-        });
-        
-        document.getElementById('buyCustomCoins').addEventListener('click', () => {
-            const coins = parseInt(document.getElementById('customCoins').value);
-            
-            if (isNaN(coins) || coins < 10) {
-                showNotification('Iltimos, 10 dan katta son kiriting!', 'error');
-                return;
-            }
-            
-            const price = coins * 100; // 1 tanga = 100 so'm
-            showPaymentForm(coins, price, 'coins');
-        });
-        
-        // To'lov formasini ko'rsatish
-        function showPaymentForm(amount, price, currency) {
-            document.getElementById('paymentAmount').textContent = amount;
-            document.getElementById('paymentPrice').textContent = price.toLocaleString();
-            document.getElementById('paymentCurrency').textContent = currency === 'diamonds' ? 'olmos' : 'tanga';
-            
-            document.getElementById('shopContent').classList.add('hidden');
-            document.getElementById('paymentContent').classList.remove('hidden');
-            
-            // To'lovni yuborish
-            document.getElementById('submitPayment').onclick = () => {
-                const receipt = document.getElementById('receipt').files[0];
-                
-                if (!receipt) {
-                    showNotification('Iltimos, to\'lov chekini yuklang!', 'error');
-                    return;
-                }
-                
-                // Bu yerda API orqali to'lov ma'lumotlarini yuborish kerak
-                showNotification('To\'lov cheki yuborildi! Tekshirilmoqda...', 'success');
-                
-                // Sahifani qayta tiklash
-                setTimeout(() => {
-                    document.getElementById('paymentContent').classList.add('hidden');
-                    document.getElementById('shopContent').classList.remove('hidden');
-                    document.getElementById('receipt').value = '';
-                }, 2000);
-            };
-        }
-        
-        // So'nggi buyurtmalarni yuklash
-        function loadRecentOrders() {
-            // Bu yerda API orqali buyurtmalarni olish kerak
-            const orders = [
-                { type: 'views', amount: '5,000', status: 'completed', date: '12.04.2023' },
-                { type: 'likes', amount: '100', status: 'pending', date: '11.04.2023' },
-                { type: 'shipments', amount: '1,000', status: 'completed', date: '10.04.2023' }
-            ];
-            
-            let html = '';
-            
-            if (orders.length === 0) {
-                html = '<p>Hozircha buyurtmalar mavjud emas</p>';
-            } else {
-                orders.forEach(order => {
-                    let statusClass = '';
-                    let statusText = '';
-                    
-                    if (order.status === 'completed') {
-                        statusClass = 'status-completed';
-                        statusText = 'Bajarildi';
-                    } else if (order.status === 'pending') {
-                        statusClass = 'status-pending';
-                        statusText = 'Kutilmoqda';
-                    } else {
-                        statusClass = 'status-failed';
-                        statusText = 'Xatolik';
-                    }
-                    
-                    html += `
-                        <div class="order-item">
-                            <div class="order-header">
-                                <div class="order-type">${order.type === 'views' ? '👁 Ko\'rishlar' : order.type === 'likes' ? '❤️ Like' : '🚀 Jo\'natishlar'}</div>
-                                <div class="order-status ${statusClass}">${statusText}</div>
-                            </div>
-                            <div class="order-details">
-                                Miqdor: ${order.amount} | Sana: ${order.date}
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            
-            document.getElementById('recentOrders').innerHTML = html;
-        }
-        
-        // Faol promokodlarni yuklash
-        function loadActivePromos() {
-            // Bu yerda API orqali promokodlarni olish kerak
-            const promos = [
-                { code: 'WELCOME50', reward: '50 💎', expires: '30.04.2023' },
-                { code: 'FIRST100', reward: '100 🪙', expires: '25.04.2023' },
-                { code: 'SPRING2023', reward: '25 💎', expires: '20.04.2023' }
-            ];
-            
-            let html = '';
-            
-            if (promos.length === 0) {
-                html = '<p>Hozircha faol promokodlar mavjud emas</p>';
-            } else {
-                promos.forEach(promo => {
-                    html += `
-                        <div class="service-item">
-                            <div class="service-info">
-                                <div class="service-name">${promo.code}</div>
-                                <div class="service-desc">Mukofot: ${promo.reward} | Muddati: ${promo.expires}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            
-            document.getElementById('activePromos').innerHTML = html;
-        }
-        
-        // Video qo'llanmalarni yuklash
-        function loadTutorials() {
-            // Bu yerda API orqali videolarni olish kerak
-            const tutorials = [
-                { title: 'Botdan foydalanish', description: 'Botning asosiy funksiyalari' },
-                { title: 'Ko\'rishlar sotib olish', description: 'Videoingizga ko\'rishlar qo\'shish' },
-                { title: 'Do\'stlarni taklif qilish', description: 'Referal orqali olmos yeg\'ish' }
-            ];
-            
-            let html = '';
-            
-            tutorials.forEach(tutorial => {
-                html += `
-                    <div class="service-item">
-                        <div class="service-info">
-                            <div class="service-name">${tutorial.title}</div>
-                            <div class="service-desc">${tutorial.description}</div>
-                        </div>
-                        <button class="btn btn-primary">Ko'rish</button>
-                    </div>
-                `;
-            });
-            
-            document.getElementById('tutorialList').innerHTML = html;
-        }
-        
-        // Statistika yuklash
-        function loadStats() {
-            // Bu yerda API orqali statistikani olish kerak
-            document.getElementById('totalUsers').textContent = '1,247';
-            document.getElementById('totalOrders').textContent = '5,683';
-            document.getElementById('totalDiamonds').textContent = '45,820';
-            document.getElementById('totalCoins').textContent = '12,450';
-            
-            const ordersStats = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">4,215</div>
-                        <div class="stat-label">Bajarilgan</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">1,203</div>
-                        <div class="stat-label">Kutilayotgan</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">265</div>
-                        <div class="stat-label">Xatolik</div>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('ordersStats').innerHTML = ordersStats;
-        }
-        
-        // Admin panel yuklash
-        function loadAdminPanel() {
-            currentAdminPage = null;
-            document.getElementById('adminSubContent').innerHTML = '';
-            
-            // Admin menyu elementlari
-            document.querySelectorAll('.admin-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const page = item.getAttribute('data-admin');
-                    loadAdminSubPage(page);
-                });
-            });
-        }
-        
-        // Admin sub-sahifa yuklash
-        function loadAdminSubPage(page) {
-            currentAdminPage = page;
-            
-            let html = '';
-            let title = '';
-            
-            switch (page) {
-                case 'users':
-                    title = 'Foydalanuvchilar boshqaruvi';
-                    html = `
-                        <div class="card">
-                            <h3>${title}</h3>
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Foydalanuvchi ID yoki username">
-                            </div>
-                            <button class="btn btn-primary">Qidirish</button>
-                            
-                            <div style="margin-top: 15px;">
-                                <p>Jami foydalanuvchilar: 1,247</p>
-                                <p>Aktiv foydalanuvchilar: 892</p>
-                                <p>Yangi foydalanuvchilar (bugun): 23</p>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'orders':
-                    title = 'Buyurtmalar boshqaruvi';
-                    html = `
-                        <div class="card">
-                            <h3>${title}</h3>
-                            <div class="tab-container">
-                                <div class="tabs">
-                                    <div class="tab active" data-tab="allOrders">Barchasi</div>
-                                    <div class="tab" data-tab="pendingOrders">Kutilayotgan</div>
-                                    <div class="tab" data-tab="completedOrders">Bajarilgan</div>
-                                </div>
-                                
-                                <div id="allOrdersTab" class="tab-content active">
-                                    <p>Barcha buyurtmalar ro'yxati</p>
-                                </div>
-                                
-                                <div id="pendingOrdersTab" class="tab-content">
-                                    <p>Kutilayotgan buyurtmalar</p>
-                                </div>
-                                
-                                <div id="completedOrdersTab" class="tab-content">
-                                    <p>Bajarilgan buyurtmalar</p>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'promocodes':
-                    title = 'Promokodlar boshqaruvi';
-                    html = `
-                        <div class="card">
-                            <h3>${title}</h3>
-                            <button class="btn btn-primary" style="margin-bottom: 15px;">Yangi promokod</button>
-                            
-                            <div class="service-item">
-                                <div class="service-info">
-                                    <div class="service-name">WELCOME50</div>
-                                    <div class="service-desc">50 💎 | 23/100 foydalanilgan</div>
-                                </div>
-                                <button class="btn btn-danger">O'chirish</button>
-                            </div>
-                            
-                            <div class="service-item">
-                                <div class="service-info">
-                                    <div class="service-name">SPRING100</div>
-                                    <div class="service-desc">100 🪙 | 15.04.2023 gacha</div>
-                                </div>
-                                <button class="btn btn-danger">O'chirish</button>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'broadcast':
-                    title = 'Reklama tarqatish';
-                    html = `
-                        <div class="card">
-                            <h3>${title}</h3>
-                            <div class="form-group">
-                                <label>Xabar turi:</label>
-                                <select class="form-control">
-                                    <option>📝 Faqat matn</option>
-                                    <option>🖼 Rasm bilan</option>
-                                    <option>🎬 Video bilan</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Xabar matni:</label>
-                                <textarea class="form-control" rows="5" placeholder="Reklama xabari..."></textarea>
-                            </div>
-                            <button class="btn btn-primary">Yuborish</button>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'channels':
-                    title = 'Kanallar boshqaruvi';
-                    html = `
-                        <div class="card">
-                            <h3>${title}</h3>
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Kanal username (@channel)">
-                            </div>
-                            <button class="btn btn-primary" style="margin-bottom: 15px;">Qo'shish</button>
-                            
-                            <div class="service-item">
-                                <div class="service-info">
-                                    <div class="service-name">@rekchi_tv</div>
-                                    <div class="service-desc">Asosiy kanal</div>
-                                </div>
-                                <button class="btn btn-danger">O'chirish</button>
-                            </div>
-                            
-                            <div class="service-item">
-                                <div class="service-info">
-                                    <div class="service-name">@insta_rekchi</div>
-                                    <div class="service-desc">Promokodlar kanali</div>
-                                </div>
-                                <button class="btn btn-danger">O'chirish</button>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'balance':
-                    title = 'Balans boshqaruvi';
-                    html = `
-                        <div class="card">
-                            <h3>${title}</h3>
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Foydalanuvchi ID yoki username">
-                            </div>
-                            <div class="form-group">
-                                <select class="form-control">
-                                    <option>💎 Olmos qo'shish</option>
-                                    <option>💎 Olmos olib tashlash</option>
-                                    <option>🪙 Tanga qo'shish</option>
-                                    <option>🪙 Tanga olib tashlash</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <input type="number" class="form-control" placeholder="Miqdor">
-                            </div>
-                            <button class="btn btn-primary">Amalga oshirish</button>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'stats':
-                    title = 'Batafsil statistika';
-                    html = `
-                        <div class="card">
-                            <h3>${title}</h3>
-                            <div class="stats-grid">
-                                <div class="stat-card">
-                                    <div class="stat-value">892</div>
-                                    <div class="stat-label">Aktiv foydalanuvchilar</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-value">355</div>
-                                    <div class="stat-label">Passiv foydalanuvchilar</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-value">1,247</div>
-                                    <div class="stat-label">Jami foydalanuvchilar</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-value">73%</div>
-                                    <div class="stat-label">Aktivlik</div>
-                                </div>
-                            </div>
-                            
-                            <div style="margin-top: 15px;">
-                                <h4>Kunlik o'sish</h4>
-                                <p>Foydalanuvchilar: +23</p>
-                                <p>Buyurtmalar: +45</p>
-                                <p>Daromad: +127,500 so'm</p>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'settings':
-                    title = 'Bot sozlamalari';
-                    html = `
-                        <div class="card">
-                            <h3>${title}</h3>
-                            <div class="form-group">
-                                <label>Admin kontakt:</label>
-                                <input type="text" class="form-control" value="@Behruzxan">
-                            </div>
-                            <div class="form-group">
-                                <label>Karta raqami:</label>
-                                <input type="text" class="form-control" value="9860 6067 4039 1457">
-                            </div>
-                            <div class="form-group">
-                                <label>Start bonus:</label>
-                                <input type="number" class="form-control" value="12">
-                            </div>
-                            <button class="btn btn-primary">Saqlash</button>
-                        </div>
-                    `;
-                    break;
-            }
-            
-            document.getElementById('adminSubContent').innerHTML = html;
-            document.getElementById('pageTitle').textContent = title;
-            
-            // Admin sub-sahifa tablarini ishga tushirish
-            document.querySelectorAll('#adminSubContent .tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabName = tab.getAttribute('data-tab');
-                    
-                    // Barcha tablarni deaktiv qilish
-                    document.querySelectorAll('#adminSubContent .tab').forEach(t => {
-                        t.classList.remove('active');
-                    });
-                    
-                    // Barcha tab kontentlarini yashirish
-                    document.querySelectorAll('#adminSubContent .tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    
-                    // Tanlangan tabni aktiv qilish
-                    tab.classList.add('active');
-                    document.getElementById(tabName + 'Tab').classList.add('active');
-                });
-            });
-        }
-        
-        // Event listenerlar
-        document.getElementById('calculateViews').addEventListener('click', calculateViews);
-        document.getElementById('calculateLikes').addEventListener('click', calculateLikes);
-        document.getElementById('calculateShipments').addEventListener('click', calculateShipments);
-        
-        document.getElementById('confirmViews').addEventListener('click', () => {
-            const videoLink = document.getElementById('videoLink').value;
-            
-            if (!videoLink) {
-                showNotification('Iltimos, video havolasini kiriting!', 'error');
-                return;
-            }
-            
-            // Bu yerda API orqali buyurtma yaratish kerak
-            showNotification('Buyurtma qabul qilindi! Ko\'rishlar qo\'shilmoqda...', 'success');
-            
-            // Sahifani tozalash
-            setTimeout(() => {
-                document.getElementById('viewsCount').value = '';
-                document.getElementById('videoLink').value = '';
-                document.getElementById('viewsResult').classList.add('hidden');
-                showPage('main');
-            }, 2000);
-        });
-        
-        document.getElementById('confirmLikes').addEventListener('click', () => {
-            const videoLink = document.getElementById('likesLink').value;
-            
-            if (!videoLink) {
-                showNotification('Iltimos, video havolasini kiriting!', 'error');
-                return;
-            }
-            
-            // Bu yerda API orqali buyurtma yaratish kerak
-            showNotification('Buyurtma qabul qilindi! Likelar qo\'shilmoqda...', 'success');
-            
-            // Sahifani tozalash
-            setTimeout(() => {
-                document.getElementById('likesCount').value = '';
-                document.getElementById('likesLink').value = '';
-                document.getElementById('likesResult').classList.add('hidden');
-                showPage('main');
-            }, 2000);
-        });
-        
-        document.getElementById('confirmShipments').addEventListener('click', () => {
-            const videoLink = document.getElementById('shipmentsLink').value;
-            
-            if (!videoLink) {
-                showNotification('Iltimos, video havolasini kiriting!', 'error');
-                return;
-            }
-            
-            // Bu yerda API orqali buyurtma yaratish kerak
-            showNotification('Buyurtma qabul qilindi! Jo\'natishlar qo\'shilmoqda...', 'success');
-            
-            // Sahifani tozalash
-            setTimeout(() => {
-                document.getElementById('shipmentsCount').value = '';
-                document.getElementById('shipmentsLink').value = '';
-                document.getElementById('shipmentsResult').classList.add('hidden');
-                showPage('main');
-            }, 2000);
-        });
-        
-        document.getElementById('applyPromo').addEventListener('click', () => {
-            const promoCode = document.getElementById('promoCode').value.trim();
-            
-            if (!promoCode) {
-                showNotification('Iltimos, promokodni kiriting!', 'error');
-                return;
-            }
-            
-            // Bu yerda API orqali promokodni tekshirish kerak
-            showNotification('Promokod muvaffaqiyatli qo\'llandi! +50 💎 olmos berildi.', 'success');
-            
-            // Sahifani tozalash
-            document.getElementById('promoCode').value = '';
-        });
-        
-        document.getElementById('inviteFriends').addEventListener('click', () => {
-            const refLink = document.getElementById('refLink').value;
-            
-            // Havolani nusxalash
-            navigator.clipboard.writeText(refLink).then(() => {
-                showNotification('Referal havolasi nusxalandi! Do'stlaringizga ulashing.', 'success');
-            });
-        });
-        
-        document.getElementById('copyRefLink').addEventListener('click', () => {
-            const refLink = document.getElementById('refLink').value;
-            
-            // Havolani nusxalash
-            navigator.clipboard.writeText(refLink).then(() => {
-                showNotification('Referal havolasi nusxalandi!', 'success');
-            });
-        });
-        
-        document.getElementById('watchTutorial').addEventListener('click', () => {
-            showNotification('Video ko\'rildi! +5 💎 olmos berildi.', 'success');
-        });
-        
-        document.getElementById('subscribeChannel').addEventListener('click', () => {
-            showNotification('Kanalga obuna bo'ldingiz! +10 💎 olmos berildi.', 'success');
-        });
-        
-        // Dastur ishga tushganda foydalanuvchi ma'lumotlarini yuklash
-        window.addEventListener('load', () => {
-            // Bu yerda API orqali foydalanuvchi ma'lumotlarini olish kerak
-            // Hozircha test ma'lumotlari
-            currentUser = {
-                id: '123456789',
-                username: 'Foydalanuvchi',
-                diamonds: 125,
-                coins: 340,
-                isAdmin: true // Test uchun admin qilib qo'yildi
-            };
-            
-            updateUserInfo();
-            showPage('main');
-        });
     </script>
 </body>
 </html>

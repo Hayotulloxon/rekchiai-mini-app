@@ -14,14 +14,13 @@
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #18222d;
             color: white;
             min-height: 100vh;
         }
 
         .screen {
             display: none;
-            padding: 20px;
             min-height: 100vh;
         }
 
@@ -29,659 +28,686 @@
             display: block;
         }
 
-        /* Loading */
-        #loading {
+        /* Chat-like Interface */
+        .chat-container {
+            padding: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+
+        .bot-message {
+            background: #2a3942;
+            border-bottom-left-radius: 5px;
+            align-self: flex-start;
+        }
+
+        .user-message {
+            background: #005c4b;
+            border-bottom-right-radius: 5px;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .message-group {
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
         }
 
-        .loader {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255,255,255,0.3);
-            border-top: 5px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+        /* Keyboard */
+        .keyboard {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1e2a35;
+            border-top: 1px solid #2a3942;
+            padding: 10px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px 0;
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 15px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-
-        .balance {
+        .keyboard-row {
             display: flex;
-            justify-content: center;
-            gap: 30px;
+            gap: 5px;
+            margin-bottom: 5px;
         }
 
-        .balance-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            background: rgba(255,255,255,0.2);
-            padding: 10px 20px;
-            border-radius: 15px;
-        }
-
-        /* Menu Grid */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .menu-item {
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px 15px;
-            text-align: center;
+        .keyboard-btn {
+            flex: 1;
+            background: #2a3942;
+            border: none;
+            color: white;
+            padding: 12px 8px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 14px;
+            transition: background 0.2s;
         }
 
-        .menu-item:hover {
-            background: rgba(255,255,255,0.25);
-            transform: translateY(-5px);
+        .keyboard-btn:active {
+            background: #3d4f5c;
         }
 
-        .menu-icon {
-            font-size: 32px;
+        /* Loading */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 16px;
+            background: #2a3942;
+            border-radius: 18px;
+            border-bottom-left-radius: 5px;
+            max-width: fit-content;
+            margin: 10px 0;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #8696a0;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        /* Service Cards */
+        .service-card {
+            background: #2a3942;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .service-card:active {
+            background: #3d4f5c;
+        }
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .service-icon {
+            font-size: 24px;
+        }
+
+        .service-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .service-desc {
+            font-size: 14px;
+            color: #8696a0;
             margin-bottom: 10px;
         }
 
-        .menu-text {
+        .service-price {
             font-size: 14px;
-            font-weight: 600;
+            color: #00a884;
         }
 
-        /* Service Content */
-        .service-content {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
+        /* Package Selection */
         .package-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin: 15px 0;
         }
 
         .package {
-            background: rgba(255,255,255,0.2);
-            border-radius: 15px;
-            padding: 20px;
+            background: #2a3942;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px 10px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
+            transition: all 0.2s;
         }
 
         .package.selected {
-            border-color: #ffd700;
-            background: rgba(255,215,0,0.2);
+            border-color: #00a884;
+            background: rgba(0, 168, 132, 0.1);
         }
 
         .package-amount {
-            font-size: 20px;
-            font-weight: bold;
+            font-size: 16px;
+            font-weight: 600;
             margin-bottom: 5px;
         }
 
         .package-price {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-
-        /* Buttons */
-        .back-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
-            border: none;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:active {
-            transform: scale(0.95);
-        }
-
-        /* Inputs */
-        .custom-input {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .custom-input input {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 15px;
-            background: rgba(255,255,255,0.9);
-            font-size: 16px;
-        }
-
-        .custom-input button {
-            background: #4ECDC4;
-            border: none;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        /* Result */
-        .result {
-            background: rgba(255,255,255,0.15);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .result-info {
-            margin-bottom: 15px;
-        }
-
-        .result-info div {
-            margin-bottom: 8px;
-            font-size: 16px;
-        }
-
-        /* Shop */
-        .shop-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .shop-item {
-            background: rgba(255,255,255,0.15);
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .shop-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .shop-icon {
-            font-size: 24px;
-        }
-
-        .shop-details h3 {
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        .shop-details p {
             font-size: 14px;
-            opacity: 0.8;
+            color: #00a884;
         }
 
-        .shop-price {
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        /* Profile */
-        .profile-card {
-            background: rgba(255,255,255,0.15);
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .stat-item {
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-
-        /* Referral */
-        .referral-card {
-            background: rgba(255,255,255,0.15);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .referral-link {
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
+        /* Balance */
+        .balance-display {
+            background: #2a3942;
+            border-radius: 12px;
             padding: 15px;
             margin: 15px 0;
-            word-break: break-all;
-            font-family: monospace;
+            display: flex;
+            justify-content: space-around;
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .balance-item {
+            text-align: center;
         }
 
-        .screen.active {
-            animation: fadeIn 0.3s ease;
+        .balance-amount {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .balance-label {
+            font-size: 12px;
+            color: #8696a0;
+        }
+
+        /* Input */
+        .input-group {
+            background: #2a3942;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .input-field {
+            width: 100%;
+            background: #1e2a35;
+            border: 1px solid #3d4f5c;
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .input-field::placeholder {
+            color: #8696a0;
+        }
+
+        .btn {
+            background: #00a884;
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .btn:active {
+            background: #008f70;
+        }
+
+        .btn-secondary {
+            background: #2a3942;
+        }
+
+        .btn-secondary:active {
+            background: #3d4f5c;
+        }
+
+        /* Tutorial Videos */
+        .video-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .video-item {
+            background: #2a3942;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+        }
+
+        .video-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .video-icon {
+            font-size: 20px;
+            color: #00a884;
+        }
+
+        .video-title {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .video-desc {
+            font-size: 13px;
+            color: #8696a0;
+            line-height: 1.4;
+        }
+
+        /* Promo Code */
+        .promo-result {
+            background: #2a3942;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .promo-success {
+            color: #00a884;
+        }
+
+        .promo-error {
+            color: #f15c6d;
+        }
+
+        /* Animation */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message, .service-card, .package, .video-item {
+            animation: slideIn 0.3s ease;
         }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loading" class="screen active">
-        <div class="loader"></div>
-        <p>RekchiAI yuklanmoqda...</p>
-    </div>
-
-    <!-- Asosiy Menyu -->
-    <div id="main-menu" class="screen">
-        <div class="header">
-            <h1>🤖 RekchiAI</h1>
-            <div class="balance">
-                <div class="balance-item">
-                    <span>💎</span>
-                    <span id="diamonds-balance">0</span>
+    <!-- Asosiy Chat Screen -->
+    <div id="main-chat" class="screen active">
+        <div class="chat-container">
+            <div class="message-group">
+                <div class="message bot-message">
+                    🤖 RekchiAI botiga xush kelibsiz!<br><br>
+                    Instagram videolaringizga ko'rishlar, likelar va jo'natishlar xizmatlarimizdan foydalaning.
                 </div>
-                <div class="balance-item">
-                    <span>🪙</span>
-                    <span id="coins-balance">0</span>
+                
+                <div class="balance-display">
+                    <div class="balance-item">
+                        <div class="balance-amount" id="main-diamonds">150</div>
+                        <div class="balance-label">💎 Olmos</div>
+                    </div>
+                    <div class="balance-item">
+                        <div class="balance-amount" id="main-coins">80</div>
+                        <div class="balance-label">🪙 Tanga</div>
+                    </div>
+                </div>
+
+                <div class="service-card" onclick="showService('views')">
+                    <div class="service-header">
+                        <div class="service-icon">👁</div>
+                        <div class="service-title">Ko'rishlar xizmati</div>
+                    </div>
+                    <div class="service-desc">Instagram videolaringizga ko'rishlar qo'shing</div>
+                    <div class="service-price">1000 ta = 10 💎</div>
+                </div>
+
+                <div class="service-card" onclick="showService('likes')">
+                    <div class="service-header">
+                        <div class="service-icon">❤️</div>
+                        <div class="service-title">Like xizmati</div>
+                    </div>
+                    <div class="service-desc">Videolaringizga likelar qo'shing</div>
+                    <div class="service-price">100 ta = 10 🪙</div>
+                </div>
+
+                <div class="service-card" onclick="showService('shipments')">
+                    <div class="service-header">
+                        <div class="service-icon">🚀</div>
+                        <div class="service-title">Jo'natishlar</div>
+                    </div>
+                    <div class="service-desc">Videolaringizni jo'nating</div>
+                    <div class="service-price">100 ta = 3 🪙</div>
                 </div>
             </div>
         </div>
 
-        <div class="menu-grid">
-            <div class="menu-item" onclick="showScreen('views-service')">
-                <div class="menu-icon">👁</div>
-                <div class="menu-text">Ko'rishlar</div>
+        <div class="keyboard">
+            <div class="keyboard-row">
+                <button class="keyboard-btn" onclick="showScreen('shop')">🛒 Do'kon</button>
+                <button class="keyboard-btn" onclick="showScreen('earn')">💎 Olmos yeg'ish</button>
             </div>
-            
-            <div class="menu-item" onclick="showScreen('likes-service')">
-                <div class="menu-icon">❤️</div>
-                <div class="menu-text">Likelar</div>
+            <div class="keyboard-row">
+                <button class="keyboard-btn" onclick="showScreen('promo')">🎁 Promokod</button>
+                <button class="keyboard-btn" onclick="showScreen('tutorials')">🎬 Video darslik</button>
             </div>
-            
-            <div class="menu-item" onclick="showScreen('shipments-service')">
-                <div class="menu-icon">🚀</div>
-                <div class="menu-text">Jo'natishlar</div>
-            </div>
-            
-            <div class="menu-item" onclick="showScreen('shop')">
-                <div class="menu-icon">🛒</div>
-                <div class="menu-text">Do'kon</div>
-            </div>
-            
-            <div class="menu-item" onclick="showScreen('earn-diamonds')">
-                <div class="menu-icon">💎</div>
-                <div class="menu-text">Olmos yeg'ish</div>
-            </div>
-            
-            <div class="menu-item" onclick="showScreen('promocode')">
-                <div class="menu-icon">🎁</div>
-                <div class="menu-text">Promokod</div>
-            </div>
-            
-            <div class="menu-item" onclick="showScreen('tutorials')">
-                <div class="menu-icon">🎬</div>
-                <div class="menu-text">Qo'llanma</div>
-            </div>
-            
-            <div class="menu-item" onclick="showScreen('profile')">
-                <div class="menu-icon">👤</div>
-                <div class="menu-text">Profil</div>
+            <div class="keyboard-row">
+                <button class="keyboard-btn" onclick="showScreen('profile')">👤 Profil</button>
+                <button class="keyboard-btn" onclick="showScreen('help')">❓ Yordam</button>
             </div>
         </div>
     </div>
 
     <!-- Ko'rishlar Xizmati -->
     <div id="views-service" class="screen">
-        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
-        <div class="header">
-            <h2>👁 Ko'rishlar xizmati</h2>
+        <div class="chat-container">
+            <div class="message-group">
+                <div class="message bot-message">
+                    👁 <b>Ko'rishlar xizmati</b><br><br>
+                    Instagram videolaringizga ko'rishlar qo'shing. Quyidagi paketlardan birini tanlang yoki o'zingiz miqdor kiriting.
+                </div>
+
+                <div class="package-grid">
+                    <div class="package" onclick="selectPackage('views', 1000, 10)">
+                        <div class="package-amount">1,000</div>
+                        <div class="package-price">10 💎</div>
+                    </div>
+                    <div class="package" onclick="selectPackage('views', 5000, 45)">
+                        <div class="package-amount">5,000</div>
+                        <div class="package-price">45 💎</div>
+                    </div>
+                    <div class="package" onclick="selectPackage('views', 10000, 90)">
+                        <div class="package-amount">10,000</div>
+                        <div class="package-price">90 💎</div>
+                    </div>
+                    <div class="package" onclick="selectPackage('views', 20000, 170)">
+                        <div class="package-amount">20,000</div>
+                        <div class="package-price">170 💎</div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <input type="number" class="input-field" id="custom-views" placeholder="Boshqa miqdor (min: 1000)">
+                    <button class="btn" onclick="calculateCustomViews()">Hisoblash</button>
+                </div>
+
+                <div id="views-result" style="display: none;">
+                    <div class="message bot-message">
+                        📊 <b>Buyurtma tafsilotlari:</b><br>
+                        • Ko'rishlar: <span id="result-views">0</span> ta<br>
+                        • Narxi: <span id="result-price">0</span> 💎<br>
+                        • Yetkazish: <span id="delivery-time">45 daqiqa</span>
+                    </div>
+                    <button class="btn" onclick="confirmOrder('views')">✅ Buyurtma berish</button>
+                </div>
+            </div>
         </div>
 
-        <div class="service-content">
-            <div class="package-grid">
-                <div class="package" onclick="selectPackage('views', 1000, 10)">
-                    <div class="package-amount">1,000</div>
-                    <div class="package-price">10 💎</div>
-                </div>
-                <div class="package" onclick="selectPackage('views', 5000, 45)">
-                    <div class="package-amount">5,000</div>
-                    <div class="package-price">45 💎</div>
-                </div>
-                <div class="package" onclick="selectPackage('views', 10000, 90)">
-                    <div class="package-amount">10,000</div>
-                    <div class="package-price">90 💎</div>
-                </div>
-                <div class="package" onclick="selectPackage('views', 20000, 170)">
-                    <div class="package-amount">20,000</div>
-                    <div class="package-price">170 💎</div>
-                </div>
-            </div>
-
-            <div class="custom-input">
-                <input type="number" id="custom-views" placeholder="Boshqa miqdor (min: 1000)">
-                <button onclick="calculateCustomViews()">Hisoblash</button>
-            </div>
-
-            <div id="views-result" class="result" style="display: none;">
-                <div class="result-info">
-                    <div>Ko'rishlar: <span id="result-views">0</span> ta</div>
-                    <div>Narxi: <span id="result-price">0</span> 💎</div>
-                    <div>Yetkazish: <span id="delivery-time">45 daqiqa</span></div>
-                </div>
-                <button class="btn-primary" onclick="confirmOrder('views')">✅ Buyurtma berish</button>
-            </div>
+        <div class="keyboard">
+            <button class="keyboard-btn btn-secondary" onclick="showScreen('main-chat')">⬅️ Ortga</button>
         </div>
     </div>
 
     <!-- Like Xizmati -->
     <div id="likes-service" class="screen">
-        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
-        <div class="header">
-            <h2>❤️ Like xizmati</h2>
+        <div class="chat-container">
+            <div class="message-group">
+                <div class="message bot-message">
+                    ❤️ <b>Like xizmati</b><br><br>
+                    Instagram videolaringizga likelar qo'shing.
+                </div>
+
+                <div class="package-grid">
+                    <div class="package" onclick="selectPackage('likes', 100, 10)">
+                        <div class="package-amount">100</div>
+                        <div class="package-price">10 🪙</div>
+                    </div>
+                    <div class="package" onclick="selectPackage('likes', 500, 45)">
+                        <div class="package-amount">500</div>
+                        <div class="package-price">45 🪙</div>
+                    </div>
+                    <div class="package" onclick="selectPackage('likes', 1000, 80)">
+                        <div class="package-amount">1,000</div>
+                        <div class="package-price">80 🪙</div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <input type="number" class="input-field" id="custom-likes" placeholder="Boshqa miqdor (min: 50)">
+                    <button class="btn" onclick="calculateCustomLikes()">Hisoblash</button>
+                </div>
+
+                <div id="likes-result" style="display: none;">
+                    <div class="message bot-message">
+                        📊 <b>Buyurtma tafsilotlari:</b><br>
+                        • Likelar: <span id="result-likes">0</span> ta<br>
+                        • Narxi: <span id="result-likes-price">0</span> 🪙<br>
+                        • Yetkazish: <span>1 soat</span>
+                    </div>
+                    <button class="btn" onclick="confirmOrder('likes')">✅ Buyurtma berish</button>
+                </div>
+            </div>
         </div>
 
-        <div class="service-content">
-            <div class="package-grid">
-                <div class="package" onclick="selectPackage('likes', 100, 10)">
-                    <div class="package-amount">100</div>
-                    <div class="package-price">10 🪙</div>
-                </div>
-                <div class="package" onclick="selectPackage('likes', 500, 45)">
-                    <div class="package-amount">500</div>
-                    <div class="package-price">45 🪙</div>
-                </div>
-                <div class="package" onclick="selectPackage('likes', 1000, 80)">
-                    <div class="package-amount">1,000</div>
-                    <div class="package-price">80 🪙</div>
-                </div>
-            </div>
-
-            <div class="custom-input">
-                <input type="number" id="custom-likes" placeholder="Boshqa miqdor (min: 50)">
-                <button onclick="calculateCustomLikes()">Hisoblash</button>
-            </div>
-
-            <div id="likes-result" class="result" style="display: none;">
-                <div class="result-info">
-                    <div>Likelar: <span id="result-likes">0</span> ta</div>
-                    <div>Narxi: <span id="result-likes-price">0</span> 🪙</div>
-                    <div>Yetkazish: <span>1 soat</span></div>
-                </div>
-                <button class="btn-primary" onclick="confirmOrder('likes')">✅ Buyurtma berish</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Jo'natishlar Xizmati -->
-    <div id="shipments-service" class="screen">
-        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
-        <div class="header">
-            <h2>🚀 Jo'natishlar</h2>
-        </div>
-
-        <div class="service-content">
-            <div class="package-grid">
-                <div class="package" onclick="selectPackage('shipments', 100, 3)">
-                    <div class="package-amount">100</div>
-                    <div class="package-price">3 🪙</div>
-                </div>
-                <div class="package" onclick="selectPackage('shipments', 500, 12)">
-                    <div class="package-amount">500</div>
-                    <div class="package-price">12 🪙</div>
-                </div>
-                <div class="package" onclick="selectPackage('shipments', 1000, 20)">
-                    <div class="package-amount">1,000</div>
-                    <div class="package-price">20 🪙</div>
-                </div>
-            </div>
-
-            <div class="custom-input">
-                <input type="number" id="custom-shipments" placeholder="Boshqa miqdor (min: 100)">
-                <button onclick="calculateCustomShipments()">Hisoblash</button>
-            </div>
-
-            <div id="shipments-result" class="result" style="display: none;">
-                <div class="result-info">
-                    <div>Jo'natishlar: <span id="result-shipments">0</span> ta</div>
-                    <div>Narxi: <span id="result-shipments-price">0</span> 🪙</div>
-                    <div>Yetkazish: <span>2 soat</span></div>
-                </div>
-                <button class="btn-primary" onclick="confirmOrder('shipments')">✅ Buyurtma berish</button>
-            </div>
+        <div class="keyboard">
+            <button class="keyboard-btn btn-secondary" onclick="showScreen('main-chat')">⬅️ Ortga</button>
         </div>
     </div>
 
     <!-- Do'kon -->
     <div id="shop" class="screen">
-        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
-        <div class="header">
-            <h2>🛒 Do'kon</h2>
-        </div>
+        <div class="chat-container">
+            <div class="message-group">
+                <div class="message bot-message">
+                    🛒 <b>Do'kon</b><br><br>
+                    Olmos va tanga sotib oling.
+                </div>
 
-        <div class="shop-grid">
-            <div class="shop-item">
-                <div class="shop-info">
-                    <div class="shop-icon">💎</div>
-                    <div class="shop-details">
-                        <h3>50 Olmos</h3>
-                        <p>Instagram ko'rishlar uchun</p>
+                <div class="service-card" onclick="selectShopItem('diamonds', 50, 5000)">
+                    <div class="service-header">
+                        <div class="service-icon">💎</div>
+                        <div class="service-title">50 Olmos</div>
                     </div>
+                    <div class="service-desc">Instagram ko'rishlar uchun</div>
+                    <div class="service-price">5,000 so'm</div>
                 </div>
-                <div class="shop-price">5,000 so'm</div>
-            </div>
-            
-            <div class="shop-item">
-                <div class="shop-info">
-                    <div class="shop-icon">💎</div>
-                    <div class="shop-details">
-                        <h3>100 Olmos</h3>
-                        <p>Instagram ko'rishlar uchun</p>
+
+                <div class="service-card" onclick="selectShopItem('diamonds', 100, 9000)">
+                    <div class="service-header">
+                        <div class="service-icon">💎</div>
+                        <div class="service-title">100 Olmos</div>
                     </div>
+                    <div class="service-desc">Instagram ko'rishlar uchun</div>
+                    <div class="service-price">9,000 so'm</div>
                 </div>
-                <div class="shop-price">9,000 so'm</div>
-            </div>
-            
-            <div class="shop-item">
-                <div class="shop-info">
-                    <div class="shop-icon">💎</div>
-                    <div class="shop-details">
-                        <h3>300 Olmos</h3>
-                        <p>Instagram ko'rishlar uchun</p>
+
+                <div class="service-card" onclick="selectShopItem('diamonds', 300, 25000)">
+                    <div class="service-header">
+                        <div class="service-icon">💎</div>
+                        <div class="service-title">300 Olmos</div>
                     </div>
+                    <div class="service-desc">Instagram ko'rishlar uchun</div>
+                    <div class="service-price">25,000 so'm</div>
                 </div>
-                <div class="shop-price">25,000 so'm</div>
-            </div>
-            
-            <div class="shop-item">
-                <div class="shop-info">
-                    <div class="shop-icon">🪙</div>
-                    <div class="shop-details">
-                        <h3>50 Tanga</h3>
-                        <p>Like va obunachilar uchun</p>
+
+                <div class="service-card" onclick="selectShopItem('coins', 50, 6000)">
+                    <div class="service-header">
+                        <div class="service-icon">🪙</div>
+                        <div class="service-title">50 Tanga</div>
                     </div>
+                    <div class="service-desc">Like va obunachilar uchun</div>
+                    <div class="service-price">6,000 so'm</div>
                 </div>
-                <div class="shop-price">6,000 so'm</div>
-            </div>
-            
-            <div class="shop-item">
-                <div class="shop-info">
-                    <div class="shop-icon">🪙</div>
-                    <div class="shop-details">
-                        <h3>100 Tanga</h3>
-                        <p>Like va obunachilar uchun</p>
+
+                <div class="service-card" onclick="selectShopItem('coins', 100, 11000)">
+                    <div class="service-header">
+                        <div class="service-icon">🪙</div>
+                        <div class="service-title">100 Tanga</div>
                     </div>
+                    <div class="service-desc">Like va obunachilar uchun</div>
+                    <div class="service-price">11,000 so'm</div>
                 </div>
-                <div class="shop-price">11,000 so'm</div>
             </div>
         </div>
 
-        <button class="btn-primary" onclick="showScreen('payment')">💳 To'lov qilish</button>
+        <div class="keyboard">
+            <button class="keyboard-btn btn-secondary" onclick="showScreen('main-chat')">⬅️ Ortga</button>
+        </div>
     </div>
 
     <!-- Olmos Yeg'ish -->
-    <div id="earn-diamonds" class="screen">
-        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
-        <div class="header">
-            <h2>💎 Olmos yeg'ish</h2>
+    <div id="earn" class="screen">
+        <div class="chat-container">
+            <div class="message-group">
+                <div class="message bot-message">
+                    💎 <b>Olmos yeg'ish</b><br><br>
+                    Do'stlaringizni taklif qiling va har biri uchun 15 olmos oling!
+                </div>
+
+                <div class="message bot-message">
+                    👫 <b>Sizning referal havolangiz:</b><br>
+                    <div class="referral-link">https://t.me/RekchiAi_bot?start=123456</div>
+                </div>
+
+                <div class="balance-display">
+                    <div class="balance-item">
+                        <div class="balance-amount" id="total-refs">3</div>
+                        <div class="balance-label">Jami taklif</div>
+                    </div>
+                    <div class="balance-item">
+                        <div class="balance-amount" id="confirmed-refs">2</div>
+                        <div class="balance-label">Tasdiqlangan</div>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="copyReferralLink()">📋 Havolani nusxalash</button>
+            </div>
         </div>
 
-        <div class="referral-card">
-            <h3>👫 Do'stlarni taklif qiling</h3>
-            <p>Har bir do'stingiz uchun +15 💎 olmos oling!</p>
-            
-            <div class="referral-link" id="referral-link">
-                https://t.me/RekchiAi_bot?start=123456
+        <div class="keyboard">
+            <button class="keyboard-btn btn-secondary" onclick="showScreen('main-chat')">⬅️ Ortga</button>
+        </div>
+    </div>
+
+    <!-- Video Darsliklar -->
+    <div id="tutorials" class="screen">
+        <div class="chat-container">
+            <div class="message-group">
+                <div class="message bot-message">
+                    🎬 <b>Video darsliklar</b><br><br>
+                    Botdan qanday foydalanishni o'rganing.
+                </div>
+
+                <div class="video-item" onclick="playVideo('qollanma')">
+                    <div class="video-header">
+                        <div class="video-icon">📱</div>
+                        <div class="video-title">Botdan foydalanish qo'llanmasi</div>
+                    </div>
+                    <div class="video-desc">RekchiAI botidan to'liq foydalanish bo'yicha video darslik</div>
+                </div>
+
+                <div class="video-item" onclick="playVideo('views')">
+                    <div class="video-header">
+                        <div class="video-icon">👁</div>
+                        <div class="video-title">Ko'rishlar qo'shish</div>
+                    </div>
+                    <div class="video-desc">Instagram videolaringizga ko'rishlar qanday qo'shiladi</div>
+                </div>
+
+                <div class="video-item" onclick="playVideo('likes')">
+                    <div class="video-header">
+                        <div class="video-icon">❤️</div>
+                        <div class="video-title">Likelar qo'shish</div>
+                    </div>
+                    <div class="video-desc">Videolaringizga likelar qanday qo'shiladi</div>
+                </div>
+
+                <div class="video-item" onclick="playVideo('referral')">
+                    <div class="video-header">
+                        <div class="video-icon">👫</div>
+                        <div class="video-title">Referal tizimi</div>
+                    </div>
+                    <div class="video-desc">Do'stlaringizni taklif qilib olmos yeg'ish</div>
+                </div>
             </div>
-            
-            <button class="btn-primary" onclick="copyReferralLink()">📋 Nusxalash</button>
         </div>
 
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-value" id="total-refs">0</div>
-                <div class="stat-label">Jami taklif</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="confirmed-refs">0</div>
-                <div class="stat-label">Tasdiqlangan</div>
-            </div>
+        <div class="keyboard">
+            <button class="keyboard-btn btn-secondary" onclick="showScreen('main-chat')">⬅️ Ortga</button>
         </div>
     </div>
 
     <!-- Promokod -->
-    <div id="promocode" class="screen">
-        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
-        <div class="header">
-            <h2>🎁 Promokod</h2>
+    <div id="promo" class="screen">
+        <div class="chat-container">
+            <div class="message-group">
+                <div class="message bot-message">
+                    🎁 <b>Promokod</b><br><br>
+                    Promokod kiriting va bonus oling.
+                </div>
+
+                <div class="input-group">
+                    <input type="text" class="input-field" id="promo-code" placeholder="Promokodni kiriting" style="text-transform: uppercase;">
+                    <button class="btn" onclick="activatePromo()">Faollashtirish</button>
+                </div>
+
+                <div id="promo-result" class="promo-result" style="display: none;">
+                    <div id="promo-message"></div>
+                </div>
+            </div>
         </div>
 
-        <div class="service-content">
-            <div class="custom-input">
-                <input type="text" id="promo-code" placeholder="Promokodni kiriting" style="text-transform: uppercase;">
-                <button onclick="activatePromo()">Faollashtirish</button>
-            </div>
-            
-            <div id="promo-result" class="result" style="display: none;">
-                <div class="result-info" id="promo-message"></div>
-            </div>
+        <div class="keyboard">
+            <button class="keyboard-btn btn-secondary" onclick="showScreen('main-chat')">⬅️ Ortga</button>
         </div>
     </div>
 
     <!-- Profil -->
     <div id="profile" class="screen">
-        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ Ortga</button>
-        <div class="header">
-            <h2>👤 Profil</h2>
+        <div class="chat-container">
+            <div class="message-group">
+                <div class="message bot-message">
+                    👤 <b>Profil</b>
+                </div>
+
+                <div class="balance-display">
+                    <div class="balance-item">
+                        <div class="balance-amount" id="profile-diamonds">150</div>
+                        <div class="balance-label">💎 Olmos</div>
+                    </div>
+                    <div class="balance-item">
+                        <div class="balance-amount" id="profile-coins">80</div>
+                        <div class="balance-label">🪙 Tanga</div>
+                    </div>
+                </div>
+
+                <div class="message bot-message">
+                    📊 <b>Statistika:</b><br>
+                    • Buyurtmalar: <span id="profile-orders">5</span> ta<br>
+                    • Referallar: <span id="profile-refs">3</span> ta<br>
+                    • Faollik: <span>7 kun</span>
+                </div>
+            </div>
         </div>
 
-        <div class="profile-card">
-            <div class="profile-avatar">👤</div>
-            <h3 id="profile-username">Foydalanuvchi</h3>
-            <p id="profile-id">ID: 123456789</p>
-        </div>
-
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-value" id="profile-diamonds">0</div>
-                <div class="stat-label">Olmos</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="profile-coins">0</div>
-                <div class="stat-label">Tanga</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="profile-orders">0</div>
-                <div class="stat-label">Buyurtma</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="profile-refs">0</div>
-                <div class="stat-label">Referal</div>
-            </div>
+        <div class="keyboard">
+            <button class="keyboard-btn btn-secondary" onclick="showScreen('main-chat')">⬅️ Ortga</button>
         </div>
     </div>
 
@@ -689,12 +715,9 @@
         // Telegram Web App initialization
         let tg = window.Telegram.WebApp;
         let currentOrder = null;
+        let currentShopItem = null;
 
-        // Initialize the app
-        tg.expand();
-        tg.ready();
-
-        // Mock user data (aslida serverdan keladi)
+        // Mock user data
         const userData = {
             diamonds: 150,
             coins: 80,
@@ -705,38 +728,27 @@
             confirmedRefs: 2
         };
 
-        // App initialization
-        function initApp() {
-            // Hide loading screen after 2 seconds
-            setTimeout(() => {
-                document.getElementById('loading').classList.remove('active');
-                showScreen('main-menu');
-                updateBalances();
-                updateProfile();
-            }, 2000);
-        }
+        // Initialize the app
+        tg.expand();
+        tg.ready();
+        updateBalances();
 
         // Screen navigation
         function showScreen(screenId) {
-            // Hide all screens
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
-            
-            // Show target screen
             document.getElementById(screenId).classList.add('active');
+        }
+
+        function showService(serviceType) {
+            showScreen(serviceType + '-service');
         }
 
         // Update balances
         function updateBalances() {
-            document.getElementById('diamonds-balance').textContent = userData.diamonds;
-            document.getElementById('coins-balance').textContent = userData.coins;
-        }
-
-        // Update profile
-        function updateProfile() {
-            document.getElementById('profile-username').textContent = userData.username;
-            document.getElementById('profile-id').textContent = `ID: ${userData.userId}`;
+            document.getElementById('main-diamonds').textContent = userData.diamonds;
+            document.getElementById('main-coins').textContent = userData.coins;
             document.getElementById('profile-diamonds').textContent = userData.diamonds;
             document.getElementById('profile-coins').textContent = userData.coins;
             document.getElementById('profile-orders').textContent = userData.totalOrders;
@@ -774,34 +786,23 @@
         function calculateCustomViews() {
             const amount = parseInt(document.getElementById('custom-views').value);
             if (amount < 1000) {
-                alert('Minimal miqdor: 1000 ta');
+                showMessage('Minimal miqdor: 1000 ta');
                 return;
             }
             
-            const price = Math.ceil(amount * 0.01); // 1000 ta = 10 olmos
+            const price = Math.ceil(amount * 0.01);
             selectPackage('views', amount, price);
         }
 
         function calculateCustomLikes() {
             const amount = parseInt(document.getElementById('custom-likes').value);
             if (amount < 50) {
-                alert('Minimal miqdor: 50 ta');
+                showMessage('Minimal miqdor: 50 ta');
                 return;
             }
             
-            const price = Math.ceil(amount / 10); // 10 like = 1 tanga
+            const price = Math.ceil(amount / 10);
             selectPackage('likes', amount, price);
-        }
-
-        function calculateCustomShipments() {
-            const amount = parseInt(document.getElementById('custom-shipments').value);
-            if (amount < 100) {
-                alert('Minimal miqdor: 100 ta');
-                return;
-            }
-            
-            const price = Math.ceil(amount * 3 / 100); // 100 ta = 3 tanga
-            selectPackage('shipments', amount, price);
         }
 
         // Delivery time calculation
@@ -819,58 +820,60 @@
         // Order confirmation
         function confirmOrder(type) {
             if (!currentOrder) {
-                alert('Iltimos, avval miqdorni tanlang!');
+                showMessage('Iltimos, avval miqdorni tanlang!');
                 return;
             }
             
             const balance = type === 'views' ? userData.diamonds : userData.coins;
             
             if (balance < currentOrder.price) {
-                alert('Yetarli mablag\' mavjud emas!');
+                showMessage('Yetarli mablag\' mavjud emas!');
                 return;
             }
             
-            // Send order to bot (mock)
-            tg.showPopup({
-                title: 'Buyurtma tasdiqlash',
-                message: `Siz ${currentOrder.amount.toLocaleString()} ta ${getServiceName(type)} sotib olmoqchisiz?\nNarxi: ${currentOrder.price} ${type === 'views' ? '💎' : '🪙'}`,
-                buttons: [
-                    {id: 'confirm', type: 'ok', text: '✅ Tasdiqlash'},
-                    {id: 'cancel', type: 'cancel', text: '❌ Bekor qilish'}
-                ]
-            }, (buttonId) => {
-                if (buttonId === 'confirm') {
-                    // Mock successful order
-                    if (type === 'views') {
-                        userData.diamonds -= currentOrder.price;
-                    } else {
-                        userData.coins -= currentOrder.price;
-                    }
-                    userData.totalOrders++;
-                    
-                    updateBalances();
-                    updateProfile();
-                    
-                    alert('✅ Buyurtma muvaffaqiyatli qabul qilindi!');
-                    showScreen('main-menu');
-                }
-            });
+            // Mock successful order
+            if (type === 'views') {
+                userData.diamonds -= currentOrder.price;
+            } else {
+                userData.coins -= currentOrder.price;
+            }
+            userData.totalOrders++;
+            
+            updateBalances();
+            showMessage(`✅ ${currentOrder.amount.toLocaleString()} ta ${getServiceName(type)} buyurtmasi qabul qilindi!`);
+            showScreen('main-chat');
         }
 
         function getServiceName(type) {
             const names = {
                 'views': 'ko\'rish',
-                'likes': 'like',
-                'shipments': 'jo\'natish'
+                'likes': 'like'
             };
             return names[type] || 'xizmat';
         }
 
+        // Shop item selection
+        function selectShopItem(type, amount, price) {
+            currentShopItem = { type, amount, price };
+            tg.showPopup({
+                title: `${amount} ${type === 'diamonds' ? '💎 Olmos' : '🪙 Tanga'}`,
+                message: `Narxi: ${price.toLocaleString()} so'm\n\nTo'lov qilish uchun admin bilan bog'laning.`,
+                buttons: [
+                    {id: 'contact', type: 'default', text: '📞 Admin bilan bog\'lanish'},
+                    {id: 'cancel', type: 'cancel', text: '❌ Bekor qilish'}
+                ]
+            }, (buttonId) => {
+                if (buttonId === 'contact') {
+                    tg.openTelegramLink('https://t.me/Behruzxan');
+                }
+            });
+        }
+
         // Referral link copy
         function copyReferralLink() {
-            const link = document.getElementById('referral-link').textContent;
+            const link = 'https://t.me/RekchiAi_bot?start=' + userData.userId;
             navigator.clipboard.writeText(link).then(() => {
-                alert('Havola nusxalandi!');
+                showMessage('✅ Havola nusxalandi!');
             });
         }
 
@@ -878,11 +881,10 @@
         function activatePromo() {
             const code = document.getElementById('promo-code').value.toUpperCase();
             if (!code) {
-                alert('Iltimos, promokodni kiriting!');
+                showMessage('Iltimos, promokodni kiriting!');
                 return;
             }
             
-            // Mock promo activation
             const resultDiv = document.getElementById('promo-result');
             const messageDiv = document.getElementById('promo-message');
             
@@ -891,20 +893,50 @@
             if (code === 'SALOM2024') {
                 userData.diamonds += 25;
                 messageDiv.innerHTML = '🎉 Tabriklaymiz!<br>+25 💎 olmos berildi!';
+                messageDiv.className = 'promo-success';
                 updateBalances();
-                updateProfile();
             } else if (code === 'TANGA50') {
                 userData.coins += 50;
                 messageDiv.innerHTML = '🎉 Tabriklaymiz!<br>+50 🪙 tanga berildi!';
+                messageDiv.className = 'promo-success';
                 updateBalances();
-                updateProfile();
             } else {
                 messageDiv.innerHTML = '❌ Noto\'g\'ri promokod!';
+                messageDiv.className = 'promo-error';
             }
         }
 
-        // Initialize app when page loads
-        window.onload = initApp;
+        // Video player
+        function playVideo(videoType) {
+            const videos = {
+                'qollanma': 'Botdan foydalanish qo\'llanmasi',
+                'views': 'Ko\'rishlar qo\'shish',
+                'likes': 'Likelar qo\'shish',
+                'referral': 'Referal tizimi'
+            };
+            
+            tg.showPopup({
+                title: '🎬 ' + videos[videoType],
+                message: 'Video darslik Telegram kanalimizda mavjud.',
+                buttons: [
+                    {id: 'watch', type: 'default', text: '📺 Ko\'rish'},
+                    {id: 'cancel', type: 'cancel', text: '❌ Yopish'}
+                ]
+            }, (buttonId) => {
+                if (buttonId === 'watch') {
+                    tg.openTelegramLink('https://t.me/rekchi_tv');
+                }
+            });
+        }
+
+        // Utility function to show messages
+        function showMessage(text) {
+            tg.showPopup({
+                title: 'Xabar',
+                message: text,
+                buttons: [{id: 'ok', type: 'default', text: 'OK'}]
+            });
+        }
     </script>
 </body>
 </html>

@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RekchiAI - Instagram Promotion</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #6a11cb;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+
+        .user-details h3 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .user-details p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .balance-section {
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .balance-cards {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .balance-card {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .balance-card.coins {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .balance-card h3 {
+            font-size: 14px;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .balance-card .amount {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .services-section {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .service-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .service-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .service-card h4 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .service-card p {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .custom-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .custom-input input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .custom-input button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 10px 20px;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+        }
+
+        .nav-item {
+            text-align: center;
+            padding: 10px 5px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .nav-item.active {
+            background: #f8f9fa;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 20px;
+            border-radius: 20px;
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .shop-items {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .shop-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .shop-item h4 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .shop-item .price {
+            color: #6a11cb;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .admin-section {
+            padding: 20px;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .admin-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6a11cb;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🤖 RekchiAI</h1>
+            <p>Instagram Promotion Platform</p>
+        </div>
+
+        <div class="user-info">
+            <div class="avatar" id="userAvatar">U</div>
+            <div class="user-details">
+                <h3 id="userName">Foydalanuvchi</h3>
+                <p id="userId">ID: ...</p>
+            </div>
+        </div>
+
+        <div class="balance-section">
+            <div class="balance-cards">
+                <div class="balance-card">
+                    <h3>💎 Olmoslar</h3>
+                    <div class="amount" id="diamondsCount">0</div>
+                </div>
+                <div class="balance-card coins">
+                    <h3>🪙 Tangalar</h3>
+                    <div class="amount" id="coinsCount">0</div>
+                </div>
+            </div>
+            <div class="quick-actions">
+                <div class="action-btn" onclick="openShop()">🛒 Do'kon</div>
+                <div class="action-btn" onclick="openEarn()">💎 Yeg'ish</div>
+            </div>
+        </div>
+
+        <div class="services-section">
+            <div class="section-title">
+                <span>🚀 Xizmatlar</span>
+            </div>
+            
+            <div class="service-grid">
+                <div class="service-card" onclick="openService('views')">
+                    <div class="service-icon">👁️</div>
+                    <h4>Ko'rishlar</h4>
+                    <p>Video ko'rishlari</p>
+                </div>
+                <div class="service-card" onclick="openService('likes')">
+                    <div class="service-icon">❤️</div>
+                    <h4>Likelar</h4>
+                    <p>Post likelari</p>
+                </div>
+                <div class="service-card" onclick="openService('shipments')">
+                    <div class="service-icon">📦</div>
+                    <h4>Jo'natishlar</h4>
+                    <p>Yuborish xizmati</p>
+                </div>
+                <div class="service-card" onclick="openPromocode()">
+                    <div class="service-icon">🎁</div>
+                    <h4>Promokod</h4>
+                    <p>Bonus olish</p>
+                </div>
+            </div>
+
+            <div class="custom-input">
+                <input type="text" id="customViews" placeholder="Ko'rishlar soni (1000+)">
+                <button onclick="calculateCustomViews()">Hisoblash</button>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <div class="nav-grid">
+                <div class="nav-item active" onclick="showSection('main')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Asosiy</div>
+                </div>
+                <div class="nav-item" onclick="showSection('services')">
+                    <div class="nav-icon">🚀</div>
+                    <div class="nav-label">Xizmatlar</div>
+                </div>
+                <div class="nav-item" onclick="openShop()">
+                    <div class="nav-icon">🛒</div>
+                    <div class="nav-label">Do'kon</div>
+                </div>
+                <div class="nav-item" onclick="openEarn()">
+                    <div class="nav-icon">💎</div>
+                    <div class="nav-label">Yeg'ish</div>
+                </div>
+                <div class="nav-item" onclick="openProfile()">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">Profil</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Windows -->
+    <div id="shopModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🛒 Do'kon</div>
+                <button class="close-btn" onclick="closeModal('shopModal')">×</button>
+            </div>
+            <div class="shop-items">
+                <div class="shop-item" onclick="buyProduct('diamonds', 50, 5000)">
+                    <h4>💎 50 Olmos</h4>
+                    <div class="price">5,000 so'm</div>
+                    <button class="action-btn">Sotib olish</button>
+                </div>
+                <div class="shop-item" onclick="buyProduct('diamonds', 100, 9000)">
+                    <h4>💎 100 Olmos</h4>
+                    <div class="price">9,000 so'm</div>
+                    <button class="action-btn">Sotib olish</button>
+                </div>
+                <div class="shop-item" onclick="buyProduct('diamonds', 300, 25000)">
+                    <h4>💎 300 Olmos</h4>
+                    <div class="price">25,000 so'm</div>
+                    <button class="action-btn">Sotib olish</button>
+                </div>
+                <div class="shop-item" onclick="buyProduct('coins', 50, 6000)">
+                    <h4>🪙 50 Tanga</h4>
+                    <div class="price">6,000 so'm</div>
+                    <button class="action-btn">Sotib olish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="serviceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="serviceTitle">Xizmat</div>
+                <button class="close-btn" onclick="closeModal('serviceModal')">×</button>
+            </div>
+            <div id="serviceContent">
+                <!-- Service content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">👑 Admin Panel</div>
+                <button class="close-btn" onclick="closeModal('adminModal')">×</button>
+            </div>
+            <div class="admin-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalUsers">0</div>
+                        <div class="stat-label">Foydalanuvchi</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalOrders">0</div>
+                        <div class="stat-label">Buyurtma</div>
+                    </div>
+                </div>
+                <div class="admin-grid">
+                    <div class="admin-card" onclick="adminAction('users')">👥 Foydalanuvchilar</div>
+                    <div class="admin-card" onclick="adminAction('orders')">📦 Buyurtmalar</div>
+                    <div class="admin-card" onclick="adminAction('promocodes')">🎁 Promokodlar</div>
+                    <div class="admin-card" onclick="adminAction('broadcast')">📢 Reklama</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Telegram Web App initialization
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.BackButton.hide();
+
+        // User data
+        let userData = {
+            id: '',
+            username: '',
+            firstName: '',
+            lastName: '',
+            diamonds: 0,
+            coins: 0,
+            isAdmin: false
+        };
+
+        // Initialize app
+        function initApp() {
+            // Get Telegram user data
+            const initData = tg.initDataUnsafe;
+            userData.id = initData.user?.id || '123456789';
+            userData.username = initData.user?.username || 'user';
+            userData.firstName = initData.user?.first_name || 'Foydalanuvchi';
+            userData.lastName = initData.user?.last_name || '';
+            
+            // Update UI with user data
+            document.getElementById('userName').textContent = userData.firstName + (userData.lastName ? ' ' + userData.lastName : '');
+            document.getElementById('userId').textContent = 'ID: ' + userData.id;
+            document.getElementById('userAvatar').textContent = userData.firstName.charAt(0).toUpperCase();
+
+            // Load user balance and check admin status
+            loadUserData();
+        }
+
+        // Load user data from backend
+        async function loadUserData() {
+            try {
+                const response = await fetch('backend.php?action=get_user_data&user_id=' + userData.id);
+                const data = await response.json();
+                
+                if (data.success) {
+                    userData.diamonds = data.diamonds;
+                    userData.coins = data.coins;
+                    userData.isAdmin = data.is_admin;
+                    
+                    updateBalanceDisplay();
+                    
+                    // Show admin button if user is admin
+                    if (userData.isAdmin) {
+                        const navGrid = document.querySelector('.nav-grid');
+                        navGrid.innerHTML += `
+                            <div class="nav-item" onclick="openAdminPanel()">
+                                <div class="nav-icon">👑</div>
+                                <div class="nav-label">Admin</div>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        // Update balance display
+        function updateBalanceDisplay() {
+            document.getElementById('diamondsCount').textContent = userData.diamonds;
+            document.getElementById('coinsCount').textContent = userData.coins;
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Shop functions
+        function openShop() {
+            openModal('shopModal');
+        }
+
+        async function buyProduct(type, amount, price) {
+            // Direct contact with admin for purchase
+            const adminUsername = 'Behruzxan'; // Replace with actual admin username
+            const message = `Salom! Men ${type === 'diamonds' ? amount + ' 💎 olmos' : amount + ' 🪙 tanga'} sotib olmoqchiman.`;
+            
+            tg.openTelegramLink(`https://t.me/${adminUsername}?start=purchase_${type}_${amount}`);
+            
+            closeModal('shopModal');
+        }
+
+        // Service functions
+        function openService(serviceType) {
+            const serviceTitles = {
+                'views': '👁️ Ko\'rishlar Xizmati',
+                'likes': '❤️ Likelar Xizmati', 
+                'shipments': '📦 Jo\'natishlar Xizmati'
+            };
+            
+            document.getElementById('serviceTitle').textContent = serviceTitles[serviceType] || 'Xizmat';
+            
+            let content = '';
+            if (serviceType === 'views') {
+                content = `
+                    <div class="service-options">
+                        <div class="service-card" onclick="orderService('views', 1000)">
+                            <h4>👁️ 1,000 ko'rish</h4>
+                            <p>10 💎 olmos</p>
+                        </div>
+                        <div class="service-card" onclick="orderService('views', 5000)">
+                            <h4>👁️ 5,000 ko'rish</h4>
+                            <p>45 💎 olmos</p>
+                        </div>
+                        <div class="service-card" onclick="orderService('views', 10000)">
+                            <h4>👁️ 10,000 ko'rish</h4>
+                            <p>90 💎 olmos</p>
+                        </div>
+                        <div class="custom-input">
+                            <input type="number" id="customViewsInput" placeholder="Boshqa miqdor" min="1000">
+                            <button onclick="orderCustomViews()">Hisoblash</button>
+                        </div>
+                    </div>
+                `;
+            } else if (serviceType === 'likes') {
+                content = `
+                    <div class="service-options">
+                        <div class="service-card" onclick="orderService('likes', 100)">
+                            <h4>❤️ 100 like</h4>
+                            <p>10 🪙 tanga</p>
+                        </div>
+                        <div class="service-card" onclick="orderService('likes', 500)">
+                            <h4>❤️ 500 like</h4>
+                            <p>45 🪙 tanga</p>
+                        </div>
+                        <div class="custom-input">
+                            <input type="number" id="customLikesInput" placeholder="Boshqa miqdor" min="50">
+                            <button onclick="orderCustomLikes()">Hisoblash</button>
+                        </div>
+                    </div>
+                `;
+            } else if (serviceType === 'shipments') {
+                content = `
+                    <div class="service-options">
+                        <div class="service-card" onclick="orderService('shipments', 1000)">
+                            <h4>📦 1,000 jo'natish</h4>
+                            <p>30 🪙 tanga</p>
+                        </div>
+                        <div class="service-card" onclick="orderService('shipments', 5000)">
+                            <h4>📦 5,000 jo'natish</h4>
+                            <p>140 🪙 tanga</p>
+                        </div>
+                        <div class="custom-input">
+                            <input type="number" id="customShipmentsInput" placeholder="Boshqa miqdor" min="100">
+                            <button onclick="orderCustomShipments()">Hisoblash</button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('serviceContent').innerHTML = content;
+            openModal('serviceModal');
+        }
+
+        async function orderService(serviceType, amount) {
+            let cost = 0;
+            let currency = '';
+            
+            if (serviceType === 'views') {
+                cost = calculateDiamondsForViews(amount);
+                currency = 'diamonds';
+            } else if (serviceType === 'likes') {
+                cost = calculateCoinsForLikes(amount);
+                currency = 'coins';
+            } else if (serviceType === 'shipments') {
+                cost = calculateCoinsForShipments(amount);
+                currency = 'coins';
+            }
+            
+            // Check balance
+            if (userData[currency] < cost) {
+                showMessage(`Yetarli ${currency === 'diamonds' ? '💎 olmos' : '🪙 tanga'} mavjud emas!`, 'error');
+                return;
+            }
+            
+            // Show link input
+            document.getElementById('serviceContent').innerHTML = `
+                <div class="success-message">
+                    Narx: ${cost} ${currency === 'diamonds' ? '💎' : '🪙'}<br>
+                    Miqdor: ${amount.toLocaleString()} ${serviceType === 'views' ? 'ko\'rish' : serviceType === 'likes' ? 'like' : 'jo\'natish'}
+                </div>
+                <div class="custom-input">
+                    <input type="text" id="serviceLink" placeholder="Instagram video/post havolasi">
+                    <button onclick="confirmOrder('${serviceType}', ${amount}, ${cost}, '${currency}')">Tasdiqlash</button>
+                </div>
+            `;
+        }
+
+        async function confirmOrder(serviceType, amount, cost, currency) {
+            const link = document.getElementById('serviceLink').value;
+            
+            if (!link || !link.includes('instagram.com')) {
+                showMessage('Iltimos, to\'g\'ri Instagram havolasini kiriting!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('backend.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'create_order',
+                        user_id: userData.id,
+                        service_type: serviceType,
+                        amount: amount,
+                        cost: cost,
+                        currency: currency,
+                        link: link,
+                        username: userData.username
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('✅ Buyurtma qabul qilindi! Ko\'rishlar qo\'shilmoqda...', 'success');
+                    userData[currency] -= cost;
+                    updateBalanceDisplay();
+                    closeModal('serviceModal');
+                } else {
+                    showMessage('❌ Xatolik yuz berdi: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('❌ Server xatosi! Iltimos, qayta urinib ko\'ring.', 'error');
+            }
+        }
+
+        // Calculation functions
+        function calculateDiamondsForViews(views) {
+            if (views >= 100000) return Math.floor(views * 0.0075);
+            else if (views >= 50000) return Math.floor(views * 0.008);
+            else if (views >= 20000) return Math.floor(views * 0.0085);
+            else if (views >= 10000) return Math.floor(views * 0.009);
+            else if (views >= 5000) return Math.floor(views * 0.009);
+            else if (views >= 1000) return Math.floor(views * 0.01);
+            else return -1;
+        }
+
+        function calculateCoinsForLikes(likes) {
+            return Math.max(1, Math.ceil(likes / 10));
+        }
+
+        function calculateCoinsForShipments(shipments) {
+            return Math.max(1, Math.ceil(shipments * 3 / 100));
+        }
+
+        // Custom order functions
+        function orderCustomViews() {
+            const amount = parseInt(document.getElementById('customViewsInput').value);
+            if (amount >= 1000) {
+                orderService('views', amount);
+            } else {
+                showMessage('Minimal miqdor: 1000 ta ko\'rish', 'error');
+            }
+        }
+
+        function orderCustomLikes() {
+            const amount = parseInt(document.getElementById('customLikesInput').value);
+            if (amount >= 50) {
+                orderService('likes', amount);
+            } else {
+                showMessage('Minimal miqdor: 50 ta like', 'error');
+            }
+        }
+
+        function orderCustomShipments() {
+            const amount = parseInt(document.getElementById('customShipmentsInput').value);
+            if (amount >= 100) {
+                orderService('shipments', amount);
+            } else {
+                showMessage('Minimal miqdor: 100 ta jo\'natish', 'error');
+            }
+        }
+
+        // Promocode function
+        function openPromocode() {
+            document.getElementById('serviceTitle').textContent = '🎁 Promokod';
+            document.getElementById('serviceContent').innerHTML = `
+                <div class="custom-input">
+                    <input type="text" id="promoCode" placeholder="Promokodni kiriting" style="text-transform: uppercase">
+                    <button onclick="applyPromocode()">Qo'llash</button>
+                </div>
+            `;
+            openModal('serviceModal');
+        }
+
+        async function applyPromocode() {
+            const code = document.getElementById('promoCode').value.toUpperCase().trim();
+            
+            if (!code) {
+                showMessage('Iltimos, promokodni kiriting!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('backend.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'apply_promocode',
+                        user_id: userData.id,
+                        code: code
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    userData.diamonds = data.balance.diamonds;
+                    userData.coins = data.balance.coins;
+                    updateBalanceDisplay();
+                    closeModal('serviceModal');
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('❌ Server xatosi! Iltimos, qayta urinib ko\'ring.', 'error');
+            }
+        }
+
+        // Earn diamonds function
+        function openEarn() {
+            document.getElementById('serviceTitle').textContent = '💎 Olmos Yeg\'ish';
+            const refLink = `https://t.me/RekchiAi_bot?start=${userData.id}`;
+            
+            document.getElementById('serviceContent').innerHTML = `
+                <div class="service-options">
+                    <div class="service-card" onclick="tg.openTelegramLink('${refLink}')">
+                        <h4>👫 Do'stlarni taklif qiling</h4>
+                        <p>Har bir do'stingiz uchun +15 💎 olmos</p>
+                    </div>
+                    <div class="service-card" onclick="openBonusChannels()">
+                        <h4>📢 Kanallarga obuna bo'ling</h4>
+                        <p>Har bir kanal uchun bonus olmoslar</p>
+                    </div>
+                    <div class="service-card" onclick="watchTutorial()">
+                        <h4>🎬 Video qo'llanma</h4>
+                        <p>Videoni ko'rib bonus oling</p>
+                    </div>
+                </div>
+            `;
+            openModal('serviceModal');
+        }
+
+        // Admin functions
+        function openAdminPanel() {
+            loadAdminStats();
+            openModal('adminModal');
+        }
+
+        async function loadAdminStats() {
+            try {
+                const response = await fetch('backend.php?action=get_admin_stats&user_id=' + userData.id);
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalUsers').textContent = data.stats.total_users;
+                    document.getElementById('totalOrders').textContent = data.stats.total_orders;
+                }
+            } catch (error) {
+                console.error('Error loading admin stats:', error);
+            }
+        }
+
+        function adminAction(action) {
+            // Implement admin actions here
+            showMessage('Admin funksiyasi ishga tushirildi: ' + action, 'success');
+        }
+
+        // Utility functions
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDiv.textContent = message;
+            
+            document.querySelector('.app-container').insertBefore(messageDiv, document.querySelector('.app-container').firstChild);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        function showSection(section) {
+            // Implement section switching
+            console.log('Showing section:', section);
+        }
+
+        function openProfile() {
+            document.getElementById('serviceTitle').textContent = '👤 Profil';
+            const refCount = 0; // This should come from backend
+            
+            document.getElementById('serviceContent').innerHTML = `
+                <div class="user-info">
+                    <div class="avatar">${userData.firstName.charAt(0).toUpperCase()}</div>
+                    <div class="user-details">
+                        <h3>${userData.firstName} ${userData.lastName || ''}</h3>
+                        <p>@${userData.username}</p>
+                        <p>ID: ${userData.id}</p>
+                    </div>
+                </div>
+                <div class="balance-cards">
+                    <div class="balance-card">
+                        <h3>💎 Olmoslar</h3>
+                        <div class="amount">${userData.diamonds}</div>
+                    </div>
+                    <div class="balance-card coins">
+                        <h3>🪙 Tangalar</h3>
+                        <div class="amount">${userData.coins}</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${refCount}</div>
+                    <div class="stat-label">Tasdiqlangan referallar</div>
+                </div>
+            `;
+            openModal('serviceModal');
+        }
+
+        function openBonusChannels() {
+            document.getElementById('serviceTitle').textContent = '📢 Bonus Kanallar';
+            document.getElementById('serviceContent').innerHTML = `
+                <div class="loading">
+                    Bonus kanallar yuklanmoqda...
+                </div>
+            `;
+            
+            // Load bonus channels from backend
+            setTimeout(() => {
+                document.getElementById('serviceContent').innerHTML = `
+                    <div class="service-options">
+                        <div class="service-card" onclick="subscribeToChannel('@insta_rekchi')">
+                            <h4>📢 @insta_rekchi</h4>
+                            <p>+10 💎 olmos</p>
+                            <button class="action-btn">Obuna bo'lish</button>
+                        </div>
+                        <div class="service-card" onclick="subscribeToChannel('@rekchi_tv')">
+                            <h4>📢 @rekchi_tv</h4>
+                            <p>+8 💎 olmos</p>
+                            <button class="action-btn">Obuna bo'lish</button>
+                        </div>
+                    </div>
+                `;
+            }, 1000);
+        }
+
+        function subscribeToChannel(channel) {
+            tg.openTelegramLink(`https://t.me/${channel.replace('@', '')}`);
+            showMessage(`✅ ${channel} kanaliga obuna bo'ldingiz! Bonus tekshirilmoqda...`, 'success');
+        }
+
+        function watchTutorial() {
+            document.getElementById('serviceTitle').textContent = '🎬 Video Qo\'llanma';
+            document.getElementById('serviceContent').innerHTML = `
+                <div class="service-options">
+                    <div class="service-card" onclick="tg.openTelegramLink('https://t.me/RekchiAi_bot')">
+                        <h4>Botdan foydalanish</h4>
+                        <p>Asosiy qo'llanma</p>
+                    </div>
+                    <div class="service-card" onclick="tg.openTelegramLink('https://t.me/RekchiAi_bot')">
+                        <h4>Ko'rishlar xizmati</h4>
+                        <p>Video ko'rishlar qo'shish</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateCustomViews() {
+            const amount = parseInt(document.getElementById('customViews').value);
+            if (amount >= 1000) {
+                const diamonds = calculateDiamondsForViews(amount);
+                if (diamonds !== -1) {
+                    document.getElementById('serviceTitle').textContent = '👁️ Ko\'rishlar Xizmati';
+                    document.getElementById('serviceContent').innerHTML = `
+                        <div class="success-message">
+                            ${amount.toLocaleString()} ta ko'rish narxi: ${diamonds} 💎 olmos
+                        </div>
+                        <div class="custom-input">
+                            <input type="text" id="customViewsLink" placeholder="Instagram video havolasi">
+                            <button onclick="confirmOrder('views', ${amount}, ${diamonds}, 'diamonds')">Tasdiqlash</button>
+                        </div>
+                    `;
+                    openModal('serviceModal');
+                } else {
+                    showMessage('Noto\'g\'ri ko\'rish miqdori!', 'error');
+                }
+            } else {
+                showMessage('Minimal miqdor: 1000 ta ko\'rish', 'error');
+            }
+        }
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

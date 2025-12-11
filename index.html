@@ -8,164 +8,50 @@
   :root{
     --tg-bg: #ffffff;
     --tg-accent: #2a9df4;
-    --tg-muted: #8b98a5;
+    --tg-muted: #6b7a86;
     --card-bg: #f7fbff;
-    --shadow: 0 6px 22px rgba(42,157,244,0.08);
-    --radius: 14px;
-    --success: #28a745;
-    --danger: #dc3545;
+    --shadow: 0 8px 26px rgba(42,157,244,0.08);
+    --radius: 12px;
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
-    color-scheme: light;
   }
-  html,body{
-    height:100%;
-    margin:0;
-    background: linear-gradient(180deg,#f3f8ff 0%, #ffffff 100%);
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-  }
-  .app {
-    max-width:720px;
-    margin:18px auto;
-    padding:16px;
-  }
-  header {
-    display:flex;
-    gap:12px;
-    align-items:center;
-    margin-bottom:18px;
-  }
-  .avatar {
-    width:56px;
-    height:56px;
-    border-radius:50%;
-    overflow:hidden;
-    flex:0 0 56px;
-    box-shadow: var(--shadow);
-    border:2px solid rgba(255,255,255,0.6);
-  }
-  .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .hgroup{
-    flex:1;
-  }
-  .hgroup h1{
-    margin:0;
-    font-size:18px;
-    color:#0f1720;
-  }
-  .hgroup p{
-    margin:2px 0 0 0;
-    color:var(--tg-muted);
-    font-size:13px;
-  }
-  .admin-toggle{
-    background:var(--tg-accent);
-    color:white;
-    border-radius:10px;
-    padding:8px 12px;
-    font-weight:600;
-    border:none;
-    cursor:pointer;
-    box-shadow: 0 8px 20px rgba(42,157,244,0.16);
-  }
-  .card{
-    background:linear-gradient(180deg,var(--card-bg), #ffffff);
-    border-radius:var(--radius);
-    padding:14px;
-    margin-bottom:14px;
-    box-shadow: var(--shadow);
-  }
-  .balance-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-  }
-  .balance{
-    font-size:28px;
-    font-weight:700;
-    color:#073b66;
-  }
-  .meta{
-    color:var(--tg-muted);
-    font-size:13px;
-  }
-  .btn{
-    background:var(--tg-accent);
-    color:white;
-    border:none;
-    padding:10px 14px;
-    border-radius:12px;
-    font-weight:700;
-    cursor:pointer;
-    box-shadow: 0 8px 24px rgba(42,157,244,0.12);
-  }
-  .btn.secondary{
-    background:transparent;
-    color:var(--tg-accent);
-    border:1px solid rgba(42,157,244,0.14);
-    box-shadow:none;
-  }
-  .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-  .small{
-    font-size:13px;
-    color:var(--tg-muted);
-  }
-  .ad-card .ad-desc{
-    font-size:14px;
-    margin-bottom:8px;
-  }
-  input[type="number"], input[type="text"]{
-    width:100%;
-    padding:10px 12px;
-    border-radius:10px;
-    border:1px solid #e6eef9;
-    background:white;
-    font-size:15px;
-    box-sizing:border-box;
-    outline:none;
-  }
-  label { font-size:13px; color:var(--tg-muted); display:block; margin-bottom:6px; }
-  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .log{
-    font-size:13px;
-    color:var(--tg-muted);
-    max-height:140px;
-    overflow:auto;
-    padding:8px;
-    border-radius:8px;
-    background:#fff;
-    border:1px solid #f0f6ff;
-  }
-  .admin-panel{
-    margin-top:10px;
-    padding:12px;
-    border-radius:12px;
-    background:linear-gradient(180deg,#fbfdff,#ffffff);
-    border:1px solid #e9f6ff;
-  }
-  .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px;}
-  .stat{
-    padding:10px;border-radius:10px;background:white;border:1px solid #f0f6ff;
-  }
-  .stat h3{margin:0;font-size:16px;color:#073b66;}
-  .stat p{margin:6px 0 0 0;color:var(--tg-muted);font-size:13px;}
-  .toplist{margin-top:10px;}
-  .toplist li{padding:8px;border-radius:8px;background:#fff;margin-bottom:6px;border:1px solid #f0f6ff;display:flex;justify-content:space-between;}
-  .footer-note{margin-top:12px;color:var(--tg-muted);font-size:12px;text-align:center;}
-  @media (max-width:520px){
-    .two-col{grid-template-columns:1fr;}
-  }
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#f3f8ff,#ffffff);-webkit-font-smoothing:antialiased;}
+  .app{max-width:720px;margin:16px auto;padding:14px;}
+  header{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+  .avatar{width:56px;height:56px;border-radius:50%;overflow:hidden;flex:0 0 56px;box-shadow:var(--shadow);border:2px solid rgba(255,255,255,0.6)}
+  .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+  .hgroup{flex:1}
+  .hgroup h1{margin:0;font-size:18px;color:#06324a}
+  .hgroup p{margin:2px 0 0 0;color:var(--tg-muted);font-size:13px}
+  .admin-toggle{background:var(--tg-accent);color:#fff;border-radius:10px;padding:8px 12px;font-weight:700;border:none;cursor:pointer;box-shadow:0 8px 20px rgba(42,157,244,0.14)}
+  .card{background:linear-gradient(180deg,var(--card-bg),#ffffff);border-radius:var(--radius);padding:14px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .balance-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .balance{font-size:28px;font-weight:800;color:#073b66}
+  .meta{color:var(--tg-muted);font-size:13px}
+  .btn{background:var(--tg-accent);color:#fff;border:none;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(42,157,244,0.12)}
+  .btn.secondary{background:transparent;color:var(--tg-accent);border:1px solid rgba(42,157,244,0.14);box-shadow:none}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  input[type="number"], input[type="text"]{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e6eef9;background:white;font-size:15px;outline:none;box-sizing:border-box}
+  label{font-size:13px;color:var(--tg-muted);display:block;margin-bottom:6px}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .log{font-size:13px;color:var(--tg-muted);max-height:140px;overflow:auto;padding:8px;border-radius:8px;background:#fff;border:1px solid #f0f6ff;white-space:pre-wrap}
+  .admin-panel{margin-top:10px;padding:12px;border-radius:12px;background:linear-gradient(180deg,#fbfdff,#ffffff);border:1px solid #e9f6ff}
+  .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+  .stat{padding:10px;border-radius:10px;background:white;border:1px solid #f0f6ff}
+  .stat h3{margin:0;font-size:16px;color:#073b66}
+  .stat p{margin:6px 0 0 0;color:var(--tg-muted);font-size:13px}
+  .toplist{margin-top:10px;padding-left:0;list-style:none}
+  .toplist li{padding:8px;border-radius:8px;background:#fff;margin-bottom:6px;border:1px solid #f0f6ff;display:flex;justify-content:space-between}
+  .footer-note{margin-top:12px;color:var(--tg-muted);font-size:12px;text-align:center}
+  @media (max-width:520px){.two-col{grid-template-columns:1fr}}
 </style>
+</head>
 <body>
   <div class="app" id="app">
     <header id="header">
-      <div class="avatar" id="avatar">
-        <!-- avatar img injected -->
-      </div>
+      <div class="avatar" id="avatar"></div>
       <div class="hgroup">
         <h1 id="displayName">Mini App</h1>
-        <p id="displayHandle" class="small">Telegram orqali oching</p>
+        <p id="displayHandle" class="meta">Telegram orqali oching</p>
       </div>
       <div id="adminBtnWrap" style="display:none">
         <button id="adminBtn" class="admin-toggle">Admin Panel</button>
@@ -174,7 +60,7 @@
 
     <div id="notTelegram" class="card" style="display:none;">
       <strong>Bu Mini App faqat Telegram ichida ishlaydi.</strong>
-      <p class="small">Iltimos, ilovani Telegram ichida oching (chat yoki kanal ichidagi Web App orqali).</p>
+      <p class="meta">Iltimos, ushbu ilovani Telegram ichidagi Web App sifatida oching (bot yoki chat ichidagi "Open" tugmasi orqali).</p>
     </div>
 
     <main id="mainArea" style="display:none">
@@ -183,11 +69,11 @@
           <div>
             <div class="meta">Sizning balans</div>
             <div class="balance" id="balance">0</div>
-            <div class="small" id="balanceTip">Local: <span id="localStamp">—</span> · Server: <span id="serverStamp">—</span></div>
+            <div class="meta" style="font-size:13px">Local: <span id="localStamp">—</span> · Server: <span id="serverStamp">—</span></div>
           </div>
           <div style="text-align:right">
-            <div class="small" id="userIdDisplay"></div>
-            <div class="small" id="userNameDisplay"></div>
+            <div class="meta" id="userIdDisplay"></div>
+            <div class="meta" id="userNameDisplay"></div>
             <div style="height:12px"></div>
             <button id="refreshBtn" class="btn secondary">Yangilash</button>
           </div>
@@ -195,8 +81,8 @@
       </section>
 
       <section class="card ad-card">
-        <div class="ad-desc"><strong>Reklama ko‘rish → 1 olmos</strong></div>
-        <div class="small" style="margin-bottom:8px">Reklama sahifasiga kirilganda haqiqiy 1 olmos beriladi. Har reklamadan faqat 1 marta olmos olinadi.</div>
+        <div style="font-weight:700">Reklama ko‘rish → 1 olmos</div>
+        <div class="meta" style="margin:8px 0">Reklama sahifasiga kirilganda haqiqiy 1 olmos beriladi. Har reklamadan faqat 1 marta olmos olinadi.</div>
         <div class="row">
           <button id="watchAdBtn" class="btn">Reklama ko‘rish</button>
           <button id="adHistoryBtn" class="btn secondary">Reklama tarix</button>
@@ -260,40 +146,23 @@
 
 <script>
 /*
-  Telegram Mini App (bitta index.html)
-  - Detect Telegram WebApp
-  - Use Telegram.WebApp.initDataUnsafe.user for user.id, first_name, username, photo_url
-  - Balance stored in localStorage as balance_<userId>
-  - "Reklama ko'rish" opens external ad page; when window closed (meaning user opened it) award 1 gem per ad per user
-  - Withdraw: POST to provided endpoint with token (front-end obfuscated). Update balance on success
-  - Admin panel visible to specified admin IDs (simulated stats)
-  - All in one file, no external libs
+ Yaxshilangan Telegram detection va user olish.
+ Agar WebApp API mavjud bo'lsa — uni ishlatamiz.
+ Agar atrof-muhit Telegram UA atrofida bo'lsa lekin WebApp yo'q bo'lsa — aniq foydalanuvchi olinmaydi,
+ shuning uchun ilova Telegram ichida ochilishini talab qiladi.
 */
 
 (function(){
-  // Basic config
   const AD_URL = "https://example.com/ad";
-  const WITHDRAW_ENDPOINT = "https://68ed1ab05ca4e.myxvest1.ru/Test/test.php"; // as requested
+  const WITHDRAW_ENDPOINT = "https://68ed1ab05ca4e.myxvest1.ru/Test/test.php";
+  // Token (obfuscated) — frontda yashirin saqlash sharti bilan: base64 saqlanadi
   const API_TOKEN_B64 = "NDU2NDU2NGFzZjc4OTU0ZTY1ZzRhN2c5OGE0Z2E2czVnNDdhN2c5OGFzOGc0NTY=";
-  // Note: token is base64 of the token string in the prompt. This is "obfuscated" in front-end.
-  // Admin IDs
   const ADMINS = [7500103239, 7104718080];
 
-  // Utils
-  const $ = (sel) => document.querySelector(sel);
-  const el = (sel) => document.getElementById(sel);
+  const $ = q => document.querySelector(q);
+  const el = id => document.getElementById(id);
 
-  // App state
-  let isTelegram = !!(window.Telegram && window.Telegram.WebApp);
-  let user = null;
-  let balance = 0;
-  let localKey = null;
-  let adWindow = null;
-  let adPoll = null;
-  const adKeyPrefix = "ad_seen_"; // + userId + "_" + encodeURIComponent(adUrl)
-  const balKeyPrefix = "balance_"; // + userId
-
-  // UI elements
+  // UI refs
   const avatarWrap = el("avatar");
   const displayName = el("displayName");
   const displayHandle = el("displayHandle");
@@ -312,7 +181,6 @@
   const statDailyAds = el("statDailyAds");
   const topList = el("topList");
 
-  // Buttons
   const watchAdBtn = el("watchAdBtn");
   const adHistoryBtn = el("adHistoryBtn");
   const withdrawBtn = el("withdrawBtn");
@@ -320,56 +188,49 @@
   const randomizeAdmin = el("randomizeAdmin");
   const copyStats = el("copyStats");
 
-  // Init
+  // state
+  let user = null;
+  let balance = 0;
+  let localKey = null;
+  let adPoll = null;
+  const adKeyPrefix = "ad_seen_";
+  const balKeyPrefix = "balance_";
+
   function logActivity(msg){
-    const time = new Date().toLocaleTimeString();
-    activityLog.innerHTML = `[${time}] ${msg}\n` + activityLog.innerHTML;
+    const t = new Date().toLocaleTimeString();
+    activityLog.textContent = `[${t}] ${msg}\n` + activityLog.textContent;
   }
   function logWithdraw(msg){
-    const time = new Date().toLocaleTimeString();
-    withdrawLog.innerHTML = `[${time}] ${msg}\n` + withdrawLog.innerHTML;
+    const t = new Date().toLocaleTimeString();
+    withdrawLog.textContent = `[${t}] ${msg}\n` + withdrawLog.textContent;
   }
+
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
 
   function renderAvatar(url, name){
     if(url){
       avatarWrap.innerHTML = '<img src="'+escapeHtml(url)+'" alt="avatar" />';
     } else {
-      // simple SVG avatar with initials
-      const initials = name ? name.split(' ').map(s=>s[0]||'').join('').slice(0,2).toUpperCase() : 'U';
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#2a9df4"/><stop offset="1" stop-color="#5ac8ff"/></linearGradient></defs><rect width="56" height="56" rx="14" fill="url(#g)"/><text x="50%" y="55%" font-family="Arial" font-size="22" fill="#fff" text-anchor="middle">${escapeHtml(initials)}</text></svg>`;
+      const initials = (name||'U').split(' ').map(x=>x[0]||'').join('').slice(0,2).toUpperCase();
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#2a9df4"/><stop offset="1" stop-color="#5ac8ff"/></linearGradient></defs><rect width="56" height="56" rx="12" fill="url(#g)"/><text x="50%" y="57%" font-family="Arial" font-size="22" fill="#fff" text-anchor="middle">${escapeHtml(initials)}</text></svg>`;
       avatarWrap.innerHTML = svg;
     }
   }
 
-  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function decodeToken(){ try{ return atob(API_TOKEN_B64); }catch(e){ return "4564564asf78954e65g4a7g98a4ga6s5g48as7g98as8g456"; } }
 
   function showNotTelegram(){
     el("notTelegram").style.display = "block";
-    document.getElementById("mainArea").style.display = "none";
+    el("mainArea").style.display = "none";
   }
-  function showMain(){
-    el("notTelegram").style.display = "none";
-    document.getElementById("mainArea").style.display = "block";
-  }
+  function showMain(){ el("notTelegram").style.display = "none"; el("mainArea").style.display = "block"; }
 
-  function decodeToken(){
-    try{
-      return atob(API_TOKEN_B64);
-    }catch(e){
-      return "4564564asf78954e65g4a7g98a4ga6s5g48as7g98as8g456"; // fallback
-    }
-  }
-
-  // Balance helpers
+  // balance
   function loadLocalBalance(){
-    const key = localKey;
-    const val = localStorage.getItem(key);
-    if(val !== null){
-      try{
-        balance = Number(JSON.parse(val));
-      }catch(e){
-        balance = 0;
-      }
+    if(!localKey) return;
+    const v = localStorage.getItem(localKey);
+    if(v!==null){
+      try{ balance = Number(JSON.parse(v)); }catch(e){ balance = 0; }
       localStamp.textContent = new Date().toLocaleTimeString();
     } else {
       balance = 0;
@@ -377,141 +238,96 @@
     }
     renderBalance();
   }
-  function saveLocalBalance(){
-    localStorage.setItem(localKey, JSON.stringify(balance));
-    localStamp.textContent = new Date().toLocaleTimeString();
-  }
-  function renderBalance(){
-    balanceEl.textContent = balance;
-  }
+  function saveLocalBalance(){ if(!localKey) return; localStorage.setItem(localKey, JSON.stringify(balance)); localStamp.textContent = new Date().toLocaleTimeString(); }
+  function renderBalance(){ balanceEl.textContent = balance; }
 
-  // Simulated server check on each open.
-  // The user requested a server check each time; real backend isn't provided for balances,
-  // so we simulate a server response while keeping localStorage as the source of truth.
+  // server check (simulated)
   function serverCheckBalance(){
     serverStamp.textContent = "tekshirilmoqda...";
-    // simulate latency
     setTimeout(()=>{
-      // Simulate server maybe returning same balance or slightly authoritative value.
-      // For demo we keep the same number but mark checked.
       serverStamp.textContent = new Date().toLocaleTimeString();
       logActivity("Server bilan balans tekshirildi (simulyatsiya).");
-    }, 900);
+    }, 800);
   }
 
-  // Award 1 gem when ad confirmed opened (only once per user per ad URL)
+  // Ad logic: open new tab and detect when closed to award 1 gem (only once per user+ad)
   function openAdAndAward(adUrl){
     if(!adUrl) return;
     const adKey = adKeyPrefix + user.id + "_" + encodeURIComponent(adUrl);
     if(localStorage.getItem(adKey)){
-      logActivity("Ushbu reklama uchun allaqachon olmos olgansiz.");
-      alert("Siz bu reklama uchun allaqachon olmos olgansiz.");
+      logActivity("Bu reklama uchun allaqachon olmos olingan.");
+      alert("Siz bu reklama uchun oldin olmos olgansiz.");
       return;
     }
-
-    // Open in new window/tab. In Telegram in-app browser this generally works.
-    try{
-      adWindow = window.open(adUrl, "_blank");
-    } catch(e){
-      adWindow = null;
-    }
-
-    if(!adWindow){
-      // Might be blocked; ask user to allow popups or open manually
-      logActivity("Reklama oynasi bloklandi yoki ochilmadi. Iltimos 'Reklama ko‘rish' tugmasini bosib sahifani oching.");
-      alert("Reklama ochilmadi. Iltimos, Telegram ichida ochishni tekshiring yoki pop-up blokirovkalarini o'chiring.");
+    let w = null;
+    try{ w = window.open(adUrl, "_blank"); }catch(e){ w = null; }
+    if(!w){
+      logActivity("Reklama oynasi ochilmadi (pop-up bloklangan).");
+      alert("Reklama oynasi ochilmadi. Iltimos Telegram ichida oching va ruxsat bering.");
       return;
     }
-
-    logActivity("Reklama sahifasi ochildi. Sahifa yopilganda 1 olmos beriladi.");
-    // Poll to detect closed window. When closed, award (only once).
+    logActivity("Reklama ochildi. Sahifa yopilganda +1 olmos beriladi.");
     adPoll = setInterval(()=>{
       try{
-        if(adWindow.closed){
-          clearInterval(adPoll);
-          adPoll = null;
-          // Mark as awarded
-          localStorage.setItem(adKey, JSON.stringify({awarded:1, at: new Date().toISOString()}));
-          // Give 1 gem
+        if(w.closed){
+          clearInterval(adPoll); adPoll = null;
+          localStorage.setItem(adKey, JSON.stringify({awarded:1, at:new Date().toISOString()}));
           balance = Number(balance) + 1;
           saveLocalBalance();
           renderBalance();
-          logActivity("Reklama sahifasi tashrif buyurildi — +1 olmos tayinlandi.");
-          alert("Sizga +1 olmos berildi! Tabriklaymiz 🎉");
+          logActivity("Reklama tashrifi tasdiqlandi — +1 olmos.");
+          alert("Sizga +1 olmos berildi!");
         }
       }catch(e){
-        // cross-origin may throw on reading props; but .closed is allowed. Ignore.
-        clearInterval(adPoll);
-        adPoll = null;
-        localStorage.setItem(adKey, JSON.stringify({awarded:1, at: new Date().toISOString()}));
+        // cross-origin could throw, still award once after a short delay
+        clearInterval(adPoll); adPoll = null;
+        localStorage.setItem(adKey, JSON.stringify({awarded:1, at:new Date().toISOString()}));
         balance = Number(balance) + 1;
         saveLocalBalance();
         renderBalance();
-        logActivity("Reklama tashrifi tasdiqlandi (xato holatida ham) — +1 olmos.");
-        alert("Sizga +1 olmos berildi! 🎉");
+        logActivity("Reklama tashrifi tasdiqlandi (xato holatda ham) — +1 olmos.");
+        alert("Sizga +1 olmos berildi!");
       }
-    },600);
+    }, 600);
   }
 
-  // Withdraw function: POST to endpoint with required JSON body
+  // Withdraw
   async function withdraw(amount){
     amount = Number(amount);
-    if(!amount || amount <= 0) { alert("Iltimos, to‘g‘ri miqdor kiriting."); return; }
-    if(amount > balance){ alert("Balansingiz yetarli emas."); return; }
-
-    const payload = {
-      token: decodeToken(),
-      user_id: user.id,
-      amount: amount
-    };
-
+    if(!amount || amount <= 0){ alert("Iltimos to'g'ri miqdor kiriting"); return; }
+    if(amount > balance){ alert("Balansingiz yetarli emas"); return; }
+    const payload = { token: decodeToken(), user_id: user.id, amount: amount };
     logWithdraw("So'rov yuborilmoqda...");
     try{
-      const res = await fetch(WITHDRAW_ENDPOINT, {
-        method: "POST",
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(payload),
-      });
-      // Try parse JSON
+      const res = await fetch(WITHDRAW_ENDPOINT, { method: "POST", headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
       const data = await res.json();
       logWithdraw("Server javobi: " + JSON.stringify(data));
       if(data && data.success === true){
         balance = balance - amount;
         saveLocalBalance();
         renderBalance();
-        logWithdraw("Ye'chib olish muvaffaqiyatli. Balans yangilandi.");
+        logWithdraw("Ye'chib olish muvaffaqiyatli.");
         alert("Ye'chib olish muvaffaqiyatli!");
       } else {
-        let msg = data && data.message ? data.message : "Server xatosi yoki muvaffaqiyatsiz so'rov.";
-        logWithdraw("Ye'chib olish muvaffaqiyatsiz: " + msg);
+        const msg = data && data.message ? data.message : "Server xatosi";
+        logWithdraw("Muvaffaqiyatsiz: " + msg);
         alert("Xato: " + msg);
       }
-    } catch (err){
-      logWithdraw("So'rov xatosi: " + err);
-      alert("So'rov yuborishda xatolik. Iltimos internet bog'lanishingizni tekshiring yoki keyinroq urinib ko'ring.");
+    }catch(err){
+      logWithdraw("So'rov xatosi: " + (err && err.message ? err.message : err));
+      alert("So'rov yuborishda xatolik. Internetni tekshiring.");
     }
   }
 
-  // Admin panel simulation
-  let adminState = {
-    users: 1250,
-    distributed: 8745,
-    dailyAds: 423,
-    reserved: 10000,
-    top10: []
-  };
+  // Admin sim
+  let adminState = { users: 1200, distributed: 8000, dailyAds: 350, reserved: 10000, top10: [] };
   function randomizeAdminState(){
-    adminState.users = 800 + Math.floor(Math.random()*3000);
-    adminState.distributed = 1000 + Math.floor(Math.random()*20000);
-    adminState.dailyAds = 100 + Math.floor(Math.random()*1500);
-    adminState.reserved = 2000 + Math.floor(Math.random()*20000);
+    adminState.users = 500 + Math.floor(Math.random()*4000);
+    adminState.distributed = 500 + Math.floor(Math.random()*30000);
+    adminState.dailyAds = 50 + Math.floor(Math.random()*2000);
+    adminState.reserved = 1000 + Math.floor(Math.random()*20000);
     adminState.top10 = [];
-    for(let i=0;i<10;i++){
-      adminState.top10.push({
-        name: "user"+(1000+i),
-        gems: Math.floor(Math.random()*1200)
-      });
-    }
+    for(let i=0;i<10;i++){ adminState.top10.push({ name: "user"+(2000+i), gems: Math.floor(Math.random()*2000) }); }
     adminState.top10.sort((a,b)=>b.gems-a.gems);
     renderAdmin();
   }
@@ -521,62 +337,87 @@
     statDailyAds.textContent = adminState.dailyAds;
     el("statReserved").textContent = adminState.reserved;
     topList.innerHTML = "";
-    adminState.top10.forEach((u,idx)=>{
-      const li = document.createElement("li");
-      li.innerHTML = `<span>#${idx+1} ${escapeHtml(u.name)}</span><strong>${u.gems}</strong>`;
-      topList.appendChild(li);
-    });
+    adminState.top10.forEach((u,i)=>{ const li = document.createElement("li"); li.innerHTML = `<span>#${i+1} ${escapeHtml(u.name)}</span><strong>${u.gems}</strong>`; topList.appendChild(li); });
   }
 
-  // Init app with Telegram user if available
-  function init(){
-    if(!isTelegram){
-      // Not inside Telegram WebApp
+  // Improved detection & user fetch
+  function isTelegramEnv(){
+    // 1) Official JS Bridge present
+    if(window.Telegram && window.Telegram.WebApp) return true;
+    // 2) Some user agents of Telegram in-app browser contain "Telegram"
+    try{
+      if(navigator && navigator.userAgent && /Telegram/i.test(navigator.userAgent)) return true;
+    }catch(e){}
+    return false;
+  }
+
+  // Try to obtain user via Telegram.WebApp.* robustly
+  function obtainTelegramUser(){
+    if(window.Telegram && window.Telegram.WebApp){
+      const tg = window.Telegram.WebApp;
+      try{ tg.ready(); }catch(e){}
+      // Prefer initDataUnsafe.user
+      if(tg.initDataUnsafe && tg.initDataUnsafe.user) return tg.initDataUnsafe.user;
+      // Fallback to initData.user
+      if(tg.initData && tg.initData.user) return tg.initData.user;
+      // In some cases user may be in tg.MainButton or not provided; return null then.
+      return null;
+    }
+    return null;
+  }
+
+  function initApp(){
+    // Detect environment
+    if(!isTelegramEnv()){
       showNotTelegram();
       return;
     }
 
-    // Telegram WebApp exists
-    try{
-      // WebApp may provide initDataUnsafe.user
-      if(window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user){
-        user = window.Telegram.WebApp.initDataUnsafe.user;
-      } else if(window.Telegram.WebApp && window.Telegram.WebApp.initData && window.Telegram.WebApp.initData.user){
-        user = window.Telegram.WebApp.initData.user;
-      } else {
-        // As fallback, try window.Telegram.WebApp.MainButton or request via Telegram? We'll display minimal.
-        user = null;
-      }
-    }catch(e){
-      user = null;
-    }
+    // Try get user
+    user = obtainTelegramUser();
 
+    // If WebApp object exists but user missing, wait short time (some clients populate slightly later)
+    if(window.Telegram && window.Telegram.WebApp && !user){
+      // wait up to 1200ms for data
+      let waited = 0;
+      const t = setInterval(()=>{
+        user = obtainTelegramUser();
+        waited += 200;
+        if(user || waited > 1200){
+          clearInterval(t);
+          continueInit();
+        }
+      },200);
+    } else {
+      continueInit();
+    }
+  }
+
+  function continueInit(){
+    // If still no user -> show clear message instructing to open via bot/button that provides WebApp user data
     if(!user || !user.id){
-      // No user info available
-      displayName.textContent = "Foydalanuvchi olinmadi";
-      displayHandle.textContent = "Telegram ichida oching va qayta urinib ko‘ring";
-      userIdDisplay.textContent = "";
-      userNameDisplay.textContent = "";
+      // If we're in a Telegram UA but WebApp user not available, we must require opening via bot's Web App (it provides user).
+      el("displayName").textContent = "Foydalanuvchi olinmadi";
+      el("displayHandle").textContent = "Iltimos, bot orqali yoki chatdagi Web App tugmasi orqali oching";
       renderAvatar(null,"U");
       el("mainArea").style.display = "block";
-      logActivity("Foydalanuvchi ma'lumotlari olinmadi.");
+      logActivity("Telegram WebApp mavjud, ammo foydalanuvchi ma'lumotlari olinmadi. Iltimos bot yoki chat ichidagi WebApp orqali oching.");
       return;
     }
 
-    // Fill UI with user data
-    displayName.textContent = (user.first_name || "Foydalanuvchi") + (user.last_name ? (" " + user.last_name) : "");
-    displayHandle.textContent = user.username ? ("@" + user.username) : "";
+    // Populate UI with user data
+    el("displayName").textContent = (user.first_name || "Foydalanuvchi") + (user.last_name ? (" " + user.last_name) : "");
+    el("displayHandle").textContent = user.username ? ("@" + user.username) : "";
     userIdDisplay.textContent = "ID: " + user.id;
     userNameDisplay.textContent = "Ism: " + (user.first_name || "-");
     renderAvatar(user.photo_url, user.first_name || user.username || "U");
 
-    // Setup local key and load balance
+    // Local key and balance load
     localKey = balKeyPrefix + user.id;
     loadLocalBalance();
-    // Perform server check
     serverCheckBalance();
 
-    // Show admin button if user is admin
+    // Admin visibility
     if(ADMINS.indexOf(Number(user.id)) !== -1){
       adminBtnWrap.style.display = "block";
       adminPanelContainer.style.display = "block";
@@ -590,64 +431,39 @@
     logActivity("Xush kelibsiz, " + (user.first_name || "foydalanuvchi") + "!");
   }
 
-  // Event bindings
-  watchAdBtn.addEventListener("click", (e)=>{
+  // events
+  watchAdBtn.addEventListener("click", ()=> {
+    if(!user || !user.id){ alert("Foydalanuvchi ma'lumotlari yo'q. Iltimos Telegram ichida oching."); return; }
     openAdAndAward(AD_URL);
   });
   adHistoryBtn.addEventListener("click", ()=>{
-    // show ad history for this ad(s)
-    const adKey = adKeyPrefix + user.id + "_" + encodeURIComponent(AD_URL);
-    const data = localStorage.getItem(adKey);
-    if(data){
-      alert("Reklama uchun olmos olindi: " + data);
-    } else {
-      alert("Hozircha siz bu reklama uchun olmos olmadingiz.");
-    }
+    if(!user) { alert("Foydalanuvchi ma'lumotlari yo'q."); return; }
+    const k = adKeyPrefix + user.id + "_" + encodeURIComponent(AD_URL);
+    const v = localStorage.getItem(k);
+    if(v) alert("Reklama uchun olmos allaqachon olingan:\n" + v);
+    else alert("Hozircha bu reklama uchun olmos olinmagan.");
   });
   withdrawBtn.addEventListener("click", ()=>{
     const amt = Number(el("withdrawAmount").value || 0);
-    if(!amt || amt <= 0){
-      alert("Iltimos to‘g‘ri miqdor kiriting.");
-      return;
-    }
-    if(!isTelegram){
-      alert("Bu funksiya faqat Telegram ichida ishlaydi.");
-      return;
-    }
+    if(!amt || amt <= 0){ alert("Iltimos miqdor kiriting."); return; }
     withdraw(amt);
   });
-  refreshBtn.addEventListener("click", ()=>{
-    loadLocalBalance();
-    serverCheckBalance();
-    logActivity("Qo'lda yangilanish amalga oshirildi.");
-  });
-  adminBtn.addEventListener("click", ()=>{
-    adminPanelContainer.style.display = adminPanelContainer.style.display === "none" ? "block" : "none";
-  });
+  refreshBtn.addEventListener("click", ()=>{ loadLocalBalance(); serverCheckBalance(); logActivity("Qo'lda yangilash amalga oshirildi."); });
+  adminBtn.addEventListener("click", ()=>{ adminPanelContainer.style.display = adminPanelContainer.style.display === "none" ? "block" : "none"; });
   randomizeAdmin.addEventListener("click", randomizeAdminState);
   copyStats.addEventListener("click", ()=>{
     const txt = `Users: ${adminState.users}\nDistributed: ${adminState.distributed}\nDailyAds: ${adminState.dailyAds}\nTop10:\n` + adminState.top10.map((u,i)=>`${i+1}. ${u.name} — ${u.gems}`).join("\n");
-    try{
-      navigator.clipboard.writeText(txt).then(()=> alert("Statlar nusxalandi"));
-    }catch(e){
-      alert("Clipboardga yozib bo'lmadi. Qolipni ko'chirib oling:\n\n" + txt);
-    }
+    try{ navigator.clipboard.writeText(txt).then(()=> alert("Statlar nusxalandi")) }catch(e){ alert("Clipboardga yozib bo'lmadi:\n\n" + txt); }
   });
 
-  // Kickoff
-  init();
+  // start
+  initApp();
 
-  // Save local balance periodically (avoid losing)
-  setInterval(()=>{
-    if(localKey) saveLocalBalance();
-  }, 5000);
+  // autosave
+  setInterval(()=> { if(localKey) saveLocalBalance(); }, 5000);
 
-  // When page unload, clear polling windows
-  window.addEventListener("beforeunload", ()=>{
+  window.addEventListener("beforeunload", ()=> {
     if(adPoll) clearInterval(adPoll);
-    if(adWindow && !adWindow.closed) {
-      try{ adWindow.close(); }catch(e){}
-    }
   });
 
 })();

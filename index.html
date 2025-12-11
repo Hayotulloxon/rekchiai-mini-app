@@ -1,1065 +1,656 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RekchiAI - Instagram Promotion</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .app-container {
-            max-width: 400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 14px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #6a11cb;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 20px;
-            margin-right: 15px;
-        }
-
-        .user-details h3 {
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        .user-details p {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .balance-section {
-            padding: 20px;
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .balance-cards {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .balance-card {
-            flex: 1;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .balance-card.coins {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .balance-card h3 {
-            font-size: 14px;
-            margin-bottom: 5px;
-            opacity: 0.9;
-        }
-
-        .balance-card .amount {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .action-btn {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: 600;
-            color: #495057;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .action-btn:hover {
-            background: #e9ecef;
-            transform: translateY(-2px);
-        }
-
-        .services-section {
-            padding: 20px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: #333;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .service-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .service-card {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .service-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .service-icon {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .service-card h4 {
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        .service-card p {
-            color: #666;
-            font-size: 12px;
-        }
-
-        .custom-input {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .custom-input input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            font-size: 16px;
-        }
-
-        .custom-input button {
-            background: #6a11cb;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .navigation {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            border-top: 1px solid #e9ecef;
-            padding: 10px 20px;
-        }
-
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
-        }
-
-        .nav-item {
-            text-align: center;
-            padding: 10px 5px;
-            cursor: pointer;
-            border-radius: 10px;
-            transition: background 0.3s ease;
-        }
-
-        .nav-item.active {
-            background: #f8f9fa;
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            margin-bottom: 5px;
-        }
-
-        .nav-label {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: white;
-            margin: 20px;
-            border-radius: 20px;
-            padding: 20px;
-            max-width: 400px;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-        }
-
-        .shop-items {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .shop-item {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .shop-item h4 {
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        .shop-item .price {
-            color: #6a11cb;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .admin-section {
-            padding: 20px;
-        }
-
-        .admin-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .admin-card {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 24px;
-            font-weight: bold;
-            color: #6a11cb;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            text-align: center;
-        }
-    </style>
-</head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Telegram Mini App — Olmos Tizimi</title>
+<style>
+  :root{
+    --tg-bg: #ffffff;
+    --tg-accent: #2a9df4;
+    --tg-muted: #8b98a5;
+    --card-bg: #f7fbff;
+    --shadow: 0 6px 22px rgba(42,157,244,0.08);
+    --radius: 14px;
+    --success: #28a745;
+    --danger: #dc3545;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+    color-scheme: light;
+  }
+  html,body{
+    height:100%;
+    margin:0;
+    background: linear-gradient(180deg,#f3f8ff 0%, #ffffff 100%);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+  .app {
+    max-width:720px;
+    margin:18px auto;
+    padding:16px;
+  }
+  header {
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .avatar {
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    overflow:hidden;
+    flex:0 0 56px;
+    box-shadow: var(--shadow);
+    border:2px solid rgba(255,255,255,0.6);
+  }
+  .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .hgroup{
+    flex:1;
+  }
+  .hgroup h1{
+    margin:0;
+    font-size:18px;
+    color:#0f1720;
+  }
+  .hgroup p{
+    margin:2px 0 0 0;
+    color:var(--tg-muted);
+    font-size:13px;
+  }
+  .admin-toggle{
+    background:var(--tg-accent);
+    color:white;
+    border-radius:10px;
+    padding:8px 12px;
+    font-weight:600;
+    border:none;
+    cursor:pointer;
+    box-shadow: 0 8px 20px rgba(42,157,244,0.16);
+  }
+  .card{
+    background:linear-gradient(180deg,var(--card-bg), #ffffff);
+    border-radius:var(--radius);
+    padding:14px;
+    margin-bottom:14px;
+    box-shadow: var(--shadow);
+  }
+  .balance-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+  }
+  .balance{
+    font-size:28px;
+    font-weight:700;
+    color:#073b66;
+  }
+  .meta{
+    color:var(--tg-muted);
+    font-size:13px;
+  }
+  .btn{
+    background:var(--tg-accent);
+    color:white;
+    border:none;
+    padding:10px 14px;
+    border-radius:12px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow: 0 8px 24px rgba(42,157,244,0.12);
+  }
+  .btn.secondary{
+    background:transparent;
+    color:var(--tg-accent);
+    border:1px solid rgba(42,157,244,0.14);
+    box-shadow:none;
+  }
+  .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .small{
+    font-size:13px;
+    color:var(--tg-muted);
+  }
+  .ad-card .ad-desc{
+    font-size:14px;
+    margin-bottom:8px;
+  }
+  input[type="number"], input[type="text"]{
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid #e6eef9;
+    background:white;
+    font-size:15px;
+    box-sizing:border-box;
+    outline:none;
+  }
+  label { font-size:13px; color:var(--tg-muted); display:block; margin-bottom:6px; }
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .log{
+    font-size:13px;
+    color:var(--tg-muted);
+    max-height:140px;
+    overflow:auto;
+    padding:8px;
+    border-radius:8px;
+    background:#fff;
+    border:1px solid #f0f6ff;
+  }
+  .admin-panel{
+    margin-top:10px;
+    padding:12px;
+    border-radius:12px;
+    background:linear-gradient(180deg,#fbfdff,#ffffff);
+    border:1px solid #e9f6ff;
+  }
+  .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px;}
+  .stat{
+    padding:10px;border-radius:10px;background:white;border:1px solid #f0f6ff;
+  }
+  .stat h3{margin:0;font-size:16px;color:#073b66;}
+  .stat p{margin:6px 0 0 0;color:var(--tg-muted);font-size:13px;}
+  .toplist{margin-top:10px;}
+  .toplist li{padding:8px;border-radius:8px;background:#fff;margin-bottom:6px;border:1px solid #f0f6ff;display:flex;justify-content:space-between;}
+  .footer-note{margin-top:12px;color:var(--tg-muted);font-size:12px;text-align:center;}
+  @media (max-width:520px){
+    .two-col{grid-template-columns:1fr;}
+  }
+</style>
 <body>
-    <div class="app-container">
-        <div class="header">
-            <h1>🤖 RekchiAI</h1>
-            <p>Instagram Promotion Platform</p>
-        </div>
+  <div class="app" id="app">
+    <header id="header">
+      <div class="avatar" id="avatar">
+        <!-- avatar img injected -->
+      </div>
+      <div class="hgroup">
+        <h1 id="displayName">Mini App</h1>
+        <p id="displayHandle" class="small">Telegram orqali oching</p>
+      </div>
+      <div id="adminBtnWrap" style="display:none">
+        <button id="adminBtn" class="admin-toggle">Admin Panel</button>
+      </div>
+    </header>
 
-        <div class="user-info">
-            <div class="avatar" id="userAvatar">U</div>
-            <div class="user-details">
-                <h3 id="userName">Foydalanuvchi</h3>
-                <p id="userId">ID: ...</p>
-            </div>
-        </div>
-
-        <div class="balance-section">
-            <div class="balance-cards">
-                <div class="balance-card">
-                    <h3>💎 Olmoslar</h3>
-                    <div class="amount" id="diamondsCount">0</div>
-                </div>
-                <div class="balance-card coins">
-                    <h3>🪙 Tangalar</h3>
-                    <div class="amount" id="coinsCount">0</div>
-                </div>
-            </div>
-            <div class="quick-actions">
-                <div class="action-btn" onclick="openShop()">🛒 Do'kon</div>
-                <div class="action-btn" onclick="openEarn()">💎 Yeg'ish</div>
-            </div>
-        </div>
-
-        <div class="services-section">
-            <div class="section-title">
-                <span>🚀 Xizmatlar</span>
-            </div>
-            
-            <div class="service-grid">
-                <div class="service-card" onclick="openService('views')">
-                    <div class="service-icon">👁️</div>
-                    <h4>Ko'rishlar</h4>
-                    <p>Video ko'rishlari</p>
-                </div>
-                <div class="service-card" onclick="openService('likes')">
-                    <div class="service-icon">❤️</div>
-                    <h4>Likelar</h4>
-                    <p>Post likelari</p>
-                </div>
-                <div class="service-card" onclick="openService('shipments')">
-                    <div class="service-icon">📦</div>
-                    <h4>Jo'natishlar</h4>
-                    <p>Yuborish xizmati</p>
-                </div>
-                <div class="service-card" onclick="openPromocode()">
-                    <div class="service-icon">🎁</div>
-                    <h4>Promokod</h4>
-                    <p>Bonus olish</p>
-                </div>
-            </div>
-
-            <div class="custom-input">
-                <input type="text" id="customViews" placeholder="Ko'rishlar soni (1000+)">
-                <button onclick="calculateCustomViews()">Hisoblash</button>
-            </div>
-        </div>
-
-        <div class="navigation">
-            <div class="nav-grid">
-                <div class="nav-item active" onclick="showSection('main')">
-                    <div class="nav-icon">🏠</div>
-                    <div class="nav-label">Asosiy</div>
-                </div>
-                <div class="nav-item" onclick="showSection('services')">
-                    <div class="nav-icon">🚀</div>
-                    <div class="nav-label">Xizmatlar</div>
-                </div>
-                <div class="nav-item" onclick="openShop()">
-                    <div class="nav-icon">🛒</div>
-                    <div class="nav-label">Do'kon</div>
-                </div>
-                <div class="nav-item" onclick="openEarn()">
-                    <div class="nav-icon">💎</div>
-                    <div class="nav-label">Yeg'ish</div>
-                </div>
-                <div class="nav-item" onclick="openProfile()">
-                    <div class="nav-icon">👤</div>
-                    <div class="nav-label">Profil</div>
-                </div>
-            </div>
-        </div>
+    <div id="notTelegram" class="card" style="display:none;">
+      <strong>Bu Mini App faqat Telegram ichida ishlaydi.</strong>
+      <p class="small">Iltimos, ilovani Telegram ichida oching (chat yoki kanal ichidagi Web App orqali).</p>
     </div>
 
-    <!-- Modal Windows -->
-    <div id="shopModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">🛒 Do'kon</div>
-                <button class="close-btn" onclick="closeModal('shopModal')">×</button>
-            </div>
-            <div class="shop-items">
-                <div class="shop-item" onclick="buyProduct('diamonds', 50, 5000)">
-                    <h4>💎 50 Olmos</h4>
-                    <div class="price">5,000 so'm</div>
-                    <button class="action-btn">Sotib olish</button>
-                </div>
-                <div class="shop-item" onclick="buyProduct('diamonds', 100, 9000)">
-                    <h4>💎 100 Olmos</h4>
-                    <div class="price">9,000 so'm</div>
-                    <button class="action-btn">Sotib olish</button>
-                </div>
-                <div class="shop-item" onclick="buyProduct('diamonds', 300, 25000)">
-                    <h4>💎 300 Olmos</h4>
-                    <div class="price">25,000 so'm</div>
-                    <button class="action-btn">Sotib olish</button>
-                </div>
-                <div class="shop-item" onclick="buyProduct('coins', 50, 6000)">
-                    <h4>🪙 50 Tanga</h4>
-                    <div class="price">6,000 so'm</div>
-                    <button class="action-btn">Sotib olish</button>
-                </div>
-            </div>
+    <main id="mainArea" style="display:none">
+      <section class="card">
+        <div class="balance-row">
+          <div>
+            <div class="meta">Sizning balans</div>
+            <div class="balance" id="balance">0</div>
+            <div class="small" id="balanceTip">Local: <span id="localStamp">—</span> · Server: <span id="serverStamp">—</span></div>
+          </div>
+          <div style="text-align:right">
+            <div class="small" id="userIdDisplay"></div>
+            <div class="small" id="userNameDisplay"></div>
+            <div style="height:12px"></div>
+            <button id="refreshBtn" class="btn secondary">Yangilash</button>
+          </div>
         </div>
-    </div>
+      </section>
 
-    <div id="serviceModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title" id="serviceTitle">Xizmat</div>
-                <button class="close-btn" onclick="closeModal('serviceModal')">×</button>
-            </div>
-            <div id="serviceContent">
-                <!-- Service content will be loaded here -->
-            </div>
+      <section class="card ad-card">
+        <div class="ad-desc"><strong>Reklama ko‘rish → 1 olmos</strong></div>
+        <div class="small" style="margin-bottom:8px">Reklama sahifasiga kirilganda haqiqiy 1 olmos beriladi. Har reklamadan faqat 1 marta olmos olinadi.</div>
+        <div class="row">
+          <button id="watchAdBtn" class="btn">Reklama ko‘rish</button>
+          <button id="adHistoryBtn" class="btn secondary">Reklama tarix</button>
         </div>
-    </div>
+      </section>
 
-    <div id="adminModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">👑 Admin Panel</div>
-                <button class="close-btn" onclick="closeModal('adminModal')">×</button>
-            </div>
-            <div class="admin-section">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalUsers">0</div>
-                        <div class="stat-label">Foydalanuvchi</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalOrders">0</div>
-                        <div class="stat-label">Buyurtma</div>
-                    </div>
-                </div>
-                <div class="admin-grid">
-                    <div class="admin-card" onclick="adminAction('users')">👥 Foydalanuvchilar</div>
-                    <div class="admin-card" onclick="adminAction('orders')">📦 Buyurtmalar</div>
-                    <div class="admin-card" onclick="adminAction('promocodes')">🎁 Promokodlar</div>
-                    <div class="admin-card" onclick="adminAction('broadcast')">📢 Reklama</div>
-                </div>
-            </div>
+      <section class="card">
+        <div class="meta">Olmosni yechib olish</div>
+        <div style="margin-top:8px" class="two-col">
+          <div>
+            <label for="withdrawAmount">Miqdor (olmos)</label>
+            <input id="withdrawAmount" type="number" min="1" placeholder="Masalan: 10" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button id="withdrawBtn" class="btn" style="width:100%">So‘rov yuborish</button>
+          </div>
         </div>
-    </div>
+        <div style="margin-top:10px" class="log" id="withdrawLog">Withdraw log...</div>
+      </section>
 
-    <script>
-        // Telegram Web App initialization
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.BackButton.hide();
+      <section class="card">
+        <div class="meta">Faoliyatlar</div>
+        <div style="margin-top:8px" class="log" id="activityLog">Tayyor...</div>
+      </section>
 
-        // User data
-        let userData = {
-            id: '',
-            username: '',
-            firstName: '',
-            lastName: '',
-            diamonds: 0,
-            coins: 0,
-            isAdmin: false
-        };
+      <div id="adminPanelContainer" style="display:none" class="card admin-panel">
+        <h3>Admin panel (simulyatsiya)</h3>
+        <div class="stat-grid">
+          <div class="stat">
+            <h3 id="statUsers">—</h3>
+            <p>Jami foydalanuvchilar</p>
+          </div>
+          <div class="stat">
+            <h3 id="statDistributed">—</h3>
+            <p>Jami tarqatilgan olmos</p>
+          </div>
+          <div class="stat">
+            <h3 id="statDailyAds">—</h3>
+            <p>Kunlik reklamaga kirishlar</p>
+          </div>
+          <div class="stat">
+            <h3 id="statReserved">—</h3>
+            <p>Rezerv (sim)</p>
+          </div>
+        </div>
 
-        // Initialize app
-        function initApp() {
-            // Get Telegram user data
-            const initData = tg.initDataUnsafe;
-            userData.id = initData.user?.id || '123456789';
-            userData.username = initData.user?.username || 'user';
-            userData.firstName = initData.user?.first_name || 'Foydalanuvchi';
-            userData.lastName = initData.user?.last_name || '';
-            
-            // Update UI with user data
-            document.getElementById('userName').textContent = userData.firstName + (userData.lastName ? ' ' + userData.lastName : '');
-            document.getElementById('userId').textContent = 'ID: ' + userData.id;
-            document.getElementById('userAvatar').textContent = userData.firstName.charAt(0).toUpperCase();
+        <div style="margin-top:12px">
+          <strong>Top 10 foydalanuvchi (ko‘p olmos yig‘ganlar)</strong>
+          <ul class="toplist" id="topList"></ul>
+          <div style="margin-top:8px" class="row">
+            <button id="randomizeAdmin" class="btn">Simulyatsiya yangila</button>
+            <button id="copyStats" class="btn secondary">Nusxa olish</button>
+          </div>
+        </div>
+      </div>
 
-            // Load user balance and check admin status
-            loadUserData();
+      <div class="footer-note">Mini App — bitta fayl. Dizayn: Telegram uslubida. Responsive.</div>
+    </main>
+  </div>
+
+<script>
+/*
+  Telegram Mini App (bitta index.html)
+  - Detect Telegram WebApp
+  - Use Telegram.WebApp.initDataUnsafe.user for user.id, first_name, username, photo_url
+  - Balance stored in localStorage as balance_<userId>
+  - "Reklama ko'rish" opens external ad page; when window closed (meaning user opened it) award 1 gem per ad per user
+  - Withdraw: POST to provided endpoint with token (front-end obfuscated). Update balance on success
+  - Admin panel visible to specified admin IDs (simulated stats)
+  - All in one file, no external libs
+*/
+
+(function(){
+  // Basic config
+  const AD_URL = "https://example.com/ad";
+  const WITHDRAW_ENDPOINT = "https://68ed1ab05ca4e.myxvest1.ru/Test/test.php"; // as requested
+  const API_TOKEN_B64 = "NDU2NDU2NGFzZjc4OTU0ZTY1ZzRhN2c5OGE0Z2E2czVnNDdhN2c5OGFzOGc0NTY=";
+  // Note: token is base64 of the token string in the prompt. This is "obfuscated" in front-end.
+  // Admin IDs
+  const ADMINS = [7500103239, 7104718080];
+
+  // Utils
+  const $ = (sel) => document.querySelector(sel);
+  const el = (sel) => document.getElementById(sel);
+
+  // App state
+  let isTelegram = !!(window.Telegram && window.Telegram.WebApp);
+  let user = null;
+  let balance = 0;
+  let localKey = null;
+  let adWindow = null;
+  let adPoll = null;
+  const adKeyPrefix = "ad_seen_"; // + userId + "_" + encodeURIComponent(adUrl)
+  const balKeyPrefix = "balance_"; // + userId
+
+  // UI elements
+  const avatarWrap = el("avatar");
+  const displayName = el("displayName");
+  const displayHandle = el("displayHandle");
+  const userIdDisplay = el("userIdDisplay");
+  const userNameDisplay = el("userNameDisplay");
+  const balanceEl = el("balance");
+  const localStamp = el("localStamp");
+  const serverStamp = el("serverStamp");
+  const activityLog = el("activityLog");
+  const withdrawLog = el("withdrawLog");
+  const adminBtnWrap = el("adminBtnWrap");
+  const adminBtn = el("adminBtn");
+  const adminPanelContainer = el("adminPanelContainer");
+  const statUsers = el("statUsers");
+  const statDistributed = el("statDistributed");
+  const statDailyAds = el("statDailyAds");
+  const topList = el("topList");
+
+  // Buttons
+  const watchAdBtn = el("watchAdBtn");
+  const adHistoryBtn = el("adHistoryBtn");
+  const withdrawBtn = el("withdrawBtn");
+  const refreshBtn = el("refreshBtn");
+  const randomizeAdmin = el("randomizeAdmin");
+  const copyStats = el("copyStats");
+
+  // Init
+  function logActivity(msg){
+    const time = new Date().toLocaleTimeString();
+    activityLog.innerHTML = `[${time}] ${msg}\n` + activityLog.innerHTML;
+  }
+  function logWithdraw(msg){
+    const time = new Date().toLocaleTimeString();
+    withdrawLog.innerHTML = `[${time}] ${msg}\n` + withdrawLog.innerHTML;
+  }
+
+  function renderAvatar(url, name){
+    if(url){
+      avatarWrap.innerHTML = '<img src="'+escapeHtml(url)+'" alt="avatar" />';
+    } else {
+      // simple SVG avatar with initials
+      const initials = name ? name.split(' ').map(s=>s[0]||'').join('').slice(0,2).toUpperCase() : 'U';
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#2a9df4"/><stop offset="1" stop-color="#5ac8ff"/></linearGradient></defs><rect width="56" height="56" rx="14" fill="url(#g)"/><text x="50%" y="55%" font-family="Arial" font-size="22" fill="#fff" text-anchor="middle">${escapeHtml(initials)}</text></svg>`;
+      avatarWrap.innerHTML = svg;
+    }
+  }
+
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+  function showNotTelegram(){
+    el("notTelegram").style.display = "block";
+    document.getElementById("mainArea").style.display = "none";
+  }
+  function showMain(){
+    el("notTelegram").style.display = "none";
+    document.getElementById("mainArea").style.display = "block";
+  }
+
+  function decodeToken(){
+    try{
+      return atob(API_TOKEN_B64);
+    }catch(e){
+      return "4564564asf78954e65g4a7g98a4ga6s5g48as7g98as8g456"; // fallback
+    }
+  }
+
+  // Balance helpers
+  function loadLocalBalance(){
+    const key = localKey;
+    const val = localStorage.getItem(key);
+    if(val !== null){
+      try{
+        balance = Number(JSON.parse(val));
+      }catch(e){
+        balance = 0;
+      }
+      localStamp.textContent = new Date().toLocaleTimeString();
+    } else {
+      balance = 0;
+      localStamp.textContent = "—";
+    }
+    renderBalance();
+  }
+  function saveLocalBalance(){
+    localStorage.setItem(localKey, JSON.stringify(balance));
+    localStamp.textContent = new Date().toLocaleTimeString();
+  }
+  function renderBalance(){
+    balanceEl.textContent = balance;
+  }
+
+  // Simulated server check on each open.
+  // The user requested a server check each time; real backend isn't provided for balances,
+  // so we simulate a server response while keeping localStorage as the source of truth.
+  function serverCheckBalance(){
+    serverStamp.textContent = "tekshirilmoqda...";
+    // simulate latency
+    setTimeout(()=>{
+      // Simulate server maybe returning same balance or slightly authoritative value.
+      // For demo we keep the same number but mark checked.
+      serverStamp.textContent = new Date().toLocaleTimeString();
+      logActivity("Server bilan balans tekshirildi (simulyatsiya).");
+    }, 900);
+  }
+
+  // Award 1 gem when ad confirmed opened (only once per user per ad URL)
+  function openAdAndAward(adUrl){
+    if(!adUrl) return;
+    const adKey = adKeyPrefix + user.id + "_" + encodeURIComponent(adUrl);
+    if(localStorage.getItem(adKey)){
+      logActivity("Ushbu reklama uchun allaqachon olmos olgansiz.");
+      alert("Siz bu reklama uchun allaqachon olmos olgansiz.");
+      return;
+    }
+
+    // Open in new window/tab. In Telegram in-app browser this generally works.
+    try{
+      adWindow = window.open(adUrl, "_blank");
+    } catch(e){
+      adWindow = null;
+    }
+
+    if(!adWindow){
+      // Might be blocked; ask user to allow popups or open manually
+      logActivity("Reklama oynasi bloklandi yoki ochilmadi. Iltimos 'Reklama ko‘rish' tugmasini bosib sahifani oching.");
+      alert("Reklama ochilmadi. Iltimos, Telegram ichida ochishni tekshiring yoki pop-up blokirovkalarini o'chiring.");
+      return;
+    }
+
+    logActivity("Reklama sahifasi ochildi. Sahifa yopilganda 1 olmos beriladi.");
+    // Poll to detect closed window. When closed, award (only once).
+    adPoll = setInterval(()=>{
+      try{
+        if(adWindow.closed){
+          clearInterval(adPoll);
+          adPoll = null;
+          // Mark as awarded
+          localStorage.setItem(adKey, JSON.stringify({awarded:1, at: new Date().toISOString()}));
+          // Give 1 gem
+          balance = Number(balance) + 1;
+          saveLocalBalance();
+          renderBalance();
+          logActivity("Reklama sahifasi tashrif buyurildi — +1 olmos tayinlandi.");
+          alert("Sizga +1 olmos berildi! Tabriklaymiz 🎉");
         }
+      }catch(e){
+        // cross-origin may throw on reading props; but .closed is allowed. Ignore.
+        clearInterval(adPoll);
+        adPoll = null;
+        localStorage.setItem(adKey, JSON.stringify({awarded:1, at: new Date().toISOString()}));
+        balance = Number(balance) + 1;
+        saveLocalBalance();
+        renderBalance();
+        logActivity("Reklama tashrifi tasdiqlandi (xato holatida ham) — +1 olmos.");
+        alert("Sizga +1 olmos berildi! 🎉");
+      }
+    },600);
+  }
 
-        // Load user data from backend
-        async function loadUserData() {
-            try {
-                const response = await fetch('backend.php?action=get_user_data&user_id=' + userData.id);
-                const data = await response.json();
-                
-                if (data.success) {
-                    userData.diamonds = data.diamonds;
-                    userData.coins = data.coins;
-                    userData.isAdmin = data.is_admin;
-                    
-                    updateBalanceDisplay();
-                    
-                    // Show admin button if user is admin
-                    if (userData.isAdmin) {
-                        const navGrid = document.querySelector('.nav-grid');
-                        navGrid.innerHTML += `
-                            <div class="nav-item" onclick="openAdminPanel()">
-                                <div class="nav-icon">👑</div>
-                                <div class="nav-label">Admin</div>
-                            </div>
-                        `;
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading user data:', error);
-            }
-        }
+  // Withdraw function: POST to endpoint with required JSON body
+  async function withdraw(amount){
+    amount = Number(amount);
+    if(!amount || amount <= 0) { alert("Iltimos, to‘g‘ri miqdor kiriting."); return; }
+    if(amount > balance){ alert("Balansingiz yetarli emas."); return; }
 
-        // Update balance display
-        function updateBalanceDisplay() {
-            document.getElementById('diamondsCount').textContent = userData.diamonds;
-            document.getElementById('coinsCount').textContent = userData.coins;
-        }
+    const payload = {
+      token: decodeToken(),
+      user_id: user.id,
+      amount: amount
+    };
 
-        // Modal functions
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
+    logWithdraw("So'rov yuborilmoqda...");
+    try{
+      const res = await fetch(WITHDRAW_ENDPOINT, {
+        method: "POST",
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload),
+      });
+      // Try parse JSON
+      const data = await res.json();
+      logWithdraw("Server javobi: " + JSON.stringify(data));
+      if(data && data.success === true){
+        balance = balance - amount;
+        saveLocalBalance();
+        renderBalance();
+        logWithdraw("Ye'chib olish muvaffaqiyatli. Balans yangilandi.");
+        alert("Ye'chib olish muvaffaqiyatli!");
+      } else {
+        let msg = data && data.message ? data.message : "Server xatosi yoki muvaffaqiyatsiz so'rov.";
+        logWithdraw("Ye'chib olish muvaffaqiyatsiz: " + msg);
+        alert("Xato: " + msg);
+      }
+    } catch (err){
+      logWithdraw("So'rov xatosi: " + err);
+      alert("So'rov yuborishda xatolik. Iltimos internet bog'lanishingizni tekshiring yoki keyinroq urinib ko'ring.");
+    }
+  }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
+  // Admin panel simulation
+  let adminState = {
+    users: 1250,
+    distributed: 8745,
+    dailyAds: 423,
+    reserved: 10000,
+    top10: []
+  };
+  function randomizeAdminState(){
+    adminState.users = 800 + Math.floor(Math.random()*3000);
+    adminState.distributed = 1000 + Math.floor(Math.random()*20000);
+    adminState.dailyAds = 100 + Math.floor(Math.random()*1500);
+    adminState.reserved = 2000 + Math.floor(Math.random()*20000);
+    adminState.top10 = [];
+    for(let i=0;i<10;i++){
+      adminState.top10.push({
+        name: "user"+(1000+i),
+        gems: Math.floor(Math.random()*1200)
+      });
+    }
+    adminState.top10.sort((a,b)=>b.gems-a.gems);
+    renderAdmin();
+  }
+  function renderAdmin(){
+    statUsers.textContent = adminState.users;
+    statDistributed.textContent = adminState.distributed;
+    statDailyAds.textContent = adminState.dailyAds;
+    el("statReserved").textContent = adminState.reserved;
+    topList.innerHTML = "";
+    adminState.top10.forEach((u,idx)=>{
+      const li = document.createElement("li");
+      li.innerHTML = `<span>#${idx+1} ${escapeHtml(u.name)}</span><strong>${u.gems}</strong>`;
+      topList.appendChild(li);
+    });
+  }
 
-        // Shop functions
-        function openShop() {
-            openModal('shopModal');
-        }
+  // Init app with Telegram user if available
+  function init(){
+    if(!isTelegram){
+      // Not inside Telegram WebApp
+      showNotTelegram();
+      return;
+    }
 
-        async function buyProduct(type, amount, price) {
-            // Direct contact with admin for purchase
-            const adminUsername = 'Behruzxan'; // Replace with actual admin username
-            const message = `Salom! Men ${type === 'diamonds' ? amount + ' 💎 olmos' : amount + ' 🪙 tanga'} sotib olmoqchiman.`;
-            
-            tg.openTelegramLink(`https://t.me/${adminUsername}?start=purchase_${type}_${amount}`);
-            
-            closeModal('shopModal');
-        }
+    // Telegram WebApp exists
+    try{
+      // WebApp may provide initDataUnsafe.user
+      if(window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user){
+        user = window.Telegram.WebApp.initDataUnsafe.user;
+      } else if(window.Telegram.WebApp && window.Telegram.WebApp.initData && window.Telegram.WebApp.initData.user){
+        user = window.Telegram.WebApp.initData.user;
+      } else {
+        // As fallback, try window.Telegram.WebApp.MainButton or request via Telegram? We'll display minimal.
+        user = null;
+      }
+    }catch(e){
+      user = null;
+    }
 
-        // Service functions
-        function openService(serviceType) {
-            const serviceTitles = {
-                'views': '👁️ Ko\'rishlar Xizmati',
-                'likes': '❤️ Likelar Xizmati', 
-                'shipments': '📦 Jo\'natishlar Xizmati'
-            };
-            
-            document.getElementById('serviceTitle').textContent = serviceTitles[serviceType] || 'Xizmat';
-            
-            let content = '';
-            if (serviceType === 'views') {
-                content = `
-                    <div class="service-options">
-                        <div class="service-card" onclick="orderService('views', 1000)">
-                            <h4>👁️ 1,000 ko'rish</h4>
-                            <p>10 💎 olmos</p>
-                        </div>
-                        <div class="service-card" onclick="orderService('views', 5000)">
-                            <h4>👁️ 5,000 ko'rish</h4>
-                            <p>45 💎 olmos</p>
-                        </div>
-                        <div class="service-card" onclick="orderService('views', 10000)">
-                            <h4>👁️ 10,000 ko'rish</h4>
-                            <p>90 💎 olmos</p>
-                        </div>
-                        <div class="custom-input">
-                            <input type="number" id="customViewsInput" placeholder="Boshqa miqdor" min="1000">
-                            <button onclick="orderCustomViews()">Hisoblash</button>
-                        </div>
-                    </div>
-                `;
-            } else if (serviceType === 'likes') {
-                content = `
-                    <div class="service-options">
-                        <div class="service-card" onclick="orderService('likes', 100)">
-                            <h4>❤️ 100 like</h4>
-                            <p>10 🪙 tanga</p>
-                        </div>
-                        <div class="service-card" onclick="orderService('likes', 500)">
-                            <h4>❤️ 500 like</h4>
-                            <p>45 🪙 tanga</p>
-                        </div>
-                        <div class="custom-input">
-                            <input type="number" id="customLikesInput" placeholder="Boshqa miqdor" min="50">
-                            <button onclick="orderCustomLikes()">Hisoblash</button>
-                        </div>
-                    </div>
-                `;
-            } else if (serviceType === 'shipments') {
-                content = `
-                    <div class="service-options">
-                        <div class="service-card" onclick="orderService('shipments', 1000)">
-                            <h4>📦 1,000 jo'natish</h4>
-                            <p>30 🪙 tanga</p>
-                        </div>
-                        <div class="service-card" onclick="orderService('shipments', 5000)">
-                            <h4>📦 5,000 jo'natish</h4>
-                            <p>140 🪙 tanga</p>
-                        </div>
-                        <div class="custom-input">
-                            <input type="number" id="customShipmentsInput" placeholder="Boshqa miqdor" min="100">
-                            <button onclick="orderCustomShipments()">Hisoblash</button>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            document.getElementById('serviceContent').innerHTML = content;
-            openModal('serviceModal');
-        }
+    if(!user || !user.id){
+      // No user info available
+      displayName.textContent = "Foydalanuvchi olinmadi";
+      displayHandle.textContent = "Telegram ichida oching va qayta urinib ko‘ring";
+      userIdDisplay.textContent = "";
+      userNameDisplay.textContent = "";
+      renderAvatar(null,"U");
+      el("mainArea").style.display = "block";
+      logActivity("Foydalanuvchi ma'lumotlari olinmadi.");
+      return;
+    }
 
-        async function orderService(serviceType, amount) {
-            let cost = 0;
-            let currency = '';
-            
-            if (serviceType === 'views') {
-                cost = calculateDiamondsForViews(amount);
-                currency = 'diamonds';
-            } else if (serviceType === 'likes') {
-                cost = calculateCoinsForLikes(amount);
-                currency = 'coins';
-            } else if (serviceType === 'shipments') {
-                cost = calculateCoinsForShipments(amount);
-                currency = 'coins';
-            }
-            
-            // Check balance
-            if (userData[currency] < cost) {
-                showMessage(`Yetarli ${currency === 'diamonds' ? '💎 olmos' : '🪙 tanga'} mavjud emas!`, 'error');
-                return;
-            }
-            
-            // Show link input
-            document.getElementById('serviceContent').innerHTML = `
-                <div class="success-message">
-                    Narx: ${cost} ${currency === 'diamonds' ? '💎' : '🪙'}<br>
-                    Miqdor: ${amount.toLocaleString()} ${serviceType === 'views' ? 'ko\'rish' : serviceType === 'likes' ? 'like' : 'jo\'natish'}
-                </div>
-                <div class="custom-input">
-                    <input type="text" id="serviceLink" placeholder="Instagram video/post havolasi">
-                    <button onclick="confirmOrder('${serviceType}', ${amount}, ${cost}, '${currency}')">Tasdiqlash</button>
-                </div>
-            `;
-        }
+    // Fill UI with user data
+    displayName.textContent = (user.first_name || "Foydalanuvchi") + (user.last_name ? (" " + user.last_name) : "");
+    displayHandle.textContent = user.username ? ("@" + user.username) : "";
+    userIdDisplay.textContent = "ID: " + user.id;
+    userNameDisplay.textContent = "Ism: " + (user.first_name || "-");
+    renderAvatar(user.photo_url, user.first_name || user.username || "U");
 
-        async function confirmOrder(serviceType, amount, cost, currency) {
-            const link = document.getElementById('serviceLink').value;
-            
-            if (!link || !link.includes('instagram.com')) {
-                showMessage('Iltimos, to\'g\'ri Instagram havolasini kiriting!', 'error');
-                return;
-            }
-            
-            try {
-                const response = await fetch('backend.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'create_order',
-                        user_id: userData.id,
-                        service_type: serviceType,
-                        amount: amount,
-                        cost: cost,
-                        currency: currency,
-                        link: link,
-                        username: userData.username
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showMessage('✅ Buyurtma qabul qilindi! Ko\'rishlar qo\'shilmoqda...', 'success');
-                    userData[currency] -= cost;
-                    updateBalanceDisplay();
-                    closeModal('serviceModal');
-                } else {
-                    showMessage('❌ Xatolik yuz berdi: ' + data.message, 'error');
-                }
-            } catch (error) {
-                showMessage('❌ Server xatosi! Iltimos, qayta urinib ko\'ring.', 'error');
-            }
-        }
+    // Setup local key and load balance
+    localKey = balKeyPrefix + user.id;
+    loadLocalBalance();
+    // Perform server check
+    serverCheckBalance();
 
-        // Calculation functions
-        function calculateDiamondsForViews(views) {
-            if (views >= 100000) return Math.floor(views * 0.0075);
-            else if (views >= 50000) return Math.floor(views * 0.008);
-            else if (views >= 20000) return Math.floor(views * 0.0085);
-            else if (views >= 10000) return Math.floor(views * 0.009);
-            else if (views >= 5000) return Math.floor(views * 0.009);
-            else if (views >= 1000) return Math.floor(views * 0.01);
-            else return -1;
-        }
+    // Show admin button if user is admin
+    if(ADMINS.indexOf(Number(user.id)) !== -1){
+      adminBtnWrap.style.display = "block";
+      adminPanelContainer.style.display = "block";
+      randomizeAdminState();
+    } else {
+      adminBtnWrap.style.display = "none";
+      adminPanelContainer.style.display = "none";
+    }
 
-        function calculateCoinsForLikes(likes) {
-            return Math.max(1, Math.ceil(likes / 10));
-        }
+    showMain();
+    logActivity("Xush kelibsiz, " + (user.first_name || "foydalanuvchi") + "!");
+  }
 
-        function calculateCoinsForShipments(shipments) {
-            return Math.max(1, Math.ceil(shipments * 3 / 100));
-        }
+  // Event bindings
+  watchAdBtn.addEventListener("click", (e)=>{
+    openAdAndAward(AD_URL);
+  });
+  adHistoryBtn.addEventListener("click", ()=>{
+    // show ad history for this ad(s)
+    const adKey = adKeyPrefix + user.id + "_" + encodeURIComponent(AD_URL);
+    const data = localStorage.getItem(adKey);
+    if(data){
+      alert("Reklama uchun olmos olindi: " + data);
+    } else {
+      alert("Hozircha siz bu reklama uchun olmos olmadingiz.");
+    }
+  });
+  withdrawBtn.addEventListener("click", ()=>{
+    const amt = Number(el("withdrawAmount").value || 0);
+    if(!amt || amt <= 0){
+      alert("Iltimos to‘g‘ri miqdor kiriting.");
+      return;
+    }
+    if(!isTelegram){
+      alert("Bu funksiya faqat Telegram ichida ishlaydi.");
+      return;
+    }
+    withdraw(amt);
+  });
+  refreshBtn.addEventListener("click", ()=>{
+    loadLocalBalance();
+    serverCheckBalance();
+    logActivity("Qo'lda yangilanish amalga oshirildi.");
+  });
+  adminBtn.addEventListener("click", ()=>{
+    adminPanelContainer.style.display = adminPanelContainer.style.display === "none" ? "block" : "none";
+  });
+  randomizeAdmin.addEventListener("click", randomizeAdminState);
+  copyStats.addEventListener("click", ()=>{
+    const txt = `Users: ${adminState.users}\nDistributed: ${adminState.distributed}\nDailyAds: ${adminState.dailyAds}\nTop10:\n` + adminState.top10.map((u,i)=>`${i+1}. ${u.name} — ${u.gems}`).join("\n");
+    try{
+      navigator.clipboard.writeText(txt).then(()=> alert("Statlar nusxalandi"));
+    }catch(e){
+      alert("Clipboardga yozib bo'lmadi. Qolipni ko'chirib oling:\n\n" + txt);
+    }
+  });
 
-        // Custom order functions
-        function orderCustomViews() {
-            const amount = parseInt(document.getElementById('customViewsInput').value);
-            if (amount >= 1000) {
-                orderService('views', amount);
-            } else {
-                showMessage('Minimal miqdor: 1000 ta ko\'rish', 'error');
-            }
-        }
+  // Kickoff
+  init();
 
-        function orderCustomLikes() {
-            const amount = parseInt(document.getElementById('customLikesInput').value);
-            if (amount >= 50) {
-                orderService('likes', amount);
-            } else {
-                showMessage('Minimal miqdor: 50 ta like', 'error');
-            }
-        }
+  // Save local balance periodically (avoid losing)
+  setInterval(()=>{
+    if(localKey) saveLocalBalance();
+  }, 5000);
 
-        function orderCustomShipments() {
-            const amount = parseInt(document.getElementById('customShipmentsInput').value);
-            if (amount >= 100) {
-                orderService('shipments', amount);
-            } else {
-                showMessage('Minimal miqdor: 100 ta jo\'natish', 'error');
-            }
-        }
+  // When page unload, clear polling windows
+  window.addEventListener("beforeunload", ()=>{
+    if(adPoll) clearInterval(adPoll);
+    if(adWindow && !adWindow.closed) {
+      try{ adWindow.close(); }catch(e){}
+    }
+  });
 
-        // Promocode function
-        function openPromocode() {
-            document.getElementById('serviceTitle').textContent = '🎁 Promokod';
-            document.getElementById('serviceContent').innerHTML = `
-                <div class="custom-input">
-                    <input type="text" id="promoCode" placeholder="Promokodni kiriting" style="text-transform: uppercase">
-                    <button onclick="applyPromocode()">Qo'llash</button>
-                </div>
-            `;
-            openModal('serviceModal');
-        }
-
-        async function applyPromocode() {
-            const code = document.getElementById('promoCode').value.toUpperCase().trim();
-            
-            if (!code) {
-                showMessage('Iltimos, promokodni kiriting!', 'error');
-                return;
-            }
-            
-            try {
-                const response = await fetch('backend.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'apply_promocode',
-                        user_id: userData.id,
-                        code: code
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showMessage(data.message, 'success');
-                    userData.diamonds = data.balance.diamonds;
-                    userData.coins = data.balance.coins;
-                    updateBalanceDisplay();
-                    closeModal('serviceModal');
-                } else {
-                    showMessage(data.message, 'error');
-                }
-            } catch (error) {
-                showMessage('❌ Server xatosi! Iltimos, qayta urinib ko\'ring.', 'error');
-            }
-        }
-
-        // Earn diamonds function
-        function openEarn() {
-            document.getElementById('serviceTitle').textContent = '💎 Olmos Yeg\'ish';
-            const refLink = `https://t.me/RekchiAi_bot?start=${userData.id}`;
-            
-            document.getElementById('serviceContent').innerHTML = `
-                <div class="service-options">
-                    <div class="service-card" onclick="tg.openTelegramLink('${refLink}')">
-                        <h4>👫 Do'stlarni taklif qiling</h4>
-                        <p>Har bir do'stingiz uchun +15 💎 olmos</p>
-                    </div>
-                    <div class="service-card" onclick="openBonusChannels()">
-                        <h4>📢 Kanallarga obuna bo'ling</h4>
-                        <p>Har bir kanal uchun bonus olmoslar</p>
-                    </div>
-                    <div class="service-card" onclick="watchTutorial()">
-                        <h4>🎬 Video qo'llanma</h4>
-                        <p>Videoni ko'rib bonus oling</p>
-                    </div>
-                </div>
-            `;
-            openModal('serviceModal');
-        }
-
-        // Admin functions
-        function openAdminPanel() {
-            loadAdminStats();
-            openModal('adminModal');
-        }
-
-        async function loadAdminStats() {
-            try {
-                const response = await fetch('backend.php?action=get_admin_stats&user_id=' + userData.id);
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('totalUsers').textContent = data.stats.total_users;
-                    document.getElementById('totalOrders').textContent = data.stats.total_orders;
-                }
-            } catch (error) {
-                console.error('Error loading admin stats:', error);
-            }
-        }
-
-        function adminAction(action) {
-            // Implement admin actions here
-            showMessage('Admin funksiyasi ishga tushirildi: ' + action, 'success');
-        }
-
-        // Utility functions
-        function showMessage(message, type) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
-            messageDiv.textContent = message;
-            
-            document.querySelector('.app-container').insertBefore(messageDiv, document.querySelector('.app-container').firstChild);
-            
-            setTimeout(() => {
-                messageDiv.remove();
-            }, 5000);
-        }
-
-        function showSection(section) {
-            // Implement section switching
-            console.log('Showing section:', section);
-        }
-
-        function openProfile() {
-            document.getElementById('serviceTitle').textContent = '👤 Profil';
-            const refCount = 0; // This should come from backend
-            
-            document.getElementById('serviceContent').innerHTML = `
-                <div class="user-info">
-                    <div class="avatar">${userData.firstName.charAt(0).toUpperCase()}</div>
-                    <div class="user-details">
-                        <h3>${userData.firstName} ${userData.lastName || ''}</h3>
-                        <p>@${userData.username}</p>
-                        <p>ID: ${userData.id}</p>
-                    </div>
-                </div>
-                <div class="balance-cards">
-                    <div class="balance-card">
-                        <h3>💎 Olmoslar</h3>
-                        <div class="amount">${userData.diamonds}</div>
-                    </div>
-                    <div class="balance-card coins">
-                        <h3>🪙 Tangalar</h3>
-                        <div class="amount">${userData.coins}</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${refCount}</div>
-                    <div class="stat-label">Tasdiqlangan referallar</div>
-                </div>
-            `;
-            openModal('serviceModal');
-        }
-
-        function openBonusChannels() {
-            document.getElementById('serviceTitle').textContent = '📢 Bonus Kanallar';
-            document.getElementById('serviceContent').innerHTML = `
-                <div class="loading">
-                    Bonus kanallar yuklanmoqda...
-                </div>
-            `;
-            
-            // Load bonus channels from backend
-            setTimeout(() => {
-                document.getElementById('serviceContent').innerHTML = `
-                    <div class="service-options">
-                        <div class="service-card" onclick="subscribeToChannel('@insta_rekchi')">
-                            <h4>📢 @insta_rekchi</h4>
-                            <p>+10 💎 olmos</p>
-                            <button class="action-btn">Obuna bo'lish</button>
-                        </div>
-                        <div class="service-card" onclick="subscribeToChannel('@rekchi_tv')">
-                            <h4>📢 @rekchi_tv</h4>
-                            <p>+8 💎 olmos</p>
-                            <button class="action-btn">Obuna bo'lish</button>
-                        </div>
-                    </div>
-                `;
-            }, 1000);
-        }
-
-        function subscribeToChannel(channel) {
-            tg.openTelegramLink(`https://t.me/${channel.replace('@', '')}`);
-            showMessage(`✅ ${channel} kanaliga obuna bo'ldingiz! Bonus tekshirilmoqda...`, 'success');
-        }
-
-        function watchTutorial() {
-            document.getElementById('serviceTitle').textContent = '🎬 Video Qo\'llanma';
-            document.getElementById('serviceContent').innerHTML = `
-                <div class="service-options">
-                    <div class="service-card" onclick="tg.openTelegramLink('https://t.me/RekchiAi_bot')">
-                        <h4>Botdan foydalanish</h4>
-                        <p>Asosiy qo'llanma</p>
-                    </div>
-                    <div class="service-card" onclick="tg.openTelegramLink('https://t.me/RekchiAi_bot')">
-                        <h4>Ko'rishlar xizmati</h4>
-                        <p>Video ko'rishlar qo'shish</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        function calculateCustomViews() {
-            const amount = parseInt(document.getElementById('customViews').value);
-            if (amount >= 1000) {
-                const diamonds = calculateDiamondsForViews(amount);
-                if (diamonds !== -1) {
-                    document.getElementById('serviceTitle').textContent = '👁️ Ko\'rishlar Xizmati';
-                    document.getElementById('serviceContent').innerHTML = `
-                        <div class="success-message">
-                            ${amount.toLocaleString()} ta ko'rish narxi: ${diamonds} 💎 olmos
-                        </div>
-                        <div class="custom-input">
-                            <input type="text" id="customViewsLink" placeholder="Instagram video havolasi">
-                            <button onclick="confirmOrder('views', ${amount}, ${diamonds}, 'diamonds')">Tasdiqlash</button>
-                        </div>
-                    `;
-                    openModal('serviceModal');
-                } else {
-                    showMessage('Noto\'g\'ri ko\'rish miqdori!', 'error');
-                }
-            } else {
-                showMessage('Minimal miqdor: 1000 ta ko\'rish', 'error');
-            }
-        }
-
-        // Initialize app when page loads
-        document.addEventListener('DOMContentLoaded', initApp);
-    </script>
+})();
+</script>
 </body>
 </html>

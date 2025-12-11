@@ -5,70 +5,71 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Telegram Mini App — Olmos Tizimi</title>
 <style>
-  :root{
-    --tg-bg: #ffffff;
-    --tg-accent: #2a9df4;
-    --tg-muted: #6b7a86;
-    --card-bg: #f7fbff;
-    --shadow: 0 8px 26px rgba(42,157,244,0.08);
-    --radius: 12px;
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
-  }
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,#f3f8ff,#ffffff);-webkit-font-smoothing:antialiased;}
-  .app{max-width:720px;margin:16px auto;padding:14px;}
-  header{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+  :root{ --tg-accent:#2a9df4; --muted:#6b7a86; --card:#fff; --bg:#f3f8ff; --shadow:0 8px 26px rgba(42,157,244,0.08); --radius:12px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; }
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#ffffff);-webkit-font-smoothing:antialiased}
+  .app{max-width:720px;margin:16px auto;padding:16px}
+  header{display:flex;gap:12px;align-items:center;margin-bottom:14px}
   .avatar{width:56px;height:56px;border-radius:50%;overflow:hidden;flex:0 0 56px;box-shadow:var(--shadow);border:2px solid rgba(255,255,255,0.6)}
-  .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+  .avatar img{width:100%;height:100%;object-fit:cover}
   .hgroup{flex:1}
-  .hgroup h1{margin:0;font-size:18px;color:#06324a}
-  .hgroup p{margin:2px 0 0 0;color:var(--tg-muted);font-size:13px}
-  .admin-toggle{background:var(--tg-accent);color:#fff;border-radius:10px;padding:8px 12px;font-weight:700;border:none;cursor:pointer;box-shadow:0 8px 20px rgba(42,157,244,0.14)}
-  .card{background:linear-gradient(180deg,var(--card-bg),#ffffff);border-radius:var(--radius);padding:14px;margin-bottom:14px;box-shadow:var(--shadow)}
-  .balance-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
-  .balance{font-size:28px;font-weight:800;color:#073b66}
-  .meta{color:var(--tg-muted);font-size:13px}
-  .btn{background:var(--tg-accent);color:#fff;border:none;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(42,157,244,0.12)}
-  .btn.secondary{background:transparent;color:var(--tg-accent);border:1px solid rgba(42,157,244,0.14);box-shadow:none}
-  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  input[type="number"], input[type="text"]{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e6eef9;background:white;font-size:15px;outline:none;box-sizing:border-box}
-  label{font-size:13px;color:var(--tg-muted);display:block;margin-bottom:6px}
-  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .log{font-size:13px;color:var(--tg-muted);max-height:140px;overflow:auto;padding:8px;border-radius:8px;background:#fff;border:1px solid #f0f6ff;white-space:pre-wrap}
-  .admin-panel{margin-top:10px;padding:12px;border-radius:12px;background:linear-gradient(180deg,#fbfdff,#ffffff);border:1px solid #e9f6ff}
-  .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
-  .stat{padding:10px;border-radius:10px;background:white;border:1px solid #f0f6ff}
-  .stat h3{margin:0;font-size:16px;color:#073b66}
-  .stat p{margin:6px 0 0 0;color:var(--tg-muted);font-size:13px}
-  .toplist{margin-top:10px;padding-left:0;list-style:none}
-  .toplist li{padding:8px;border-radius:8px;background:#fff;margin-bottom:6px;border:1px solid #f0f6ff;display:flex;justify-content:space-between}
-  .footer-note{margin-top:12px;color:var(--tg-muted);font-size:12px;text-align:center}
-  @media (max-width:520px){.two-col{grid-template-columns:1fr}}
+  h1{margin:0;font-size:18px;color:#06324a}
+  .meta{color:var(--muted);font-size:13px}
+  .card{background:linear-gradient(180deg,#f7fbff,#ffffff);border-radius:var(--radius);padding:14px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .btn{background:var(--tg-accent);color:#fff;border:none;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer}
+  .btn.secondary{background:transparent;color:var(--tg-accent);border:1px solid rgba(42,157,244,0.14)}
+  input[type="text"], input[type="number"]{width:100%;padding:10px;border-radius:10px;border:1px solid #e6eef9;background:white;font-size:15px;box-sizing:border-box}
+  .log{font-size:13px;color:var(--muted);max-height:140px;overflow:auto;padding:8px;border-radius:8px;background:#fff;border:1px solid #f0f6ff;white-space:pre-wrap}
+  .warn{background:#fff3cd;border:1px solid #ffeeba;padding:10px;border-radius:10px;color:#856404}
+  @media (max-width:520px){ .row{flex-direction:column} }
 </style>
 </head>
 <body>
   <div class="app" id="app">
-    <header id="header">
+    <header>
       <div class="avatar" id="avatar"></div>
       <div class="hgroup">
-        <h1 id="displayName">Mini App</h1>
-        <p id="displayHandle" class="meta">Telegram orqali oching</p>
-      </div>
-      <div id="adminBtnWrap" style="display:none">
-        <button id="adminBtn" class="admin-toggle">Admin Panel</button>
+        <h1 id="displayName">Olmos Mini App</h1>
+        <div id="displayHandle" class="meta">Telegram ichida oching yoki quyidagi ko‘rsatmalarga amal qiling</div>
       </div>
     </header>
 
-    <div id="notTelegram" class="card" style="display:none;">
-      <strong>Bu Mini App faqat Telegram ichida ishlaydi.</strong>
-      <p class="meta">Iltimos, ushbu ilovani Telegram ichidagi Web App sifatida oching (bot yoki chat ichidagi "Open" tugmasi orqali).</p>
+    <!-- NOT IN WEBAPP: show clear instructions + open-bot buttons -->
+    <div id="notTelegram" class="card" style="display:none">
+      <div style="font-weight:700;margin-bottom:8px">Ilova Telegram Web App sifatida ochilmadi</div>
+      <div class="meta" style="margin-bottom:10px">
+        Telegram faqat bot orqali Web App sifatida foydalanuvchi ma'lumotlarini beradi. 
+        Agar URLni oddiy brauzer yoki Telegram ichidagi sahifa orqali to‘g‘ridan-to‘g‘ri ochgan bo‘lsangiz, user ma'lumotlari kelmaydi.
+      </div>
+
+      <div style="margin-bottom:10px">
+        <label class="meta">Bot username (misol: MyBot) — kiriting yoki mavjudini o‘zgartiring:</label>
+        <input type="text" id="botUsername" placeholder="Bot username (misol: MyBot)" />
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <button id="openTme" class="btn">Open via https://t.me/<span id="btnTmeText">BOT</span></button>
+        <button id="openTgScheme" class="btn secondary">Open via tg://resolve (mobil)</button>
+        <button id="retryBtn" class="btn secondary">Qayta tekshirish</button>
+      </div>
+
+      <div class="warn" style="margin-bottom:8px">
+        Agar siz bot muallifi bo‘lsangiz: botdan yuborilgan "Open Web App" tugmasi yoki InlineKeyboard bilan oching. 
+        "Open via t.me" tugmasi sizni bot chatiga yo‘naltiradi — bot ichida Web App tugmasi bilan oching.
+      </div>
+
+      <div style="margin-top:8px">
+        <strong>Tez yordam (debug):</strong>
+        <div id="debug" class="log"></div>
+      </div>
     </div>
 
+    <!-- MAIN APP -->
     <main id="mainArea" style="display:none">
       <section class="card">
-        <div class="balance-row">
+        <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
             <div class="meta">Sizning balans</div>
-            <div class="balance" id="balance">0</div>
+            <div style="font-size:28px;font-weight:700;color:#073b66" id="balance">0</div>
             <div class="meta" style="font-size:13px">Local: <span id="localStamp">—</span> · Server: <span id="serverStamp">—</span></div>
           </div>
           <div style="text-align:right">
@@ -80,10 +81,10 @@
         </div>
       </section>
 
-      <section class="card ad-card">
+      <section class="card">
         <div style="font-weight:700">Reklama ko‘rish → 1 olmos</div>
-        <div class="meta" style="margin:8px 0">Reklama sahifasiga kirilganda haqiqiy 1 olmos beriladi. Har reklamadan faqat 1 marta olmos olinadi.</div>
-        <div class="row">
+        <div class="meta" style="margin:8px 0">Sahifa ochilganda haqiqiy 1 olmos beriladi. Har reklamadan faqat 1 marta olmos olinadi.</div>
+        <div style="display:flex;gap:8px">
           <button id="watchAdBtn" class="btn">Reklama ko‘rish</button>
           <button id="adHistoryBtn" class="btn secondary">Reklama tarix</button>
         </div>
@@ -91,13 +92,11 @@
 
       <section class="card">
         <div class="meta">Olmosni yechib olish</div>
-        <div style="margin-top:8px" class="two-col">
+        <div style="margin-top:8px;display:grid;grid-template-columns:1fr 160px;gap:8px">
           <div>
-            <label for="withdrawAmount">Miqdor (olmos)</label>
-            <input id="withdrawAmount" type="number" min="1" placeholder="Masalan: 10" />
+            <input id="withdrawAmount" type="number" min="1" placeholder="Miqdor (olmos)" />
           </div>
           <div>
-            <label>&nbsp;</label>
             <button id="withdrawBtn" class="btn" style="width:100%">So‘rov yuborish</button>
           </div>
         </div>
@@ -108,62 +107,39 @@
         <div class="meta">Faoliyatlar</div>
         <div style="margin-top:8px" class="log" id="activityLog">Tayyor...</div>
       </section>
-
-      <div id="adminPanelContainer" style="display:none" class="card admin-panel">
-        <h3>Admin panel (simulyatsiya)</h3>
-        <div class="stat-grid">
-          <div class="stat">
-            <h3 id="statUsers">—</h3>
-            <p>Jami foydalanuvchilar</p>
-          </div>
-          <div class="stat">
-            <h3 id="statDistributed">—</h3>
-            <p>Jami tarqatilgan olmos</p>
-          </div>
-          <div class="stat">
-            <h3 id="statDailyAds">—</h3>
-            <p>Kunlik reklamaga kirishlar</p>
-          </div>
-          <div class="stat">
-            <h3 id="statReserved">—</h3>
-            <p>Rezerv (sim)</p>
-          </div>
-        </div>
-
-        <div style="margin-top:12px">
-          <strong>Top 10 foydalanuvchi (ko‘p olmos yig‘ganlar)</strong>
-          <ul class="toplist" id="topList"></ul>
-          <div style="margin-top:8px" class="row">
-            <button id="randomizeAdmin" class="btn">Simulyatsiya yangila</button>
-            <button id="copyStats" class="btn secondary">Nusxa olish</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer-note">Mini App — bitta fayl. Dizayn: Telegram uslubida. Responsive.</div>
     </main>
   </div>
 
 <script>
-/*
- Yaxshilangan Telegram detection va user olish.
- Agar WebApp API mavjud bo'lsa — uni ishlatamiz.
- Agar atrof-muhit Telegram UA atrofida bo'lsa lekin WebApp yo'q bo'lsa — aniq foydalanuvchi olinmaydi,
- shuning uchun ilova Telegram ichida ochilishini talab qiladi.
+/* YANGILANGAN: Telegram WebApp bo'lmasa aniq ko'rsatma va linklar bilan ishlaydi.
+   Qanday ishlatish:
+   1) Agar bot username bilsangiz, kiritib "Open via t.me" tugmasi orqali bot chatini oching.
+   2) Bot ichida Web App tugmasini bosing (bot tomonidan yuborilgan Web App tugmasi user ma'lumotlarini beradi).
+   3) Web App ochilgach, sahifa avtomatik Telegram.WebApp orqali user ma'lumotlarini oladi.
 */
 
 (function(){
   const AD_URL = "https://example.com/ad";
   const WITHDRAW_ENDPOINT = "https://68ed1ab05ca4e.myxvest1.ru/Test/test.php";
-  // Token (obfuscated) — frontda yashirin saqlash sharti bilan: base64 saqlanadi
   const API_TOKEN_B64 = "NDU2NDU2NGFzZjc4OTU0ZTY1ZzRhN2c5OGE0Z2E2czVnNDdhN2c5OGFzOGc0NTY=";
   const ADMINS = [7500103239, 7104718080];
 
-  const $ = q => document.querySelector(q);
+  const $ = sel => document.querySelector(sel);
   const el = id => document.getElementById(id);
 
   // UI refs
-  const avatarWrap = el("avatar");
+  const notTelegram = el("notTelegram");
+  const debug = el("debug");
+  const botUsernameInput = el("botUsername");
+  const btnTmeText = el("btnTmeText");
+  const openTme = el("openTme");
+  const openTgScheme = el("openTgScheme");
+  const retryBtn = el("retryBtn");
+
+  const mainArea = el("mainArea");
+  const activityLog = el("activityLog");
+  const withdrawLog = el("withdrawLog");
+  const avatar = el("avatar");
   const displayName = el("displayName");
   const displayHandle = el("displayHandle");
   const userIdDisplay = el("userIdDisplay");
@@ -171,300 +147,241 @@
   const balanceEl = el("balance");
   const localStamp = el("localStamp");
   const serverStamp = el("serverStamp");
-  const activityLog = el("activityLog");
-  const withdrawLog = el("withdrawLog");
-  const adminBtnWrap = el("adminBtnWrap");
-  const adminBtn = el("adminBtn");
-  const adminPanelContainer = el("adminPanelContainer");
-  const statUsers = el("statUsers");
-  const statDistributed = el("statDistributed");
-  const statDailyAds = el("statDailyAds");
-  const topList = el("topList");
 
   const watchAdBtn = el("watchAdBtn");
   const adHistoryBtn = el("adHistoryBtn");
   const withdrawBtn = el("withdrawBtn");
   const refreshBtn = el("refreshBtn");
-  const randomizeAdmin = el("randomizeAdmin");
-  const copyStats = el("copyStats");
+  const withdrawAmount = el("withdrawAmount");
 
   // state
   let user = null;
   let balance = 0;
   let localKey = null;
-  let adPoll = null;
   const adKeyPrefix = "ad_seen_";
   const balKeyPrefix = "balance_";
-
-  function logActivity(msg){
-    const t = new Date().toLocaleTimeString();
-    activityLog.textContent = `[${t}] ${msg}\n` + activityLog.textContent;
-  }
-  function logWithdraw(msg){
-    const t = new Date().toLocaleTimeString();
-    withdrawLog.textContent = `[${t}] ${msg}\n` + withdrawLog.textContent;
-  }
+  let adPoll = null;
 
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
+  function logActivity(msg){ activityLog.textContent = `[${new Date().toLocaleTimeString()}] ${msg}\n` + activityLog.textContent; }
+  function logWithdraw(msg){ withdrawLog.textContent = `[${new Date().toLocaleTimeString()}] ${msg}\n` + withdrawLog.textContent; }
 
-  function renderAvatar(url, name){
-    if(url){
-      avatarWrap.innerHTML = '<img src="'+escapeHtml(url)+'" alt="avatar" />';
-    } else {
-      const initials = (name||'U').split(' ').map(x=>x[0]||'').join('').slice(0,2).toUpperCase();
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#2a9df4"/><stop offset="1" stop-color="#5ac8ff"/></linearGradient></defs><rect width="56" height="56" rx="12" fill="url(#g)"/><text x="50%" y="57%" font-family="Arial" font-size="22" fill="#fff" text-anchor="middle">${escapeHtml(initials)}</text></svg>`;
-      avatarWrap.innerHTML = svg;
+  function renderAvatar(url,name){
+    if(url){ avatar.innerHTML = '<img src="'+escapeHtml(url)+'" alt="avatar" />'; }
+    else {
+      const initials = (name||'U').split(' ').map(s=>s[0]||'').join('').slice(0,2).toUpperCase();
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect width="56" height="56" rx="12" fill="#2a9df4"/><text x="50%" y="55%" font-family="Arial" font-size="22" fill="#fff" text-anchor="middle">${escapeHtml(initials)}</text></svg>`;
+      avatar.innerHTML = svg;
     }
   }
 
   function decodeToken(){ try{ return atob(API_TOKEN_B64); }catch(e){ return "4564564asf78954e65g4a7g98a4ga6s5g48as7g98as8g456"; } }
 
-  function showNotTelegram(){
-    el("notTelegram").style.display = "block";
-    el("mainArea").style.display = "none";
+  function isTelegramEnv(){
+    if(window.Telegram && window.Telegram.WebApp) return true;
+    try{ if(navigator && navigator.userAgent && /Telegram/i.test(navigator.userAgent)) return true; }catch(e){}
+    return false;
   }
-  function showMain(){ el("notTelegram").style.display = "none"; el("mainArea").style.display = "block"; }
 
-  // balance
-  function loadLocalBalance(){
-    if(!localKey) return;
-    const v = localStorage.getItem(localKey);
-    if(v!==null){
-      try{ balance = Number(JSON.parse(v)); }catch(e){ balance = 0; }
-      localStamp.textContent = new Date().toLocaleTimeString();
-    } else {
-      balance = 0;
-      localStamp.textContent = "—";
+  function obtainTelegramUser(){
+    if(window.Telegram && window.Telegram.WebApp){
+      const tg = window.Telegram.WebApp;
+      try{ if(tg.initDataUnsafe && tg.initDataUnsafe.user) return tg.initDataUnsafe.user; }catch(e){}
+      try{ if(tg.initData && tg.initData.user) return tg.initData.user; }catch(e){}
     }
-    renderBalance();
+    return null;
   }
+
+  // Balance
+  function loadLocalBalance(){ if(!localKey) return; const v = localStorage.getItem(localKey); if(v!==null){ try{ balance = Number(JSON.parse(v)); }catch(e){ balance = 0; } localStamp.textContent = new Date().toLocaleTimeString(); } else { balance = 0; localStamp.textContent = "—"; } renderBalance(); }
   function saveLocalBalance(){ if(!localKey) return; localStorage.setItem(localKey, JSON.stringify(balance)); localStamp.textContent = new Date().toLocaleTimeString(); }
   function renderBalance(){ balanceEl.textContent = balance; }
+  function serverCheck(){ serverStamp.textContent = "tekshirilmoqda..."; setTimeout(()=>{ serverStamp.textContent = new Date().toLocaleTimeString(); logActivity("Server bilan balans tekshirildi (simulyatsiya)."); },700); }
 
-  // server check (simulated)
-  function serverCheckBalance(){
-    serverStamp.textContent = "tekshirilmoqda...";
-    setTimeout(()=>{
-      serverStamp.textContent = new Date().toLocaleTimeString();
-      logActivity("Server bilan balans tekshirildi (simulyatsiya).");
-    }, 800);
-  }
-
-  // Ad logic: open new tab and detect when closed to award 1 gem (only once per user+ad)
-  function openAdAndAward(adUrl){
-    if(!adUrl) return;
-    const adKey = adKeyPrefix + user.id + "_" + encodeURIComponent(adUrl);
-    if(localStorage.getItem(adKey)){
-      logActivity("Bu reklama uchun allaqachon olmos olingan.");
-      alert("Siz bu reklama uchun oldin olmos olgansiz.");
-      return;
-    }
+  // Ad
+  function openAdAndAward(url){
+    if(!url) return;
+    const key = adKeyPrefix + user.id + "_" + encodeURIComponent(url);
+    if(localStorage.getItem(key)){ alert("Bu reklama uchun olmos oldin olindi."); logActivity("Ad: allaqachon olmos olingan"); return; }
     let w = null;
-    try{ w = window.open(adUrl, "_blank"); }catch(e){ w = null; }
-    if(!w){
-      logActivity("Reklama oynasi ochilmadi (pop-up bloklangan).");
-      alert("Reklama oynasi ochilmadi. Iltimos Telegram ichida oching va ruxsat bering.");
-      return;
-    }
-    logActivity("Reklama ochildi. Sahifa yopilganda +1 olmos beriladi.");
+    try{ w = window.open(url, "_blank"); }catch(e){ w = null; }
+    if(!w){ alert("Pop-up bloklandi yoki ochilmadi. Iltimos Telegram ichida oching."); return; }
+    logActivity("Reklama ochildi. Yopilganda +1 olmos beriladi.");
     adPoll = setInterval(()=>{
       try{
-        if(w.closed){
-          clearInterval(adPoll); adPoll = null;
-          localStorage.setItem(adKey, JSON.stringify({awarded:1, at:new Date().toISOString()}));
-          balance = Number(balance) + 1;
-          saveLocalBalance();
-          renderBalance();
-          logActivity("Reklama tashrifi tasdiqlandi — +1 olmos.");
-          alert("Sizga +1 olmos berildi!");
-        }
+        if(w.closed){ clearInterval(adPoll); adPoll=null; localStorage.setItem(key, JSON.stringify({awarded:1,at:new Date().toISOString()})); balance = Number(balance)+1; saveLocalBalance(); renderBalance(); alert("+1 olmos berildi!"); logActivity("Ad tashrifi tasdiqlandi — +1"); }
       }catch(e){
-        // cross-origin could throw, still award once after a short delay
-        clearInterval(adPoll); adPoll = null;
-        localStorage.setItem(adKey, JSON.stringify({awarded:1, at:new Date().toISOString()}));
-        balance = Number(balance) + 1;
-        saveLocalBalance();
-        renderBalance();
-        logActivity("Reklama tashrifi tasdiqlandi (xato holatda ham) — +1 olmos.");
-        alert("Sizga +1 olmos berildi!");
-      }
-    }, 600);
+        clearInterval(adPoll); adPoll=null; localStorage.setItem(key, JSON.stringify({awarded:1,at:new Date().toISOString()})); balance = Number(balance)+1; saveLocalBalance(); renderBalance(); alert("+1 olmos berildi!"); logActivity("Ad tashrifi tasdiqlandi (xatolik) — +1"); }
+    },600);
   }
 
   // Withdraw
   async function withdraw(amount){
     amount = Number(amount);
-    if(!amount || amount <= 0){ alert("Iltimos to'g'ri miqdor kiriting"); return; }
-    if(amount > balance){ alert("Balansingiz yetarli emas"); return; }
+    if(!amount || amount<=0){ alert("Iltimos to'g'ri miqdor kiriting"); return; }
+    if(amount>balance){ alert("Balansingiz yetarli emas"); return; }
     const payload = { token: decodeToken(), user_id: user.id, amount: amount };
     logWithdraw("So'rov yuborilmoqda...");
     try{
-      const res = await fetch(WITHDRAW_ENDPOINT, { method: "POST", headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      const res = await fetch(WITHDRAW_ENDPOINT, { method:"POST", headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
       const data = await res.json();
       logWithdraw("Server javobi: " + JSON.stringify(data));
-      if(data && data.success === true){
-        balance = balance - amount;
-        saveLocalBalance();
-        renderBalance();
-        logWithdraw("Ye'chib olish muvaffaqiyatli.");
-        alert("Ye'chib olish muvaffaqiyatli!");
-      } else {
-        const msg = data && data.message ? data.message : "Server xatosi";
-        logWithdraw("Muvaffaqiyatsiz: " + msg);
-        alert("Xato: " + msg);
-      }
-    }catch(err){
-      logWithdraw("So'rov xatosi: " + (err && err.message ? err.message : err));
-      alert("So'rov yuborishda xatolik. Internetni tekshiring.");
-    }
+      if(data && data.success === true){ balance = balance - amount; saveLocalBalance(); renderBalance(); logWithdraw("Muvaffaqiyatli"); alert("Ye'chib olish muvaffaqiyatli"); }
+      else { const msg = data && data.message ? data.message : "Xatolik"; logWithdraw("Xato: "+msg); alert("Xato: "+msg); }
+    }catch(err){ logWithdraw("So'rov xatosi: "+ (err.message||err)); alert("So'rovda xato. Internetni tekshiring.") }
   }
 
-  // Admin sim
-  let adminState = { users: 1200, distributed: 8000, dailyAds: 350, reserved: 10000, top10: [] };
-  function randomizeAdminState(){
-    adminState.users = 500 + Math.floor(Math.random()*4000);
-    adminState.distributed = 500 + Math.floor(Math.random()*30000);
-    adminState.dailyAds = 50 + Math.floor(Math.random()*2000);
-    adminState.reserved = 1000 + Math.floor(Math.random()*20000);
-    adminState.top10 = [];
-    for(let i=0;i<10;i++){ adminState.top10.push({ name: "user"+(2000+i), gems: Math.floor(Math.random()*2000) }); }
-    adminState.top10.sort((a,b)=>b.gems-a.gems);
-    renderAdmin();
+  // UI flows
+  function showNotTelegramUI(){
+    notTelegram.style.display = "block";
+    mainArea.style.display = "none";
+    // load saved bot username
+    const saved = localStorage.getItem("miniapp_bot_username");
+    if(saved) botUsernameInput.value = saved;
+    updateBotButtons();
+    updateDebug();
   }
-  function renderAdmin(){
-    statUsers.textContent = adminState.users;
-    statDistributed.textContent = adminState.distributed;
-    statDailyAds.textContent = adminState.dailyAds;
-    el("statReserved").textContent = adminState.reserved;
-    topList.innerHTML = "";
-    adminState.top10.forEach((u,i)=>{ const li = document.createElement("li"); li.innerHTML = `<span>#${i+1} ${escapeHtml(u.name)}</span><strong>${u.gems}</strong>`; topList.appendChild(li); });
+  function showMainUI(){
+    notTelegram.style.display = "none";
+    mainArea.style.display = "block";
   }
 
-  // Improved detection & user fetch
-  function isTelegramEnv(){
-    // 1) Official JS Bridge present
-    if(window.Telegram && window.Telegram.WebApp) return true;
-    // 2) Some user agents of Telegram in-app browser contain "Telegram"
+  function updateDebug(){
+    const lines = [];
+    lines.push("navigator.userAgent: " + (navigator.userAgent || "n/a"));
+    lines.push("isTelegramEnv (heuristic): " + isTelegramEnv());
+    lines.push("window.Telegram: " + (window.Telegram ? "present" : "absent"));
+    lines.push("window.Telegram.WebApp: " + (window.Telegram && window.Telegram.WebApp ? "present" : "absent"));
     try{
-      if(navigator && navigator.userAgent && /Telegram/i.test(navigator.userAgent)) return true;
+      const tg = window.Telegram && window.Telegram.WebApp;
+      if(tg){
+        lines.push("initDataUnsafe: " + (tg.initDataUnsafe ? JSON.stringify(Object.keys(tg.initDataUnsafe)) : "null"));
+        lines.push("initData: " + (tg.initData ? JSON.stringify(Object.keys(tg.initData)) : "null"));
+      }
     }catch(e){}
-    return false;
+    debug.textContent = lines.join("\n");
   }
 
-  // Try to obtain user via Telegram.WebApp.* robustly
-  function obtainTelegramUser(){
-    if(window.Telegram && window.Telegram.WebApp){
-      const tg = window.Telegram.WebApp;
-      try{ tg.ready(); }catch(e){}
-      // Prefer initDataUnsafe.user
-      if(tg.initDataUnsafe && tg.initDataUnsafe.user) return tg.initDataUnsafe.user;
-      // Fallback to initData.user
-      if(tg.initData && tg.initData.user) return tg.initData.user;
-      // In some cases user may be in tg.MainButton or not provided; return null then.
-      return null;
-    }
-    return null;
+  function updateBotButtons(){
+    const v = (botUsernameInput.value || "").trim();
+    const txt = v ? v : "BOT";
+    btnTmeText.textContent = txt;
+    localStorage.setItem("miniapp_bot_username", v);
   }
 
-  function initApp(){
-    // Detect environment
-    if(!isTelegramEnv()){
-      showNotTelegram();
-      return;
-    }
-
-    // Try get user
+  // Init when WebApp available
+  function initWithTelegram(){
+    // get user
     user = obtainTelegramUser();
-
-    // If WebApp object exists but user missing, wait short time (some clients populate slightly later)
-    if(window.Telegram && window.Telegram.WebApp && !user){
-      // wait up to 1200ms for data
-      let waited = 0;
-      const t = setInterval(()=>{
-        user = obtainTelegramUser();
-        waited += 200;
-        if(user || waited > 1200){
-          clearInterval(t);
-          continueInit();
-        }
-      },200);
-    } else {
-      continueInit();
-    }
-  }
-
-  function continueInit(){
-    // If still no user -> show clear message instructing to open via bot/button that provides WebApp user data
     if(!user || !user.id){
-      // If we're in a Telegram UA but WebApp user not available, we must require opening via bot's Web App (it provides user).
-      el("displayName").textContent = "Foydalanuvchi olinmadi";
-      el("displayHandle").textContent = "Iltimos, bot orqali yoki chatdagi Web App tugmasi orqali oching";
+      // show instruction if no user
+      displayName.textContent = "Foydalanuvchi olinmadi";
+      displayHandle.textContent = "Iltimos, bot orqali yoki chatdagi Web App tugmasi orqali oching";
       renderAvatar(null,"U");
-      el("mainArea").style.display = "block";
-      logActivity("Telegram WebApp mavjud, ammo foydalanuvchi ma'lumotlari olinmadi. Iltimos bot yoki chat ichidagi WebApp orqali oching.");
+      showNotTelegramUI();
+      logActivity("Telegram mavjud, ammo initData bilan user kelmadi.");
       return;
     }
-
-    // Populate UI with user data
-    el("displayName").textContent = (user.first_name || "Foydalanuvchi") + (user.last_name ? (" " + user.last_name) : "");
-    el("displayHandle").textContent = user.username ? ("@" + user.username) : "";
+    // fill UI
+    displayName.textContent = (user.first_name || "Foydalanuvchi") + (user.last_name ? " "+user.last_name : "");
+    displayHandle.textContent = user.username ? ("@"+user.username) : "";
     userIdDisplay.textContent = "ID: " + user.id;
     userNameDisplay.textContent = "Ism: " + (user.first_name || "-");
     renderAvatar(user.photo_url, user.first_name || user.username || "U");
-
-    // Local key and balance load
     localKey = balKeyPrefix + user.id;
     loadLocalBalance();
-    serverCheckBalance();
-
-    // Admin visibility
-    if(ADMINS.indexOf(Number(user.id)) !== -1){
-      adminBtnWrap.style.display = "block";
-      adminPanelContainer.style.display = "block";
-      randomizeAdminState();
-    } else {
-      adminBtnWrap.style.display = "none";
-      adminPanelContainer.style.display = "none";
-    }
-
-    showMain();
-    logActivity("Xush kelibsiz, " + (user.first_name || "foydalanuvchi") + "!");
+    serverCheck();
+    showMainUI();
+    logActivity("Xush kelibsiz, " + (user.first_name||"foydalanuvchi") + "!");
   }
 
   // events
-  watchAdBtn.addEventListener("click", ()=> {
-    if(!user || !user.id){ alert("Foydalanuvchi ma'lumotlari yo'q. Iltimos Telegram ichida oching."); return; }
+  openTme.addEventListener("click", ()=>{
+    const bot = (botUsernameInput.value || "").trim();
+    if(!bot){ alert("Iltimos bot username-ni kiriting (misol: MyBot)."); return; }
+    // Save and open https link (opens Telegram app or web)
+    localStorage.setItem("miniapp_bot_username", bot);
+    const url = "https://t.me/" + encodeURIComponent(bot) + "?start=webapp";
+    window.open(url, "_blank");
+  });
+  openTgScheme.addEventListener("click", ()=>{
+    const bot = (botUsernameInput.value || "").trim();
+    if(!bot){ alert("Iltimos bot username-ni kiriting."); return; }
+    const scheme = "tg://resolve?domain=" + encodeURIComponent(bot) + "&start=webapp";
+    // For some browsers, tg:// will open Telegram app on mobile devices
+    window.location.href = scheme;
+  });
+  retryBtn.addEventListener("click", ()=>{
+    updateDebug();
+    // Try initialization again
+    setTimeout(()=> {
+      if(window.Telegram && window.Telegram.WebApp){
+        try{ window.Telegram.WebApp.ready(); }catch(e){}
+      }
+      if(window.Telegram && window.Telegram.WebApp && (window.Telegram.WebApp.initDataUnsafe || window.Telegram.WebApp.initData)){
+        initWithTelegram();
+      } else {
+        updateDebug();
+        alert("Hali ham WebApp user ma'lumotlari mavjud emas. Iltimos bot orqali Web App tugmasi bilan oching.");
+      }
+    }, 300);
+  });
+
+  botUsernameInput.addEventListener("input", updateBotButtons);
+
+  watchAdBtn.addEventListener("click", ()=>{
+    if(!user || !user.id){ alert("Foydalanuvchi ma'lumotlari yo'q. Iltimos bot orqali oching."); return; }
     openAdAndAward(AD_URL);
   });
   adHistoryBtn.addEventListener("click", ()=>{
-    if(!user) { alert("Foydalanuvchi ma'lumotlari yo'q."); return; }
-    const k = adKeyPrefix + user.id + "_" + encodeURIComponent(AD_URL);
-    const v = localStorage.getItem(k);
-    if(v) alert("Reklama uchun olmos allaqachon olingan:\n" + v);
-    else alert("Hozircha bu reklama uchun olmos olinmagan.");
+    if(!user){ alert("Foydalanuvchi ma'lumotlari yo'q."); return; }
+    const key = adKeyPrefix + user.id + "_" + encodeURIComponent(AD_URL);
+    const v = localStorage.getItem(key);
+    alert(v ? ("Reklama uchun allaqachon olindi:\n"+v) : "Hozircha bu reklama uchun olmos olinmagan.");
   });
   withdrawBtn.addEventListener("click", ()=>{
-    const amt = Number(el("withdrawAmount").value || 0);
-    if(!amt || amt <= 0){ alert("Iltimos miqdor kiriting."); return; }
-    withdraw(amt);
+    if(!user || !user.id){ alert("Foydalanuvchi ma'lumotlari yo'q. Iltimos bot orqali oching."); return; }
+    const a = Number(withdrawAmount.value || 0);
+    if(!a || a<=0){ alert("To'g'ri miqdor kiriting"); return; }
+    withdraw(a);
   });
-  refreshBtn.addEventListener("click", ()=>{ loadLocalBalance(); serverCheckBalance(); logActivity("Qo'lda yangilash amalga oshirildi."); });
-  adminBtn.addEventListener("click", ()=>{ adminPanelContainer.style.display = adminPanelContainer.style.display === "none" ? "block" : "none"; });
-  randomizeAdmin.addEventListener("click", randomizeAdminState);
-  copyStats.addEventListener("click", ()=>{
-    const txt = `Users: ${adminState.users}\nDistributed: ${adminState.distributed}\nDailyAds: ${adminState.dailyAds}\nTop10:\n` + adminState.top10.map((u,i)=>`${i+1}. ${u.name} — ${u.gems}`).join("\n");
-    try{ navigator.clipboard.writeText(txt).then(()=> alert("Statlar nusxalandi")) }catch(e){ alert("Clipboardga yozib bo'lmadi:\n\n" + txt); }
-  });
+  refreshBtn.addEventListener("click", ()=>{ loadLocalBalance(); serverCheck(); logActivity("Qo'lda yangilash amalga oshirildi."); });
 
-  // start
-  initApp();
+  // Start detection
+  function start(){
+    updateBotButtons();
+    updateDebug();
+    // If WebApp user available, init; else show notTelegram
+    if(window.Telegram && window.Telegram.WebApp && (window.Telegram.WebApp.initDataUnsafe || window.Telegram.WebApp.initData)){
+      initWithTelegram();
+    } else {
+      // Wait briefly in case data arrives shortly
+      let tries = 0;
+      const t = setInterval(()=>{
+        tries++;
+        updateDebug();
+        if(window.Telegram && window.Telegram.WebApp && (window.Telegram.WebApp.initDataUnsafe || window.Telegram.WebApp.initData)){
+          clearInterval(t);
+          initWithTelegram();
+          return;
+        }
+        if(tries>=5){
+          clearInterval(t);
+          // Not available — show instructions
+          showNotTelegramUI();
+        }
+      },250);
+    }
+  }
+
+  // helpers used earlier
+  function renderAvatar(url,name){ if(url){ avatar.innerHTML = '<img src="'+escapeHtml(url)+'" alt="avatar" />'; } else { const initials=(name||'U').split(' ').map(s=>s[0]||'').join('').slice(0,2).toUpperCase(); avatar.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect width="56" height="56" rx="12" fill="#2a9df4"/><text x="50%" y="55%" font-family="Arial" font-size="22" fill="#fff" text-anchor="middle">${escapeHtml(initials)}</text></svg>`; } }
+
+  start();
 
   // autosave
-  setInterval(()=> { if(localKey) saveLocalBalance(); }, 5000);
-
-  window.addEventListener("beforeunload", ()=> {
-    if(adPoll) clearInterval(adPoll);
-  });
+  setInterval(()=>{ if(localKey) saveLocalBalance(); }, 5000);
+  window.addEventListener("beforeunload", ()=>{ if(adPoll) clearInterval(adPoll); });
 
 })();
 </script>

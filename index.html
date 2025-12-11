@@ -3,8 +3,8 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Telegram Diamond Mini App</title><!-- Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script><!-- Tashqi reklama SDK -->
+  <title>Diamond Rewards</title><!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script><!-- Reklama SDK -->
   <script src="//libtl.com/sdk.js" data-zone="10303593" data-sdk="show_10303593"></script>
   <style>
       body {
@@ -21,10 +21,9 @@
       body {
         width: 100%;
         height: 100%;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
-          sans-serif;
-        background: #0f172a;
-        color: #e5e7eb;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #ffffff;
       }
 
       body {
@@ -39,31 +38,27 @@
         display: flex;
         justify-content: center;
         align-items: stretch;
-        padding: 16px;
+        padding: 20px;
+        overflow-y: auto;
       }
 
       .app-container {
         width: 100%;
-        max-width: 480px;
-        background: radial-gradient(
-          circle at top left,
-          #1d4ed8 0%,
-          #020617 45%,
-          #020617 100%
-        );
-        border-radius: 24px;
-        box-shadow: 0 18px 50px rgba(15, 23, 42, 0.9);
-        padding: 16px 16px 20px;
+        max-width: 420px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 32px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 24px;
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        overflow: hidden;
+        gap: 20px;
+        align-self: flex-start;
       }
 
       header {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 16px;
       }
 
       .top-bar {
@@ -76,415 +71,340 @@
       .brand {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 12px;
       }
 
       .logo-circle {
-        width: 32px;
-        height: 32px;
-        border-radius: 999px;
-        background: linear-gradient(135deg, #38bdf8, #1d4ed8);
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
         display: flex;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.5);
+        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
       }
 
       .logo-icon {
-        width: 18px;
-        height: 18px;
-        border-radius: 4px;
-        border: 2px solid #e5e7eb;
-        position: relative;
-      }
-
-      .logo-icon::before {
-        content: "";
-        position: absolute;
-        left: 1px;
-        top: 50%;
-        width: 9px;
-        height: 2px;
-        background: #e5e7eb;
-        transform: translateY(-50%) rotate(-20deg);
-        transform-origin: left center;
+        font-size: 24px;
       }
 
       .brand-text {
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 4px;
       }
 
       .brand-title {
-        font-size: 16px;
-        font-weight: 600;
-        letter-spacing: 0.01em;
-        color: #f9fafb;
+        font-size: 20px;
+        font-weight: 700;
+        color: #1a202c;
       }
 
       .brand-subtitle {
-        font-size: 12px;
-        color: #9ca3af;
+        font-size: 13px;
+        color: #718096;
       }
 
       .admin-button {
-        padding: 6px 10px;
-        border-radius: 999px;
-        border: 1px solid rgba(148, 163, 184, 0.4);
-        background: rgba(15, 23, 42, 0.75);
-        color: #e5e7eb;
-        font-size: 11px;
-        font-weight: 500;
+        padding: 8px 14px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 600;
         display: none;
         align-items: center;
         gap: 6px;
         cursor: pointer;
-        transition: all 0.16s ease-out;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
       }
 
-      .admin-button:hover,
-      .admin-button:focus-visible {
-        background: rgba(15, 23, 42, 0.95);
-        border-color: #38bdf8;
-        outline: none;
+      .admin-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
       }
 
       .admin-dot {
         width: 6px;
         height: 6px;
-        border-radius: 999px;
-        background: #22c55e;
-        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
+        border-radius: 50%;
+        background: #48bb78;
       }
 
       .status-banner {
-        font-size: 12px;
-        padding: 8px 10px;
-        border-radius: 999px;
-        background: rgba(15, 23, 42, 0.75);
-        border: 1px solid rgba(148, 163, 184, 0.4);
-        color: #9ca3af;
+        font-size: 13px;
+        padding: 12px 16px;
+        border-radius: 16px;
+        background: rgba(102, 126, 234, 0.1);
+        border: 2px solid rgba(102, 126, 234, 0.2);
+        color: #4a5568;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
       }
 
       .status-dot {
-        width: 9px;
-        height: 9px;
-        border-radius: 999px;
-        background: #f97316;
-        box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.18);
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #f6ad55;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
       }
 
       .status-text {
         flex: 1;
+        font-weight: 500;
       }
 
       .status-badge {
-        padding: 3px 8px;
-        border-radius: 999px;
-        font-size: 10px;
-        font-weight: 500;
-        letter-spacing: 0.04em;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
         text-transform: uppercase;
-        background: rgba(15, 23, 42, 0.9);
-        color: #e5e7eb;
-      }
-
-      .hidden {
-        display: none !important;
+        background: rgba(102, 126, 234, 0.2);
+        color: #667eea;
       }
 
       main {
-        flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        overflow: auto;
-        padding-right: 4px;
+        gap: 16px;
       }
 
       .user-card {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 10px;
-        border-radius: 18px;
-        background: rgba(15, 23, 42, 0.9);
-        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.7);
+        gap: 14px;
+        padding: 20px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
       }
 
       .avatar {
-        width: 42px;
-        height: 42px;
-        border-radius: 999px;
-        background: radial-gradient(circle at 30% 20%, #38bdf8, #1e3a8a);
-        border: 2px solid rgba(148, 163, 184, 0.7);
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 3px solid rgba(255, 255, 255, 0.3);
         display: flex;
         justify-content: center;
         align-items: center;
-        color: #f9fafb;
-        font-weight: 600;
-        font-size: 18px;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 20px;
         flex-shrink: 0;
         position: relative;
       }
 
       .avatar-badge {
         position: absolute;
-        right: -2px;
-        bottom: -2px;
-        width: 15px;
-        height: 15px;
-        border-radius: 999px;
-        background: #22c55e;
-        border: 2px solid #020617;
+        right: -4px;
+        bottom: -4px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #48bb78;
+        border: 3px solid #667eea;
       }
 
       .user-info {
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 4px;
       }
 
       .user-name {
-        font-size: 14px;
-        font-weight: 600;
-        color: #f9fafb;
+        font-size: 16px;
+        font-weight: 700;
+        color: #ffffff;
       }
 
       .user-username {
-        font-size: 12px;
-        color: #9ca3af;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.8);
       }
 
       .user-id {
-        font-size: 11px;
-        color: #6b7280;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
       }
 
       .balance-pill {
-        padding: 7px 10px;
-        border-radius: 999px;
-        background: linear-gradient(135deg, #1d4ed8, #22c55e);
+        padding: 12px 16px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
         display: flex;
         flex-direction: column;
-        gap: 2px;
-        color: #f9fafb;
-        font-size: 11px;
-        box-shadow: 0 10px 30px rgba(56, 189, 248, 0.5);
+        gap: 4px;
+        color: #ffffff;
+        font-size: 12px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
       }
 
       .balance-label {
         opacity: 0.9;
+        font-weight: 500;
       }
 
       .balance-value {
         display: flex;
         align-items: center;
-        gap: 6px;
-        font-weight: 600;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 20px;
       }
 
       .diamond-icon {
-        width: 14px;
-        height: 14px;
-        background: conic-gradient(from 180deg, #e5e7eb, #38bdf8, #22c55e, #e5e7eb);
-        clip-path: polygon(50% 0%, 100% 35%, 75% 100%, 25% 100%, 0% 35%);
-        box-shadow: 0 0 10px rgba(191, 219, 254, 0.9);
+        font-size: 20px;
       }
 
       .balance-sync {
-        display: flex;
-        justify-content: flex-end;
         font-size: 10px;
-        color: #9ca3af;
+        color: rgba(255, 255, 255, 0.7);
         margin-top: 2px;
       }
 
       .section-card {
-        border-radius: 18px;
-        padding: 12px 12px 14px;
-        background: rgba(15, 23, 42, 0.9);
-        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.7);
+        border-radius: 20px;
+        padding: 20px;
+        background: #ffffff;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 16px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
       }
 
       .section-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        gap: 8px;
+        align-items: flex-start;
+        gap: 12px;
       }
 
       .section-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: #e5e7eb;
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 4px;
       }
 
       .section-subtitle {
-        font-size: 11px;
-        color: #9ca3af;
+        font-size: 13px;
+        color: #718096;
+        line-height: 1.5;
       }
 
       .tag-pill {
-        padding: 4px 8px;
-        border-radius: 999px;
-        background: rgba(15, 23, 42, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.4);
-        font-size: 10px;
-        color: #9ca3af;
+        padding: 6px 12px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        font-size: 12px;
+        color: #ffffff;
+        font-weight: 600;
+        white-space: nowrap;
       }
 
       .primary-button {
         width: 100%;
         border: none;
         outline: none;
-        border-radius: 999px;
-        padding: 10px 14px;
-        font-size: 14px;
-        font-weight: 600;
-        letter-spacing: 0.02em;
+        border-radius: 16px;
+        padding: 16px 20px;
+        font-size: 16px;
+        font-weight: 700;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
         cursor: pointer;
-        background: linear-gradient(135deg, #38bdf8, #1d4ed8);
-        color: #f9fafb;
-        box-shadow: 0 10px 30px rgba(56, 189, 248, 0.75);
-        transition: transform 0.12s ease-out, box-shadow 0.12s ease-out,
-          filter 0.15s ease-out, opacity 0.15s ease-out;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #ffffff;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        transition: all 0.3s ease;
       }
 
       .primary-button:disabled {
-        opacity: 0.6;
-        cursor: default;
-        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.8);
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
       }
 
-      .primary-button:not(:disabled):hover,
-      .primary-button:not(:disabled):focus-visible {
-        transform: translateY(-1px);
-        box-shadow: 0 14px 38px rgba(56, 189, 248, 0.9);
-        filter: brightness(1.05);
-        outline: none;
+      .primary-button:not(:disabled):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(102, 126, 234, 0.5);
       }
 
-      .primary-button-icon {
-        width: 16px;
-        height: 16px;
-        border-radius: 999px;
-        border: 1px solid rgba(15, 23, 42, 0.8);
-        background: radial-gradient(circle at 30% 20%, #f9fafb, #38bdf8);
-        box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.4);
+      .primary-button:not(:disabled):active {
+        transform: translateY(0);
+      }
+
+      .button-icon {
+        font-size: 20px;
       }
 
       .ad-container {
-        min-height: 100px;
-        border-radius: 12px;
-        background: rgba(15, 23, 42, 0.5);
-        border: 1px dashed rgba(148, 163, 184, 0.4);
+        min-height: 120px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        border: 2px dashed rgba(102, 126, 234, 0.3);
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 12px;
-        position: relative;
-        overflow: hidden;
+        padding: 20px;
       }
 
       .ad-placeholder {
-        font-size: 11px;
-        color: #6b7280;
+        font-size: 13px;
+        color: #718096;
         text-align: center;
-      }
-
-      .link-button {
-        width: 100%;
-        border-radius: 999px;
-        border: 1px solid rgba(148, 163, 184, 0.4);
-        background: rgba(15, 23, 42, 0.9);
-        color: #e5e7eb;
-        padding: 9px 12px;
-        font-size: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        cursor: pointer;
-        transition: background 0.14s ease-out, border-color 0.14s ease-out,
-          transform 0.1s ease-out;
-      }
-
-      .link-button:hover,
-      .link-button:focus-visible {
-        background: rgba(15, 23, 42, 1);
-        border-color: #38bdf8;
-        outline: none;
-        transform: translateY(-0.5px);
-      }
-
-      .link-button-left {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        text-align: left;
-      }
-
-      .link-button-title {
-        font-size: 12px;
         font-weight: 500;
-      }
-
-      .link-button-desc {
-        font-size: 10px;
-        color: #9ca3af;
-      }
-
-      .link-button-chevron {
-        width: 14px;
-        height: 14px;
-        border-radius: 999px;
-        border: 1px solid rgba(148, 163, 184, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 9px;
-        color: #9ca3af;
       }
 
       .form-row {
         display: flex;
         flex-direction: column;
-        gap: 4px;
-        margin-bottom: 6px;
+        gap: 8px;
       }
 
       .form-label {
-        font-size: 11px;
-        color: #9ca3af;
+        font-size: 14px;
+        color: #4a5568;
+        font-weight: 600;
       }
 
       .input-wrapper {
         display: flex;
         align-items: center;
-        gap: 6px;
-        border-radius: 999px;
-        background: rgba(15, 23, 42, 0.95);
-        border: 1px solid rgba(148, 163, 184, 0.6);
-        padding: 6px 10px;
+        gap: 8px;
+        border-radius: 12px;
+        background: #f7fafc;
+        border: 2px solid #e2e8f0;
+        padding: 12px 16px;
+        transition: all 0.2s ease;
+      }
+
+      .input-wrapper:focus-within {
+        border-color: #667eea;
+        background: #ffffff;
       }
 
       .input-prefix {
-        font-size: 11px;
-        color: #6b7280;
-        white-space: nowrap;
+        font-size: 14px;
+        color: #718096;
+        font-weight: 600;
       }
 
       .input-field {
@@ -492,295 +412,279 @@
         border: none;
         outline: none;
         background: transparent;
-        color: #e5e7eb;
-        font-size: 13px;
+        color: #1a202c;
+        font-size: 16px;
+        font-weight: 600;
       }
 
       .input-field::placeholder {
-        color: #4b5563;
+        color: #cbd5e0;
       }
 
       .small-text {
-        font-size: 10px;
-        color: #6b7280;
+        font-size: 12px;
+        color: #a0aec0;
+        line-height: 1.5;
       }
 
       .section-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 6px;
-        font-size: 10px;
-        color: #6b7280;
+        gap: 8px;
+        font-size: 12px;
+        color: #718096;
+        padding-top: 8px;
+        border-top: 1px solid #e2e8f0;
       }
 
       .pill {
-        border-radius: 999px;
-        padding: 3px 8px;
-        border: 1px solid rgba(148, 163, 184, 0.5);
-        background: rgba(15, 23, 42, 0.9);
+        border-radius: 10px;
+        padding: 4px 10px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        font-weight: 600;
       }
 
       .toast {
         position: fixed;
         left: 50%;
-        bottom: 12px;
+        bottom: 20px;
         transform: translateX(-50%);
-        max-width: 440px;
-        width: calc(100% - 32px);
-        padding: 10px 12px;
-        border-radius: 999px;
-        background: rgba(15, 23, 42, 0.98);
-        border: 1px solid rgba(148, 163, 184, 0.7);
-        font-size: 12px;
-        color: #e5e7eb;
+        max-width: 380px;
+        width: calc(100% - 40px);
+        padding: 16px 20px;
+        border-radius: 16px;
+        background: #1a202c;
+        font-size: 14px;
+        color: #ffffff;
         display: none;
         align-items: center;
-        gap: 8px;
-        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.9);
-        z-index: 40;
+        gap: 12px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        z-index: 1000;
+        animation: slideUp 0.3s ease;
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateX(-50%) translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(-50%) translateY(0);
+          opacity: 1;
+        }
       }
 
       .toast-icon {
-        width: 16px;
-        height: 16px;
-        border-radius: 999px;
-        background: #22c55e;
-        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.35);
+        font-size: 24px;
       }
 
       .toast-text {
         flex: 1;
+        font-weight: 500;
       }
 
       .toast-close {
-        width: 18px;
-        height: 18px;
-        border-radius: 999px;
-        border: 1px solid rgba(148, 163, 184, 0.7);
-        background: transparent;
-        color: #9ca3af;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 11px;
+        font-size: 18px;
         cursor: pointer;
+        transition: all 0.2s ease;
       }
 
-      .toast-error .toast-icon {
-        background: #ef4444;
-        box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.4);
+      .toast-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .toast-success {
+        background: linear-gradient(135deg, #48bb78, #38a169);
       }
 
       .toast-error {
-        border-color: rgba(248, 113, 113, 0.8);
+        background: linear-gradient(135deg, #f56565, #e53e3e);
       }
 
       .admin-panel-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(15, 23, 42, 0.8);
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
         display: none;
         justify-content: center;
         align-items: center;
-        padding: 16px;
-        z-index: 50;
+        padding: 20px;
+        z-index: 999;
       }
 
       .admin-panel {
         width: 100%;
-        max-width: 520px;
-        max-height: 96%;
-        background: radial-gradient(
-          circle at top left,
-          #1e40af 0%,
-          #020617 40%,
-          #020617 100%
-        );
-        border-radius: 22px;
-        box-shadow: 0 18px 60px rgba(15, 23, 42, 1);
-        padding: 14px 14px 18px;
+        max-width: 480px;
+        max-height: 90%;
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 24px;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 16px;
+        overflow-y: auto;
       }
 
       .admin-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #e2e8f0;
       }
 
       .admin-title {
-        font-size: 15px;
-        font-weight: 600;
-        color: #f9fafb;
+        font-size: 20px;
+        font-weight: 700;
+        color: #1a202c;
       }
 
       .admin-badge {
-        font-size: 11px;
-        color: #9ca3af;
+        font-size: 12px;
+        color: #718096;
       }
 
       .admin-close {
-        width: 26px;
-        height: 26px;
-        border-radius: 999px;
-        border: 1px solid rgba(148, 163, 184, 0.7);
-        background: rgba(15, 23, 42, 0.9);
-        color: #e5e7eb;
-        font-size: 14px;
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        border: none;
+        background: #f7fafc;
+        color: #4a5568;
+        font-size: 20px;
         cursor: pointer;
         display: flex;
         justify-content: center;
         align-items: center;
+        transition: all 0.2s ease;
+      }
+
+      .admin-close:hover {
+        background: #e2e8f0;
       }
 
       .admin-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
       }
 
       .admin-stat {
         border-radius: 16px;
-        padding: 10px;
-        background: rgba(15, 23, 42, 0.92);
-        border: 1px solid rgba(148, 163, 184, 0.6);
+        padding: 16px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        border: 1px solid rgba(102, 126, 234, 0.2);
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 8px;
       }
 
       .admin-stat-label {
-        font-size: 10px;
-        color: #9ca3af;
+        font-size: 12px;
+        color: #718096;
+        font-weight: 600;
       }
 
       .admin-stat-value {
-        font-size: 16px;
-        font-weight: 600;
-        color: #e5e7eb;
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a202c;
       }
 
       .admin-stat-footnote {
-        font-size: 10px;
-        color: #6b7280;
+        font-size: 11px;
+        color: #a0aec0;
       }
 
       .admin-top-list {
-        margin-top: 4px;
         border-radius: 16px;
-        padding: 10px;
-        background: rgba(15, 23, 42, 0.92);
-        border: 1px solid rgba(148, 163, 184, 0.6);
+        padding: 16px;
+        background: #f7fafc;
         display: flex;
         flex-direction: column;
-        gap: 6px;
-        overflow: auto;
+        gap: 12px;
       }
 
       .admin-list-title {
-        font-size: 12px;
-        font-weight: 500;
-        color: #e5e7eb;
+        font-size: 14px;
+        font-weight: 700;
+        color: #1a202c;
       }
 
       .user-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 8px;
-        font-size: 11px;
-        color: #9ca3af;
+        gap: 12px;
+        font-size: 13px;
+        color: #4a5568;
+        padding: 8px 0;
       }
 
       .user-row-main {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 10px;
       }
 
       .rank-badge {
-        width: 16px;
-        height: 16px;
-        border-radius: 999px;
-        background: rgba(37, 99, 235, 0.9);
+        width: 24px;
+        height: 24px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
         display: flex;
         justify-content: center;
         align-items: center;
-        color: #f9fafb;
-        font-size: 9px;
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 700;
       }
 
       .user-row-amount {
-        font-size: 11px;
-        font-weight: 500;
-        color: #e5e7eb;
+        font-size: 14px;
+        font-weight: 700;
+        color: #1a202c;
         display: flex;
         align-items: center;
-        gap: 4px;
-      }
-
-      .mini-diamond {
-        width: 10px;
-        height: 10px;
-        background: conic-gradient(
-          from 180deg,
-          #e5e7eb,
-          #38bdf8,
-          #22c55e,
-          #e5e7eb
-        );
-        clip-path: polygon(50% 0%, 100% 40%, 75% 100%, 25% 100%, 0% 40%);
+        gap: 6px;
       }
 
       footer {
-        margin-top: 4px;
-        font-size: 10px;
-        color: #6b7280;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .footer-right {
-        display: flex;
-        gap: 6px;
-        align-items: center;
-      }
-
-      .footer-tag {
-        padding: 3px 7px;
-        border-radius: 999px;
-        background: rgba(15, 23, 42, 0.8);
-        border: 1px solid rgba(148, 163, 184, 0.5);
-      }
-
-      .badge-green {
-        border-color: rgba(34, 197, 94, 0.7);
-        color: #bbf7d0;
-      }
-
-      .badge-blue {
-        border-color: rgba(56, 189, 248, 0.8);
-        color: #bfdbfe;
+        margin-top: 8px;
+        font-size: 12px;
+        color: #a0aec0;
+        text-align: center;
+        padding-top: 16px;
+        border-top: 1px solid #e2e8f0;
       }
 
       @media (max-width: 480px) {
-        .app-container {
-          border-radius: 20px;
-          padding: 14px 12px 16px;
+        .app-wrapper {
+          padding: 12px;
         }
 
-        .user-card {
-          padding: 9px;
+        .app-container {
+          padding: 20px;
+          border-radius: 24px;
         }
 
         .section-card {
-          padding: 10px 10px 12px;
+          padding: 16px;
         }
       }
     </style>
@@ -796,25 +700,27 @@
      <div class="top-bar">
       <div class="brand">
        <div class="logo-circle" aria-hidden="true">
-        <div class="logo-icon"></div>
+        <div class="logo-icon">
+         💎
+        </div>
        </div>
        <div class="brand-text">
         <div class="brand-title" id="appTitle">
          Diamond Rewards
         </div>
         <div class="brand-subtitle" id="appSubtitle">
-         Telegram ichida olmos yig'ing
+         Olmos yig'ing va mukofot oling
         </div>
        </div>
-      </div><button id="adminButton" class="admin-button" type="button" aria-label="Admin panelni ochish"> <span class="admin-dot"></span> <span>Admin Panel</span> </button>
+      </div><button id="adminButton" class="admin-button" type="button" aria-label="Admin panelni ochish"> <span class="admin-dot"></span> <span>Admin</span> </button>
      </div>
      <div class="status-banner" id="envBanner">
       <div class="status-dot" id="envDot"></div>
       <div class="status-text" id="envText">
-       Telegram Mini App ichida ishga tushiring.
+       Telegram Mini App ichida ishga tushiring
       </div>
       <div class="status-badge" id="envBadge">
-       WEB APP
+       WEB
       </div>
      </div>
     </header>
@@ -833,12 +739,14 @@
         ID: -
        </div>
       </div>
-      <div class="balance-pill" aria-label="Olmos balansi"><span class="balance-label">Jami olmos</span>
+      <div class="balance-pill" aria-label="Olmos balansi"><span class="balance-label">Balans</span>
        <div class="balance-value">
-        <div class="diamond-icon"></div><span id="balanceValue">0</span>
+        <div class="diamond-icon">
+         💎
+        </div><span id="balanceValue">0</span>
        </div>
        <div class="balance-sync" id="balanceSyncText">
-        Balans yangilanmoqda...
+        Yuklanmoqda...
        </div>
       </div>
      </section><!-- REKLAMA / EARN -->
@@ -846,65 +754,58 @@
       <div class="section-header">
        <div>
         <div class="section-title">
-         Reklama orqali olmos
+         🎬 Reklama ko'ring
         </div>
         <div class="section-subtitle">
-         Reklamani ko'rganingizda avtomatik 1 olmos beriladi
+         Har bir reklama uchun 1 olmos oling
         </div>
        </div>
        <div class="tag-pill">
-        +1 olmos / reklama
+        +1 💎
        </div>
-      </div><!-- Reklama SDK konteyner -->
+      </div>
       <div class="ad-container" id="adContainer">
        <div class="ad-placeholder">
-        Reklama yuklanmoqda...
+        Reklama tayyor. Tugmani bosing!
        </div>
-      </div><button id="showAdButton" class="primary-button" type="button"> <span class="primary-button-icon" aria-hidden="true"></span> <span>Reklamani ko'rsatish</span> </button>
-      <div class="section-footer"><span id="adInfoText"> Har bir reklama ko'rilganda avtomatik olmos qo'shiladi. </span> <span class="pill" id="adCounter"> Bugun: <span id="adTodayCount">0</span> reklama </span>
+      </div><button id="showAdButton" class="primary-button" type="button"> <span class="button-icon">▶️</span> <span>Reklamani boshlash</span> </button>
+      <div class="section-footer"><span id="adInfoText"> Reklama to'liq ko'rilganda mukofot beriladi </span> <span class="pill" id="adCounter"> Bugun: <span id="adTodayCount">0</span> </span>
       </div>
      </section><!-- WITHDRAW -->
      <section class="section-card" id="withdrawSection">
       <div class="section-header">
        <div>
         <div class="section-title" id="withdrawTitle">
-         Olmosni yechib olish
+         💰 Yechib olish
         </div>
         <div class="section-subtitle">
-         Balansingizdan real xizmatlaringiz uchun foydalaning
+         Olmoslaringizni real mukofotga aylantiring
         </div>
        </div>
        <div class="tag-pill">
-        Minimal 1 olmos
+        Min: 1
        </div>
       </div>
-      <div class="form-row"><label class="form-label" for="withdrawAmount"> Miqdorni kiriting </label>
-       <div class="input-wrapper"><span class="input-prefix">Olmos:</span> <input id="withdrawAmount" class="input-field" type="number" min="1" step="1" inputmode="numeric" placeholder="Masalan: 10">
+      <div class="form-row"><label class="form-label" for="withdrawAmount"> Miqdor </label>
+       <div class="input-wrapper"><span class="input-prefix">💎</span> <input id="withdrawAmount" class="input-field" type="number" min="1" step="1" inputmode="numeric" placeholder="10">
        </div>
        <div class="small-text">
-        So'rovingiz quyidagi API orqali yuboriladi: <span style="color: #9ca3af;"> /Test/test.php </span>
+        So'rovingiz API orqali yuboriladi va balans yangilanadi
        </div>
-      </div><button id="withdrawButton" class="primary-button" type="button"> <span class="primary-button-icon" aria-hidden="true"></span> <span id="withdrawButtonText">Olmosni yechib olish</span> </button>
-      <div class="section-footer"><span class="small-text" id="withdrawHint"> Yechib olishda balansingiz real vaqtda yangilanadi. </span> <span class="pill"> So'rovlar: <span id="withdrawCount">0</span> </span>
+      </div><button id="withdrawButton" class="primary-button" type="button"> <span class="button-icon">🚀</span> <span id="withdrawButtonText">Yechib olish</span> </button>
+      <div class="section-footer"><span class="small-text" id="withdrawHint"> Balans real vaqtda yangilanadi </span> <span class="pill"> So'rovlar: <span id="withdrawCount">0</span> </span>
       </div>
      </section>
     </main>
     <footer>
-     <div>
-      <div>
-       Telegram Mini App loyihasi
-      </div>
-      <div>
-       LocalStorage orqali balans saqlanadi.
-      </div>
-     </div>
-     <div class="footer-right"><span class="footer-tag badge-blue">Local cache</span> <span class="footer-tag badge-green">Live SDK</span>
-     </div>
+     Telegram Mini App • LocalStorage bilan ishlaydi
     </footer>
    </div>
   </div><!-- TOAST -->
   <div class="toast" id="toast">
-   <div class="toast-icon" id="toastIcon"></div>
+   <div class="toast-icon" id="toastIcon">
+    ✓
+   </div>
    <div class="toast-text" id="toastMessage">
     Xabar matni
    </div><button class="toast-close" id="toastClose" type="button"> × </button>
@@ -914,62 +815,62 @@
     <div class="admin-header">
      <div>
       <div class="admin-title">
-       Admin Panel
+       📊 Admin Panel
       </div>
       <div class="admin-badge">
-       Faqat belgilangan Telegram ID lar uchun
+       Statistika va boshqaruv
       </div>
-     </div><button class="admin-close" id="adminClose" type="button" aria-label="Admin panelni yopish"> × </button>
+     </div><button class="admin-close" id="adminClose" type="button" aria-label="Yopish"> × </button>
     </div>
     <div class="admin-grid">
      <div class="admin-stat">
       <div class="admin-stat-label">
-       Jami foydalanuvchilar
+       Foydalanuvchilar
       </div>
       <div class="admin-stat-value" id="statTotalUsers">
        0
       </div>
       <div class="admin-stat-footnote">
-       Simulyatsiya qilingan qiymat
+       Jami ro'yxatdan o'tgan
       </div>
      </div>
      <div class="admin-stat">
       <div class="admin-stat-label">
-       Jami tarqatilgan olmos
+       Tarqatilgan olmos
       </div>
       <div class="admin-stat-value" id="statTotalDiamonds">
        0
       </div>
       <div class="admin-stat-footnote">
-       Reklama + bonus orqali
+       Reklama orqali
       </div>
      </div>
      <div class="admin-stat">
       <div class="admin-stat-label">
-       Bugungi reklama kirishlari
+       Bugungi reklamalar
       </div>
       <div class="admin-stat-value" id="statTodayAds">
        0
       </div>
       <div class="admin-stat-footnote">
-       Faqat WebApp seansi bo'yicha
+       Joriy seans
       </div>
      </div>
      <div class="admin-stat">
       <div class="admin-stat-label">
-       Yechib olish so'rovlari
+       Yechib olishlar
       </div>
       <div class="admin-stat-value" id="statWithdraws">
        0
       </div>
       <div class="admin-stat-footnote">
-       Muvaffaqiyatli so'rovlar soni
+       Muvaffaqiyatli
       </div>
      </div>
     </div>
     <div class="admin-top-list">
      <div class="admin-list-title">
-      Eng ko'p olmos yig'gan TOP 10 foydalanuvchi
+      🏆 TOP 10 foydalanuvchilar
      </div>
      <div id="topUsersList"></div>
     </div>
@@ -977,7 +878,7 @@
   </div>
   <script>
       (function () {
-        // === KONFIG & DOIMIY O'ZGARUVCHILAR ===
+        // === KONFIG ===
         var WITHDRAW_API_URL =
           "https://68ed1ab05ca4e.myxvest1.ru/Test/test.php";
 
@@ -995,9 +896,6 @@
         var balance = 0;
         var withdrawRequests = 0;
         var adViewCountToday = 0;
-
-        // Reklama SDK tracking
-        var adShownCount = 0;
         var lastAdTimestamp = 0;
 
         var adminStats = {
@@ -1026,7 +924,6 @@
         var envBadge = document.getElementById("envBadge");
 
         var userCard = document.getElementById("userCard");
-        var avatar = document.getElementById("avatar");
         var avatarInitials = document.getElementById("avatarInitials");
         var userNameEl = document.getElementById("userName");
         var userUsernameEl = document.getElementById("userUsername");
@@ -1036,16 +933,12 @@
 
         var adContainer = document.getElementById("adContainer");
         var showAdButton = document.getElementById("showAdButton");
-        var adInfoText = document.getElementById("adInfoText");
         var adTodayCountEl = document.getElementById("adTodayCount");
 
         var withdrawAmountInput = document.getElementById("withdrawAmount");
         var withdrawButton = document.getElementById("withdrawButton");
         var withdrawCountEl = document.getElementById("withdrawCount");
-        var withdrawTitleEl = document.getElementById("withdrawTitle");
-        var withdrawButtonTextEl =
-          document.getElementById("withdrawButtonText");
-        var withdrawHintEl = document.getElementById("withdrawHint");
+        var withdrawButtonTextEl = document.getElementById("withdrawButtonText");
 
         var adminButton = document.getElementById("adminButton");
         var adminOverlay = document.getElementById("adminOverlay");
@@ -1061,17 +954,19 @@
         var toastMessage = document.getElementById("toastMessage");
         var toastClose = document.getElementById("toastClose");
 
-        var appTitleEl = document.getElementById("appTitle");
-        var appSubtitleEl = document.getElementById("appSubtitle");
-
         // === YORDAMCHI FUNKSIYALAR ===
         function showToast(message, type) {
           toastMessage.textContent = message;
+          toastEl.className = "toast";
+          
           if (type === "error") {
             toastEl.classList.add("toast-error");
+            toastIcon.textContent = "✕";
           } else {
-            toastEl.classList.remove("toast-error");
+            toastEl.classList.add("toast-success");
+            toastIcon.textContent = "✓";
           }
+          
           toastEl.style.display = "flex";
 
           setTimeout(function () {
@@ -1118,22 +1013,19 @@
         }
 
         function simulateServerBalanceCheck() {
-          balanceSyncText.textContent = "Balans tasdiqlandi";
+          balanceSyncText.textContent = "✓ Tasdiqlandi";
           setTimeout(function () {
-            balanceSyncText.textContent = "LocalStorage bilan sinxron";
-          }, 1800);
+            balanceSyncText.textContent = "Sinxronlashtirilgan";
+          }, 2000);
         }
 
         function formatNumber(num) {
-          var s = String(num);
-          return s.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+          return String(num).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
         }
 
         function updateAdminPanel() {
           statTotalUsers.textContent = formatNumber(adminStats.totalUsers);
-          statTotalDiamonds.textContent = formatNumber(
-            adminStats.totalDiamonds
-          );
+          statTotalDiamonds.textContent = formatNumber(adminStats.totalDiamonds);
           statTodayAds.textContent = formatNumber(adminStats.todayAds);
           statWithdraws.textContent = formatNumber(adminStats.withdraws);
 
@@ -1150,23 +1042,14 @@
             rank.textContent = index + 1;
 
             var text = document.createElement("div");
-            text.textContent =
-              "ID: " + user.id + " · @" + user.username;
+            text.textContent = "@" + user.username;
 
             main.appendChild(rank);
             main.appendChild(text);
 
             var amount = document.createElement("div");
             amount.className = "user-row-amount";
-
-            var diamond = document.createElement("div");
-            diamond.className = "mini-diamond";
-
-            var amt = document.createElement("span");
-            amt.textContent = user.diamonds;
-
-            amount.appendChild(diamond);
-            amount.appendChild(amt);
+            amount.innerHTML = "💎 " + user.diamonds;
 
             row.appendChild(main);
             row.appendChild(amount);
@@ -1192,13 +1075,12 @@
           }
         });
 
-        // === REKLAMA SDK INTEGRATSIYASI ===
+        // === REKLAMA SDK ===
         function grantDiamondForAd() {
           if (!currentUser) return;
 
           var now = Date.now();
-          // Har 5 soniyada 1 martadan ko'p olmos bermaslik (spam oldini olish)
-          if (now - lastAdTimestamp < 5000) {
+          if (now - lastAdTimestamp < 3000) {
             return;
           }
 
@@ -1213,101 +1095,93 @@
           adminStats.totalDiamonds += 1;
           adTodayCountEl.textContent = adViewCountToday;
 
-          showToast("Reklama ko'rildi! +1 olmos qo'shildi.", "success");
+          showToast("🎉 Reklama ko'rildi! +1 olmos qo'shildi", "success");
         }
 
-        // Reklama SDK yuklanganini kuzatish
         function checkAdSDK() {
-          // SDK global funksiyasini tekshirish (show_10303593)
-          if (typeof window.show_10303593 === "function") {
-            return true;
-          }
-          return false;
+          return typeof window.show_10303593 === "function";
         }
 
-        // Reklamani ko'rsatish tugmasi
         showAdButton.addEventListener("click", function () {
           if (!isTelegramEnv() || !currentUser) {
-            showToast(
-              "Reklama faqat Telegram WebApp ichida ishlaydi.",
-              "error"
-            );
+            showToast("Faqat Telegram WebApp ichida ishlaydi", "error");
             return;
           }
 
-          if (checkAdSDK()) {
-            try {
-              // SDK funksiyasini chaqirish
-              window.show_10303593();
-              
-              // Reklama ko'rsatilganda olmos berish
-              // SDK callback bo'lmasa, tugma bosilganda berish
-              setTimeout(function() {
-                grantDiamondForAd();
-              }, 1000);
-              
-            } catch (e) {
-              showToast("Reklama yuklanishda xatolik yuz berdi.", "error");
-            }
-          } else {
-            showToast("Reklama SDK hali yuklanmagan. Biroz kuting...", "error");
+          if (!checkAdSDK()) {
+            showToast("Reklama SDK yuklanmagan. Internetni tekshiring", "error");
+            return;
+          }
+
+          showAdButton.disabled = true;
+          showAdButton.innerHTML = '<span class="button-icon">⏳</span><span>Yuklanmoqda...</span>';
+
+          try {
+            // SDK Promise bilan ishlaydi
+            window.show_10303593().then(function() {
+              // Reklama to'liq ko'rilganda mukofot berish
+              grantDiamondForAd();
+              showAdButton.disabled = false;
+              showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
+            }).catch(function(error) {
+              showToast("Reklama yuklanishda xatolik", "error");
+              showAdButton.disabled = false;
+              showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
+            });
+          } catch (e) {
+            showToast("Reklama chaqirishda xatolik", "error");
+            showAdButton.disabled = false;
+            showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
           }
         });
 
-        // SDK yuklanganini tekshirish (sahifa yuklanganda)
+        // SDK yuklanganini tekshirish
         var sdkCheckInterval = setInterval(function() {
           if (checkAdSDK()) {
-            adContainer.innerHTML = '<div class="ad-placeholder">Reklama tayyor. Tugmani bosing.</div>';
+            adContainer.innerHTML = '<div class="ad-placeholder">✅ Reklama tayyor. Tugmani bosing!</div>';
             clearInterval(sdkCheckInterval);
           }
         }, 500);
 
-        // 10 soniyadan keyin tekshirishni to'xtatish
         setTimeout(function() {
           clearInterval(sdkCheckInterval);
           if (!checkAdSDK()) {
-            adContainer.innerHTML = '<div class="ad-placeholder">Reklama SDK yuklanmadi. Internetni tekshiring.</div>';
+            adContainer.innerHTML = '<div class="ad-placeholder">⚠️ Reklama SDK yuklanmadi</div>';
           }
         }, 10000);
 
         // === WITHDRAW ===
         withdrawButton.addEventListener("click", function () {
           if (!currentUser) {
-            showToast(
-              "Telegram foydalanuvchisi aniqlanmadi. Iltimos, WebApp ichida oching.",
-              "error"
-            );
+            showToast("Telegram foydalanuvchisi aniqlanmadi", "error");
             return;
           }
 
           var rawAmount = withdrawAmountInput.value.trim();
           if (!rawAmount) {
-            showToast("Miqdor kiriting.", "error");
+            showToast("Miqdor kiriting", "error");
             return;
           }
 
           var amount = parseInt(rawAmount, 10);
           if (isNaN(amount) || amount <= 0) {
-            showToast("Miqdor noto'g'ri. Faqat musbat butun son kiriting.", "error");
+            showToast("Noto'g'ri miqdor", "error");
             return;
           }
 
           if (amount > balance) {
-            showToast(
-              "Balansingizda yetarli olmos mavjud emas.",
-              "error"
-            );
+            showToast("Balansingizda yetarli olmos yo'q", "error");
             return;
           }
 
           withdrawButton.disabled = true;
-          var oldText = withdrawButtonTextEl.textContent;
           withdrawButtonTextEl.textContent = "Yuborilmoqda...";
 
+          // API formatiga mos payload
           var payload = {
             token: WITHDRAW_API_TOKEN,
-            user_id: currentUser.id,
-            amount: amount,
+            user_id: parseInt(currentUser.id, 10),
+            amount: amount
           };
 
           fetch(WITHDRAW_API_URL, {
@@ -1318,21 +1192,24 @@
             body: JSON.stringify(payload),
           })
             .then(function (res) {
-              return res
-                .text()
-                .then(function (t) {
-                  try {
-                    return JSON.parse(t);
-                  } catch (e) {
-                    return { raw: t };
-                  }
-                })
-                .catch(function () {
-                  return {};
-                });
+              if (!res.ok) {
+                throw new Error("Server xatosi: " + res.status);
+              }
+              return res.text();
             })
-            .then(function (data) {
-              if (data && data.success === true) {
+            .then(function (responseText) {
+              // Javobni tekshirish
+              var data;
+              try {
+                data = JSON.parse(responseText);
+              } catch (e) {
+                // Agar JSON bo'lmasa, matnni ko'rsatish
+                console.log("Server javobi:", responseText);
+                data = { raw: responseText };
+              }
+
+              // Muvaffaqiyatli javobni tekshirish
+              if (data && (data.success === true || data.status === "success" || responseText.indexOf("success") !== -1)) {
                 balance -= amount;
                 if (balance < 0) balance = 0;
                 updateBalanceUI();
@@ -1343,36 +1220,29 @@
                 adminStats.withdraws += 1;
                 withdrawCountEl.textContent = withdrawRequests;
 
-                showToast(
-                  "So'rov muvaffaqiyatli yuborildi, balans yangilandi.",
-                  "success"
-                );
+                showToast("✅ Muvaffaqiyatli yechib olindi!", "success");
+                withdrawAmountInput.value = "";
               } else {
-                showToast(
-                  "API muvaffaqiyatli javob qaytarmadi yoki format noto'g'ri.",
-                  "error"
-                );
+                var errorMsg = data.message || data.error || "API xatosi";
+                showToast("❌ " + errorMsg, "error");
               }
             })
-            .catch(function () {
-              showToast(
-                "Serverga ulanib bo'lmadi. Keyinroq qayta urinib ko'ring.",
-                "error"
-              );
+            .catch(function (error) {
+              console.error("Xatolik:", error);
+              showToast("Serverga ulanib bo'lmadi", "error");
             })
             .finally(function () {
               withdrawButton.disabled = false;
-              withdrawButtonTextEl.textContent = oldText;
+              withdrawButtonTextEl.textContent = "Yechib olish";
             });
         });
 
-        // === TELEGRAM WEBAPP INIT ===
+        // === TELEGRAM INIT ===
         function initApp() {
           if (!isTelegramEnv()) {
-            envDot.style.background = "#ef4444";
+            envDot.style.background = "#f56565";
             envBadge.textContent = "BRAUZER";
-            envText.textContent =
-              "Bu mini ilova faqat Telegram WebApp ichida ishlaydi. Telegram ichidan qayta oching.";
+            envText.textContent = "Faqat Telegram WebApp ichida ishlaydi";
             userCard.style.opacity = "0.5";
             showAdButton.disabled = true;
             withdrawButton.disabled = true;
@@ -1384,9 +1254,8 @@
           var user = tg.initDataUnsafe.user;
 
           if (!user || !user.id) {
-            envDot.style.background = "#ef4444";
-            envText.textContent =
-              "Telegram foydalanuvchisi aniqlanmadi. Iltimos, qaytadan oching.";
+            envDot.style.background = "#f56565";
+            envText.textContent = "Foydalanuvchi aniqlanmadi";
             return;
           }
 
@@ -1401,13 +1270,13 @@
             (currentUser.first_name || "") +
             (currentUser.last_name ? " " + currentUser.last_name : "");
           if (!fullName.trim()) {
-            fullName = "Telegram foydalanuvchisi";
+            fullName = "Telegram User";
           }
 
           userNameEl.textContent = fullName;
           userUsernameEl.textContent = currentUser.username
             ? "@" + currentUser.username
-            : "@no_username";
+            : "@user";
           userIdEl.textContent = "ID: " + currentUser.id;
 
           var initials = "";
@@ -1426,17 +1295,17 @@
           updateBalanceUI();
           simulateServerBalanceCheck();
 
-          envDot.style.background = "#22c55e";
+          envDot.style.background = "#48bb78";
           envBadge.textContent = "TELEGRAM";
-          envText.textContent =
-            "Telegram WebApp orqali foydalanuvchi muvaffaqiyatli aniqlangan.";
+          envText.textContent = "✓ Muvaffaqiyatli ulandi";
 
           if (ADMIN_IDS.indexOf(currentUser.id) !== -1) {
             adminButton.style.display = "inline-flex";
           }
 
           try {
-            tg.setHeaderColor("#0f172a");
+            tg.setHeaderColor("#667eea");
+            tg.setBackgroundColor("#667eea");
           } catch (e) {}
         }
 
@@ -1447,5 +1316,5 @@
         }
       })();
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac4805313069250',t:'MTc2NTQ1MTA2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac48dc7031e9250',t:'MTc2NTQ1MTYxOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

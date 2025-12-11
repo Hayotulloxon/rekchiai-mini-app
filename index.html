@@ -364,6 +364,15 @@
         padding: 20px;
       }
 
+      /* new: make ad area clearly clickable when needed */
+      .ad-container.clickable {
+        cursor: pointer;
+      }
+      .ad-container.focus {
+        box-shadow: 0 0 0 6px rgba(102,126,234,0.12);
+        transition: box-shadow 0.2s ease;
+      }
+
       .ad-placeholder {
         font-size: 13px;
         color: #718096;
@@ -710,10 +719,10 @@
       </div>
       <div class="ad-container" id="adContainer">
        <div class="ad-placeholder">
-        Reklama tayyor. Tugmani bosing!
+        Reklama tayyor. Tugmani bosing va reklamadagi joyga kirib bonus oling!
        </div>
       </div><button id="showAdButton" class="primary-button" type="button"> <span class="button-icon">▶️</span> <span>Reklamani boshlash</span> </button>
-      <div class="section-footer"><span id="adInfoText"> Reklama to'liq ko'rilganda mukofot beriladi </span> <span class="pill" id="adCounter"> Bugun: <span id="adTodayCount">0</span> </span>
+      <div class="section-footer"><span id="adInfoText"> Reklamadagi joyga kirganingizda mukofot beriladi (click) </span> <span class="pill" id="adCounter"> Bugun: <span id="adTodayCount">0</span> </span>
       </div>
      </section>
     </main>
@@ -998,11 +1007,11 @@
             var nameEl = document.createElement("div");
             nameEl.style.fontWeight = "600";
             nameEl.style.color = "#1a202c";
-            nameEl.textContent = user.username;
+            nameEl.textContent = user.username || ("User" + user.id);
 
             var idEl = document.createElement("div");
-            idEl.style.fontSize = "11px";
-            idEl.style.color = "#a0aec0";
+            idEl.style.fontSize = "12px";
+            idEl.style.color = "#718096";
             idEl.textContent = "ID: " + user.id;
 
             userInfo.appendChild(nameEl);
@@ -1013,7 +1022,7 @@
 
             var amount = document.createElement("div");
             amount.className = "user-row-amount";
-            amount.innerHTML = "🎬 " + user.adsCount + " ta";
+            amount.textContent = user.adsCount + " 💎";
 
             row.appendChild(main);
             row.appendChild(amount);
@@ -1022,202 +1031,146 @@
           });
         }
 
-        function openAdminPanel() {
-          updateAdminPanel();
-          adminOverlay.style.display = "flex";
-        }
+        // Foydalanuvchi ma'lumotlarini yuklash va UI'ni boshlash
+        function initForUser(user) {
+          currentUser = user;
+          try {
+            document.getElementById("avatarInitials").textContent = (user.first_name || "U").charAt(0).toUpperCase() + (user.last_name ? (user.last_name.charAt(0).toUpperCase()) : "");
+          } catch (e) {}
+          userNameEl.textContent = (user.first_name || "Foydalanuvchi") + (user.last_name ? (" " + user.last_name) : "");
+          userUsernameEl.textContent = user.username ? ("@" + user.username) : "@username";
+          userIdEl.textContent = "ID: " + (user.id || "-");
 
-        function closeAdminPanel() {
-          adminOverlay.style.display = "none";
-        }
-
-        adminButton.addEventListener("click", openAdminPanel);
-        adminClose.addEventListener("click", closeAdminPanel);
-        adminOverlay.addEventListener("click", function (e) {
-          if (e.target === adminOverlay) {
-            closeAdminPanel();
-          }
-        });
-
-        // === REKLAMA SDK ===
-        function grantDiamondForAd() {
-          if (!currentUser) return;
-
-          var now = Date.now();
-          if (now - lastAdTimestamp < 3000) {
-            return;
-          }
-
-          lastAdTimestamp = now;
-          balance += 1;
+          // Load balance from local then from server
+          balance = loadBalanceFromLocal(user.id || "anon");
           updateBalanceUI();
-          saveBalanceToLocal(currentUser.id, balance);
-          
-          // Serverga yangi balansni yuborish
-          saveBalanceToServer(currentUser.id, balance);
+          loadBalanceFromServer(user.id || "anon");
 
-          adViewCountToday += 1;
+          // load ad count
+          try {
+            adViewCountToday = parseInt(localStorage.getItem("user_ads_" + (user.id || "anon")) || "0", 10);
+            if (isNaN(adViewCountToday)) adViewCountToday = 0;
+          } catch (e) {
+            adViewCountToday = 0;
+          }
           adTodayCountEl.textContent = adViewCountToday;
 
-          // Foydalanuvchi reklama statistikasini saqlash
-          try {
-            var userAdsKey = "user_ads_" + currentUser.id;
-            var currentAdsCount = parseInt(localStorage.getItem(userAdsKey) || "0", 10);
-            localStorage.setItem(userAdsKey, String(currentAdsCount + 1));
-            
-            var userNameKey = "user_name_" + currentUser.id;
-            var displayName = currentUser.username || currentUser.first_name || "User" + currentUser.id;
-            localStorage.setItem(userNameKey, displayName);
-          } catch (e) {}
-
-          showToast("🎉 Reklama ko'rildi! +1 olmos qo'shildi", "success");
+          // make ad container clickable (visual)
+          adContainer.classList.add('clickable');
         }
 
-        function initAdsgramSDK() {
-          if (typeof window.Adsgram === "undefined") {
-            adContainer.innerHTML = '<div class="ad-placeholder">⚠️ Adsgram SDK yuklanmadi</div>';
-            return false;
-          }
-
-          try {
-            AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
-            
-            // Event listener'larni qo'shish
-            AdController.addEventListener('onReward', function() {
-              grantDiamondForAd();
-            });
-            
-            AdController.addEventListener('onError', function() {
-              showToast("Reklama yuklanishda xatolik", "error");
-            });
-            
-            AdController.addEventListener('onSkip', function() {
-              showToast("Reklama to'xtatildi", "error");
-            });
-
-            adContainer.innerHTML = '<div class="ad-placeholder">✅ Reklama tayyor. Tugmani bosing!</div>';
-            return true;
-          } catch (e) {
-            adContainer.innerHTML = '<div class="ad-placeholder">❌ SDK ishga tushmadi</div>';
-            return false;
-          }
-        }
-
-        showAdButton.addEventListener("click", function () {
-          if (!isTelegramEnv() || !currentUser) {
-            showToast("Faqat Telegram WebApp ichida ishlaydi", "error");
-            return;
-          }
-
-          if (!AdController) {
-            showToast("Reklama SDK tayyor emas", "error");
-            return;
-          }
-
-          showAdButton.disabled = true;
-          showAdButton.innerHTML = '<span class="button-icon">⏳</span><span>Yuklanmoqda...</span>';
-
-          AdController.show()
-            .then(function (result) {
-              // result.done === true bo'lsa, foydalanuvchi reklamani to'liq ko'rdi
-              // onReward event avtomatik chaqiriladi
-              showAdButton.disabled = false;
-              showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
-            })
-            .catch(function (result) {
-              // Xatolik yoki reklama yo'q
-              // onError yoki onSkip event avtomatik chaqiriladi
-              showAdButton.disabled = false;
-              showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
-            });
-        });
-
-        // === TELEGRAM INIT ===
-        function initApp() {
-          if (!isTelegramEnv()) {
-            envDot.style.background = "#f56565";
-            envBadge.textContent = "BRAUZER";
-            envText.textContent = "Faqat Telegram WebApp ichida ishlaydi";
-            userCard.style.opacity = "0.5";
-            showAdButton.disabled = true;
-            return;
-          }
-
-          var tg = window.Telegram.WebApp;
-          tg.ready();
-          var user = tg.initDataUnsafe.user;
-
-          if (!user || !user.id) {
-            envDot.style.background = "#f56565";
-            envText.textContent = "Foydalanuvchi aniqlanmadi";
-            return;
-          }
-
-          currentUser = {
-            id: String(user.id),
-            first_name: user.first_name || "",
-            last_name: user.last_name || "",
-            username: user.username || "",
-          };
-
-          var fullName =
-            (currentUser.first_name || "") +
-            (currentUser.last_name ? " " + currentUser.last_name : "");
-          if (!fullName.trim()) {
-            fullName = "Telegram User";
-          }
-
-          userNameEl.textContent = fullName;
-          userUsernameEl.textContent = currentUser.username
-            ? "@" + currentUser.username
-            : "@user";
-          userIdEl.textContent = "ID: " + currentUser.id;
-
-          var initials = "";
-          if (currentUser.first_name) {
-            initials += currentUser.first_name[0].toUpperCase();
-          }
-          if (currentUser.last_name) {
-            initials += currentUser.last_name[0].toUpperCase();
-          }
-          if (!initials) {
-            initials = "TG";
-          }
-          avatarInitials.textContent = initials;
-
-          // Avval local'dan yuklash
-          balance = loadBalanceFromLocal(currentUser.id);
-          updateBalanceUI();
-          
-          // Keyin serverdan yangilash
-          loadBalanceFromServer(currentUser.id);
-
-          envDot.style.background = "#48bb78";
-          envBadge.textContent = "TELEGRAM";
-          envText.textContent = "✓ Muvaffaqiyatli ulandi";
-
-          // Admin tugmasini faqat adminlarga ko'rsatish
-          if (ADMIN_IDS.indexOf(currentUser.id) !== -1) {
+        // Admin button visibility
+        function tryShowAdminButton(user) {
+          if (!user) return;
+          if (ADMIN_IDS.indexOf(String(user.id)) !== -1) {
             adminButton.style.display = "inline-flex";
           } else {
             adminButton.style.display = "none";
           }
-
-          // Adsgram SDK ni ishga tushirish
-          initAdsgramSDK();
-
-          try {
-            tg.setHeaderColor("#667eea");
-            tg.setBackgroundColor("#667eea");
-          } catch (e) {}
         }
 
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", initApp);
-        } else {
-          initApp();
+        // Admin panel open/close
+        adminButton.addEventListener("click", function () {
+          updateAdminPanel();
+          adminOverlay.style.display = "flex";
+        });
+        adminClose.addEventListener("click", function () {
+          adminOverlay.style.display = "none";
+        });
+        adminOverlay.addEventListener("click", function (e) {
+          if (e.target === adminOverlay) adminOverlay.style.display = "none";
+        });
+
+        // Ad click logic:
+        // give bonus when user clicks adContainer (reklamadagi joyga kirgani uchun / click)
+        function canShowAd() {
+          var now = Date.now();
+          // small gap to avoid accidental double clicks
+          if (now - lastAdTimestamp < 2000) return false;
+          // daily cap fallback
+          if (adViewCountToday >= 100) return false;
+          return true;
+        }
+
+        function rewardUserForAd() {
+          // safety: ensure we have a user
+          if (!currentUser) {
+            showToast("Foydalanuvchi topilmadi", "error");
+            return;
+          }
+
+          adViewCountToday += 1;
+          lastAdTimestamp = Date.now();
+          try {
+            localStorage.setItem("user_ads_" + (currentUser.id || "anon"), String(adViewCountToday));
+            localStorage.setItem("user_name_" + (currentUser.id || "anon"), String(currentUser.username || currentUser.first_name || "User"));
+          } catch (e) {}
+          adTodayCountEl.textContent = adViewCountToday;
+
+          // give +1 diamond immediately on click
+          balance = Number(balance) + 1;
+          updateBalanceUI();
+          saveBalanceToLocal(currentUser.id || "anon", balance);
+          saveBalanceToServer(currentUser.id || "anon", balance);
+          showToast("Siz 1 💎 oldingiz!🎉", "success");
+        }
+
+        // When user clicks the ad area, reward
+        adContainer.addEventListener("click", function (e) {
+          if (!currentUser) {
+            showToast("Foydalanuvchi topilmadi", "error");
+            return;
+          }
+          if (!canShowAd()) {
+            showToast("Iltimos biroz kuting...", "error");
+            return;
+          }
+
+          // If ad element contains a real ad link you'd normally open it here.
+          // For the requested behavior: reward on click (entering ad area)
+          rewardUserForAd();
+        });
+
+        // Show Ad button: guide user to click ad area (we do not reward for watching)
+        showAdButton.addEventListener("click", function () {
+          if (!currentUser) {
+            showToast("Foydalanuvchi topilmadi", "error");
+            return;
+          }
+
+          // Visual hint: focus the ad area and instruct to click
+          adContainer.classList.add('focus');
+          showToast("Reklamadagi joyga bosing va bonus oling", "success");
+          setTimeout(function () {
+            adContainer.classList.remove('focus');
+          }, 2200);
+        });
+
+        // Init flow: detect Telegram environment, otherwise show web note
+        function startApp() {
+          if (isTelegramEnv()) {
+            tryShowAdminButton(window.Telegram.WebApp.initDataUnsafe.user);
+            initForUser(window.Telegram.WebApp.initDataUnsafe.user);
+            envText.textContent = "Telegram ichida ochildi";
+            envBadge.textContent = "TG";
+          } else {
+            // fallback anonymous user
+            var anon = { id: "web_anon", first_name: "Web", username: "web" };
+            tryShowAdminButton(anon);
+            initForUser(anon);
+            envText.textContent = "Brauzer (WEB) muhitida";
+            envBadge.textContent = "WEB";
+          }
+        }
+
+        // run on load
+        try {
+          document.addEventListener("DOMContentLoaded", startApp);
+        } catch (e) {
+          // fallback
+          startApp();
         }
       })();
-    </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac4e3eeb1c6ae0b',t:'MTc2NTQ1NTE0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  </script>
+ </body>
 </html>

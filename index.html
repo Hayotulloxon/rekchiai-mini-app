@@ -1,590 +1,476 @@
 <!doctype html>
 <html lang="uz" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Diamond Rewards</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-card: #334155;
-            --bg-gradient: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
-            --border-color: #475569;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --error: #ef4444;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 440px;
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            padding: 24px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .logo-circle {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            background: var(--bg-gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .user-card {
-            background: var(--bg-gradient);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .user-info {
-            flex: 1;
-        }
-
-        .user-name {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .user-username {
-            font-size: 14px;
-            opacity: 0.9;
-            margin: 4px 0;
-        }
-
-        .balance-pill {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 12px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .balance-value {
-            font-size: 24px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        .primary-button {
-            width: 100%;
-            background: var(--bg-gradient);
-            border: none;
-            border-radius: 12px;
-            padding: 16px;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .primary-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .status-banner {
-            background: rgba(124, 58, 237, 0.1);
-            border: 1px solid rgba(124, 58, 237, 0.2);
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--warning);
-        }
-
-        .admin-button {
-            background: var(--bg-gradient);
-            border: none;
-            border-radius: 10px;
-            padding: 8px 16px;
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-            display: none;
-        }
-
-        .admin-panel {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            z-index: 1000;
-        }
-
-        .admin-content {
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            padding: 24px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .users-list {
-            margin-top: 20px;
-        }
-
-        .user-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--success);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 10px;
-            display: none;
-            z-index: 1001;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diamond Rewards</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-card: #334155;
+    --bg-gradient: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --border-color: #475569;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+.app-container {
+    width: 100%;
+    max-width: 440px;
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid var(--border-color);
+}
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.logo-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--bg-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+.status-banner {
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--warning);
+}
+.user-card {
+    background: var(--bg-gradient);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+.balance-pill {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.balance-value {
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.section-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+}
+.primary-button {
+    width: 100%;
+    background: var(--bg-gradient);
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.primary-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.admin-button {
+    background: var(--bg-gradient);
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    display: none;
+}
+.admin-panel {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+}
+.admin-content {
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--success);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 10px;
+    display: none;
+    z-index: 1001;
+}
+</style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="brand">
-            <div class="logo-circle">💎</div>
+<div class="app-container">
+    <div class="brand">
+        <div class="logo-circle">💎</div>
+        <div>
+            <h1>Diamond Rewards</h1>
+            <p style="color: var(--text-muted); font-size: 14px;">Click qiling - olmos oling</p>
+        </div>
+        <button class="admin-button" id="adminButton">Admin</button>
+    </div>
+
+    <div class="status-banner" id="statusBanner">
+        <div class="status-dot"></div>
+        <span id="statusText">Yuklanmoqda...</span>
+    </div>
+
+    <div class="user-card">
+        <div class="avatar" id="avatar">U</div>
+        <div class="user-info">
+            <div class="user-name" id="userName">Foydalanuvchi</div>
+            <div class="user-username" id="userUsername">@username</div>
+            <div style="font-size: 12px; opacity: 0.7;" id="userId">ID: -</div>
+        </div>
+        <div class="balance-pill">
+            <div style="font-size: 12px; margin-bottom: 4px;">Balans</div>
+            <div class="balance-value">
+                <span>💎</span>
+                <span id="balanceValue">0</span>
+            </div>
+            <div style="font-size: 11px; opacity: 0.7;" id="balanceSync">Sinxronlanmoqda...</div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h2 style="font-size: 18px; margin-bottom: 8px;">🔗 Reklamaga o'ting</h2>
+        <p style="color: var(--text-muted); margin-bottom: 16px;">Click qilganingiz uchun 1 olmos oling</p>
+        
+        <div style="background: rgba(124, 58, 237, 0.1); border: 2px dashed rgba(124, 58, 237, 0.3); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 16px;">
+            <div id="adStatus">Reklama yuklanmoqda...</div>
+        </div>
+
+        <button class="primary-button" id="showAdButton">
+            <span>🔗</span>
+            <span>Reklamani ochish</span>
+        </button>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 16px; font-size: 14px; color: var(--text-muted);">
+            <span>Click qilgandan keyin mukofot beriladi</span>
+            <span>Bugun: <span id="todayCount">0</span></span>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-muted);">
+        Diamond Rewards • Server sinxronizatsiyasi
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="admin-panel" id="adminPanel">
+    <div class="admin-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h2>📊 Admin Panel</h2>
+            <button style="background: none; border: none; color: var(--text-primary); font-size: 24px; cursor: pointer;" id="closeAdmin">×</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+            <div style="background: var(--bg-card); padding: 16px; border-radius: 12px;">
+                <div style="font-size: 14px; color: var(--text-muted);">Jami foydalanuvchilar</div>
+                <div style="font-size: 32px; font-weight: bold;" id="totalUsers">0</div>
+            </div>
+            <div style="background: var(--bg-card); padding: 16px; border-radius: 12px;">
+                <div style="font-size: 14px; color: var(--text-muted);">Jami clicklar</div>
+                <div style="font-size: 32px; font-weight: bold;" id="totalClicks">0</div>
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 16px;">👥 Barcha foydalanuvchilar</h3>
+        <div class="users-list" id="usersList">
+            <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                Yuklanmoqda...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const CONFIG = {
+    BALANCE_API_URL: 'https://68ed1ab05ca4e7.xvest1.ru/Test/balance.php',
+    API_TOKEN: '4564564asf78954e65g4a7g98a4ga6s5g48as7g98as8g456',
+    ADMIN_IDS: ['7500103239', '7104718080']
+};
+
+let currentUser = null;
+let balance = 0;
+let todayCount = 0;
+
+const statusBanner = document.getElementById('statusBanner');
+const statusText = document.getElementById('statusText');
+const avatar = document.getElementById('avatar');
+const userName = document.getElementById('userName');
+const userUsername = document.getElementById('userUsername');
+const userId = document.getElementById('userId');
+const balanceValue = document.getElementById('balanceValue');
+const balanceSync = document.getElementById('balanceSync');
+const adStatus = document.getElementById('adStatus');
+const showAdButton = document.getElementById('showAdButton');
+const todayCountEl = document.getElementById('todayCount');
+const adminButton = document.getElementById('adminButton');
+const adminPanel = document.getElementById('adminPanel');
+const closeAdmin = document.getElementById('closeAdmin');
+const totalUsers = document.getElementById('totalUsers');
+const totalClicks = document.getElementById('totalClicks');
+const usersList = document.getElementById('usersList');
+const toast = document.getElementById('toast');
+
+function showToast(message, type = 'success') {
+    toast.textContent = message;
+    toast.style.background = type === 'error' ? 'var(--error)' : 'var(--success)';
+    toast.style.display = 'block';
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3000);
+}
+
+async function fetchBalance(userId) {
+    try {
+        const response = await fetch(CONFIG.BALANCE_API_URL, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                action: 'get_balance',
+                user_id: userId,
+                token: CONFIG.API_TOKEN
+            })
+        });
+        const data = await response.json();
+        return data.success ? data.balance || 0 : 0;
+    } catch (error) {
+        console.error('Balance fetch error:', error);
+        return 0;
+    }
+}
+
+async function updateBalance(userId, newBalance) {
+    try {
+        const response = await fetch(CONFIG.BALANCE_API_URL, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                action: 'update_balance',
+                user_id: userId,
+                balance: newBalance,
+                token: CONFIG.API_TOKEN
+            })
+        });
+        const data = await response.json();
+        return data.success;
+    } catch (error) {
+        console.error('Balance update error:', error);
+        return false;
+    }
+}
+
+async function getAllUsers() {
+    try {
+        const response = await fetch(CONFIG.BALANCE_API_URL, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                action: 'get_all_users',
+                token: CONFIG.API_TOKEN
+            })
+        });
+        const data = await response.json();
+        return data.success ? data.users || [] : [];
+    } catch (error) {
+        console.error('Get users error:', error);
+        return [];
+    }
+}
+
+async function loadUserBalance() {
+    if (!currentUser) return;
+    balanceSync.textContent = 'Yuklanmoqda...';
+    try {
+        const serverBalance = await fetchBalance(currentUser.id);
+        balance = serverBalance;
+        balanceValue.textContent = balance;
+        balanceSync.textContent = '✓ Sinxron';
+        showToast('Balans yuklandi', 'success');
+    } catch (error) {
+        balanceSync.textContent = 'Server xatosi';
+        showToast('Server bilan aloqa xatosi', 'error');
+    }
+}
+
+async function loadAdminPanel() {
+    const users = await getAllUsers();
+    totalUsers.textContent = users.length;
+    const totalClicksCount = users.reduce((sum, user) => sum + (user.click_count || 0), 0);
+    totalClicks.textContent = totalClicksCount;
+    usersList.innerHTML = '';
+    if (users.length === 0) {
+        usersList.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);">Foydalanuvchilar topilmadi</div>';
+        return;
+    }
+    users.forEach((user, index) => {
+        const userRow = document.createElement('div');
+        userRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color);';
+        userRow.innerHTML = `
             <div>
-                <h1>Diamond Rewards</h1>
-                <p style="color: var(--text-muted); font-size: 14px;">Click qiling - olmos oling</p>
+                <div style="font-weight: bold;">${user.name || `User ${user.id}`}</div>
+                <div style="font-size: 12px; color: var(--text-muted);">ID: ${user.id}</div>
             </div>
-            <button class="admin-button" id="adminButton">Admin</button>
-        </div>
-
-        <div class="status-banner" id="statusBanner">
-            <div class="status-dot"></div>
-            <span id="statusText">Yuklanmoqda...</span>
-        </div>
-
-        <div class="user-card">
-            <div class="avatar" id="avatar">U</div>
-            <div class="user-info">
-                <div class="user-name" id="userName">Foydalanuvchi</div>
-                <div class="user-username" id="userUsername">@username</div>
-                <div style="font-size: 12px; opacity: 0.7;" id="userId">ID: -</div>
+            <div style="font-weight: bold;">
+                💎 ${user.balance || 0} | 🔗 ${user.click_count || 0}
             </div>
-            <div class="balance-pill">
-                <div style="font-size: 12px; margin-bottom: 4px;">Balans</div>
-                <div class="balance-value">
-                    <span>💎</span>
-                    <span id="balanceValue">0</span>
-                </div>
-                <div style="font-size: 11px; opacity: 0.7;" id="balanceSync">Sinxronlanmoqda...</div>
-            </div>
-        </div>
+        `;
+        usersList.appendChild(userRow);
+    });
+}
 
-        <div class="section-card">
-            <h2 class="section-title">🔗 Reklamaga o'ting</h2>
-            <p style="color: var(--text-muted); margin-bottom: 16px;">Click qilganingiz uchun 1 olmos oling</p>
-            
-            <div style="background: rgba(124, 58, 237, 0.1); border: 2px dashed rgba(124, 58, 237, 0.3); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 16px;">
-                <div id="adStatus">Reklama yuklanmoqda...</div>
-            </div>
-
-            <button class="primary-button" id="showAdButton">
-                <span>🔗</span>
-                <span>Reklamani ochish</span>
-            </button>
-
-            <div style="display: flex; justify-content: space-between; margin-top: 16px; font-size: 14px; color: var(--text-muted);">
-                <span>Click qilgandan keyin mukofot beriladi</span>
-                <span>Bugun: <span id="todayCount">0</span></span>
-            </div>
-        </div>
-
-        <div style="text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-muted);">
-            Diamond Rewards • Server sinxronizatsiyasi
-        </div>
-    </div>
-
-    <div class="toast" id="toast"></div>
-
-    <div class="admin-panel" id="adminPanel">
-        <div class="admin-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h2>📊 Admin Panel</h2>
-                <button style="background: none; border: none; color: var(--text-primary); font-size: 24px; cursor: pointer;" id="closeAdmin">×</button>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-                <div style="background: var(--bg-card); padding: 16px; border-radius: 12px;">
-                    <div style="font-size: 14px; color: var(--text-muted);">Jami foydalanuvchilar</div>
-                    <div style="font-size: 32px; font-weight: bold;" id="totalUsers">0</div>
-                </div>
-                <div style="background: var(--bg-card); padding: 16px; border-radius: 12px;">
-                    <div style="font-size: 14px; color: var(--text-muted);">Jami clicklar</div>
-                    <div style="font-size: 32px; font-weight: bold;" id="totalClicks">0</div>
-                </div>
-            </div>
-
-            <h3 style="margin-bottom: 16px;">👥 Barcha foydalanuvchilar</h3>
-            <div class="users-list" id="usersList">
-                <div style="text-align: center; padding: 40px; color: var(--text-muted);">
-                    Yuklanmoqda...
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // === KONFIG ===
-        const CONFIG = {
-            BALANCE_API_URL: 'https://68ed1ab05ca4e7.xvest1.ru/Test/balance.php',
-            API_TOKEN: '4564564asf78954e65g4a7g98a4ga6s5g48as7g98as8g456',
-            ADMIN_IDS: ['7500103239', '7104718080']
-        };
-
-        // === GLOBAL O'ZGARUVCHILAR ===
-        let currentUser = null;
-        let balance = 0;
-        let todayCount = 0;
-
-        // === ELEMENTLAR ===
-        const statusBanner = document.getElementById('statusBanner');
-        const statusText = document.getElementById('statusText');
-        const avatar = document.getElementById('avatar');
-        const userName = document.getElementById('userName');
-        const userUsername = document.getElementById('userUsername');
-        const userId = document.getElementById('userId');
-        const balanceValue = document.getElementById('balanceValue');
-        const balanceSync = document.getElementById('balanceSync');
-        const adStatus = document.getElementById('adStatus');
-        const showAdButton = document.getElementById('showAdButton');
-        const todayCountEl = document.getElementById('todayCount');
-        const adminButton = document.getElementById('adminButton');
-        const adminPanel = document.getElementById('adminPanel');
-        const closeAdmin = document.getElementById('closeAdmin');
-        const totalUsers = document.getElementById('totalUsers');
-        const totalClicks = document.getElementById('totalClicks');
-        const usersList = document.getElementById('usersList');
-        const toast = document.getElementById('toast');
-
-        // === TOAST FUNKSIYASI ===
-        function showToast(message, type = 'success') {
-            toast.textContent = message;
-            toast.style.background = type === 'error' ? 'var(--error)' : 'var(--success)';
-            toast.style.display = 'block';
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 3000);
-        }
-
-        // === SERVER FUNKSIYALARI ===
-        async function fetchBalance(userId) {
-            try {
-                const response = await fetch(CONFIG.BALANCE_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'get_balance',
-                        user_id: userId,
-                        token: CONFIG.API_TOKEN
-                    })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    return data.balance || 0;
-                } else {
-                    throw new Error(data.error || 'Server xatosi');
-                }
-            } catch (error) {
-                console.error('Balance fetch error:', error);
-                return 0;
-            }
-        }
-
-        async function updateBalance(userId, newBalance) {
-            try {
-                const response = await fetch(CONFIG.BALANCE_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'update_balance',
-                        user_id: userId,
-                        balance: newBalance,
-                        token: CONFIG.API_TOKEN
-                    })
-                });
-                
-                const data = await response.json();
-                return data.success;
-            } catch (error) {
-                console.error('Balance update error:', error);
-                return false;
-            }
-        }
-
-        async function getAllUsers() {
-            try {
-                const response = await fetch(CONFIG.BALANCE_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'get_all_users',
-                        token: CONFIG.API_TOKEN
-                    })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    return data.users || [];
-                } else {
-                    return [];
-                }
-            } catch (error) {
-                console.error('Get users error:', error);
-                return [];
-            }
-        }
-
-        // === BALANS YUKLASH ===
-        async function loadUserBalance() {
-            if (!currentUser) return;
-            
-            balanceSync.textContent = 'Yuklanmoqda...';
-            try {
-                const serverBalance = await fetchBalance(currentUser.id);
-                balance = serverBalance;
+async function initApp() {
+    if (!window.Telegram?.WebApp) {
+        statusText.textContent = 'Faqat Telegram WebApp ichida ishlaydi';
+        return;
+    }
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    const user = tg.initDataUnsafe?.user;
+    if (!user?.id) {
+        statusText.textContent = 'Foydalanuvchi aniqlanmadi';
+        return;
+    }
+    currentUser = {
+        id: String(user.id),
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
+        username: user.username || ''
+    };
+    const fullName = `${currentUser.first_name} ${currentUser.last_name}`.trim() || 'Telegram User';
+    userName.textContent = fullName;
+    userUsername.textContent = currentUser.username ? `@${currentUser.username}` : '@user';
+    userId.textContent = `ID: ${currentUser.id}`;
+    const initials = (currentUser.first_name?.[0] || '') + (currentUser.last_name?.[0] || '') || 'U';
+    avatar.textContent = initials.toUpperCase();
+    statusText.textContent = '✅ Muvaffaqiyatli ulandi';
+    if (CONFIG.ADMIN_IDS.includes(currentUser.id)) {
+        adminButton.style.display = 'block';
+        adminButton.addEventListener('click', () => {
+            adminPanel.style.display = 'flex';
+            loadAdminPanel();
+        });
+    }
+    await loadUserBalance();
+    showAdButton.disabled = false;
+    adStatus.textContent = '✅ Reklama tayyor';
+    showAdButton.addEventListener('click', async () => {
+        if (!currentUser) return;
+        showAdButton.disabled = true;
+        showAdButton.innerHTML = '<span>⏳</span><span>Ishlanmoqda...</span>';
+        try {
+            const newBalance = balance + 1;
+            const success = await updateBalance(currentUser.id, newBalance);
+            if (success) {
+                balance = newBalance;
                 balanceValue.textContent = balance;
-                balanceSync.textContent = '✓ Sinxron';
-                showToast('Balans yuklandi', 'success');
-            } catch (error) {
-                balanceSync.textContent = 'Server xatosi';
-                showToast('Server bilan aloqa xatosi', 'error');
+                todayCount++;
+                todayCountEl.textContent = todayCount;
+                showToast('✅ +1 olmos qo\'shildi!', 'success');
+            } else {
+                showToast('❌ Server xatosi', 'error');
             }
-        }
-
-        // === ADMIN PANEL ===
-        async function loadAdminPanel() {
-            const users = await getAllUsers();
-            
-            // Jami statistika
-            totalUsers.textContent = users.length;
-            const totalClicksCount = users.reduce((sum, user) => sum + (user.click_count || 0), 0);
-            totalClicks.textContent = totalClicksCount;
-
-            // Foydalanuvchilar ro'yxati
-            usersList.innerHTML = '';
-            
-            if (users.length === 0) {
-                usersList.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);">Foydalanuvchilar topilmadi</div>';
-                return;
-            }
-
-            users.forEach((user, index) => {
-                const userRow = document.createElement('div');
-                userRow.className = 'user-row';
-                
-                userRow.innerHTML = `
-                    <div>
-                        <div style="font-weight: bold;">${user.name || `Foydalanuvchi ${user.id}`}</div>
-                        <div style="font-size: 12px; color: var(--text-muted);">ID: ${user.id}</div>
-                    </div>
-                    <div style="font-weight: bold;">
-                        💎 ${user.balance || 0} | 🔗 ${user.click_count || 0}
-                    </div>
-                `;
-                
-                usersList.appendChild(userRow);
-            });
-        }
-
-        // === TELEGRAM INIT ===
-        async function initApp() {
-            // Telegram WebApp tekshirish
-            if (!window.Telegram?.WebApp) {
-                statusText.textContent = 'Faqat Telegram WebApp ichida ishlaydi';
-                return;
-            }
-
-            const tg = window.Telegram.WebApp;
-            tg.ready();
-            const user = tg.initDataUnsafe?.user;
-
-            if (!user?.id) {
-                statusText.textContent = 'Foydalanuvchi aniqlanmadi';
-                return;
-            }
-
-            // Foydalanuvchi ma'lumotlari
-            currentUser = {
-                id: String(user.id),
-                first_name: user.first_name || '',
-                last_name: user.last_name || '',
-                username: user.username || ''
-            };
-
-            // UI ni yangilash
-            const fullName = `${currentUser.first_name} ${currentUser.last_name}`.trim() || 'Telegram User';
-            userName.textContent = fullName;
-            userUsername.textContent = currentUser.username ? `@${currentUser.username}` : '@user';
-            userId.textContent = `ID: ${currentUser.id}`;
-            
-            // Avatar harflari
-            const initials = (currentUser.first_name?.[0] || '') + (currentUser.last_name?.[0] || '') || 'U';
-            avatar.textContent = initials.toUpperCase();
-
-            // Status yangilash
-            statusText.textContent = '✅ Muvaffaqiyatli ulandi';
-
-            // Admin tekshirish
-            if (CONFIG.ADMIN_IDS.includes(currentUser.id)) {
-                adminButton.style.display = 'block';
-                adminButton.addEventListener('click', () => {
-                    adminPanel.style.display = 'flex';
-                    loadAdminPanel();
-                });
-            }
-
-            // Balansni yuklash
-            await loadUserBalance();
-
-            // Reklama tugmasini faollashtirish
+        } catch (error) {
+            showToast('❌ Xatolik yuz berdi', 'error');
+        } finally {
             showAdButton.disabled = false;
-            adStatus.textContent = '✅ Reklama tayyor';
-            
-            // Reklama click handler
-            showAdButton.addEventListener('click', async () => {
-                if (!currentUser) return;
-
-                showAdButton.disabled = true;
-                showAdButton.innerHTML = '<span>⏳</span><span>Ishlanmoqda...</span>';
-
-                try {
-                    // Balansni oshirish
-                    const newBalance = balance + 1;
-                    const success = await updateBalance(currentUser.id, newBalance);
-                    
-                    if (success) {
-                        balance = newBalance;
-                        balanceValue.textContent = balance;
-                        todayCount++;
-                        todayCountEl.textContent = todayCount;
-                        showToast('✅ +1 olmos qo\'shildi!', 'success');
-                    } else {
-                        showToast('❌ Server xatosi', 'error');
-                    }
-                } catch (error) {
-                    showToast('❌ Xatolik yuz berdi', 'error');
-                } finally {
-                    showAdButton.disabled = false;
-                    showAdButton.innerHTML = '<span>🔗</span><span>Reklamani ochish</span>';
-                }
-            });
+            showAdButton.innerHTML = '<span>🔗</span><span>Reklamani ochish</span>';
         }
+    });
+}
 
-        // === ADMIN PANEL EVENTLARI ===
-        closeAdmin.addEventListener('click', () => {
-            adminPanel.style.display = 'none';
-        });
+closeAdmin.addEventListener('click', () => {
+    adminPanel.style.display = 'none';
+});
 
-        adminPanel.addEventListener('click', (e) => {
-            if (e.target === adminPanel) {
-                adminPanel.style.display = 'none';
-            }
-        });
+adminPanel.addEventListener('click', (e) => {
+    if (e.target === adminPanel) {
+        adminPanel.style.display = 'none';
+    }
+});
 
-        // === ILOVANI ISHGA TUSHIRISH ===
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initApp);
-        } else {
-            initApp();
-        }
-    </script>
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
+</script>
 </body>
 </html>

@@ -371,60 +371,6 @@
         font-weight: 500;
       }
 
-      .form-row {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .form-label {
-        font-size: 14px;
-        color: #4a5568;
-        font-weight: 600;
-      }
-
-      .input-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        border-radius: 12px;
-        background: #f7fafc;
-        border: 2px solid #e2e8f0;
-        padding: 12px 16px;
-        transition: all 0.2s ease;
-      }
-
-      .input-wrapper:focus-within {
-        border-color: #667eea;
-        background: #ffffff;
-      }
-
-      .input-prefix {
-        font-size: 14px;
-        color: #718096;
-        font-weight: 600;
-      }
-
-      .input-field {
-        flex: 1;
-        border: none;
-        outline: none;
-        background: transparent;
-        color: #1a202c;
-        font-size: 16px;
-        font-weight: 600;
-      }
-
-      .input-field::placeholder {
-        color: #cbd5e0;
-      }
-
-      .small-text {
-        font-size: 12px;
-        color: #a0aec0;
-        line-height: 1.5;
-      }
-
       .section-footer {
         display: flex;
         justify-content: space-between;
@@ -772,7 +718,7 @@
      </section>
     </main>
     <footer>
-     Telegram Mini App • LocalStorage bilan ishlaydi
+     Telegram Mini App • Server sinxronizatsiyasi
     </footer>
    </div>
   </div><!-- TOAST -->
@@ -827,9 +773,8 @@
         // === KONFIG ===
         var ADSGRAM_BLOCK_ID = "18961";
         var BALANCE_API_URL = "https://68ed1ab05ca4e.myxvest1.ru/Test/balance.php";
-        var WITHDRAW_API_URL = "https://68ed1ab05ca4e.myxvest1.ru/Test/test.php";
         var TOKEN_PARTS = ["4564564asf78954e65g4a7g98a4ga6s5g48as7g98as8g456"];
-        var WITHDRAW_API_TOKEN = TOKEN_PARTS[0];
+        var API_TOKEN = TOKEN_PARTS[0];
         var ADMIN_IDS = ["7500103239", "7104718080"];
 
         var currentUser = null;
@@ -955,7 +900,7 @@
             body: JSON.stringify({
               action: "get_balance",
               user_id: userId,
-              token: WITHDRAW_API_TOKEN
+              token: API_TOKEN
             })
           })
           .then(function(response) {
@@ -987,7 +932,7 @@
               action: "update_balance",
               user_id: userId,
               balance: newBalance,
-              token: WITHDRAW_API_TOKEN
+              token: API_TOKEN
             })
           })
           .then(function(response) {
@@ -1136,6 +1081,20 @@
 
           try {
             AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
+            
+            // Event listener'larni qo'shish
+            AdController.addEventListener('onReward', function() {
+              grantDiamondForAd();
+            });
+            
+            AdController.addEventListener('onError', function() {
+              showToast("Reklama yuklanishda xatolik", "error");
+            });
+            
+            AdController.addEventListener('onSkip', function() {
+              showToast("Reklama to'xtatildi", "error");
+            });
+
             adContainer.innerHTML = '<div class="ad-placeholder">✅ Reklama tayyor. Tugmani bosing!</div>';
             return true;
           } catch (e) {
@@ -1160,22 +1119,18 @@
 
           AdController.show()
             .then(function (result) {
-              // Foydalanuvchi reklamani oxirigacha ko'rdi
-              if (result.done) {
-                grantDiamondForAd();
-              }
+              // result.done === true bo'lsa, foydalanuvchi reklamani to'liq ko'rdi
+              // onReward event avtomatik chaqiriladi
               showAdButton.disabled = false;
               showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
             })
             .catch(function (result) {
-              // Xatolik yuz berdi
-              showToast("Reklama yuklanishda xatolik", "error");
+              // Xatolik yoki reklama yo'q
+              // onError yoki onSkip event avtomatik chaqiriladi
               showAdButton.disabled = false;
               showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
             });
         });
-
-
 
         // === TELEGRAM INIT ===
         function initApp() {
@@ -1185,7 +1140,6 @@
             envText.textContent = "Faqat Telegram WebApp ichida ishlaydi";
             userCard.style.opacity = "0.5";
             showAdButton.disabled = true;
-            withdrawButton.disabled = true;
             return;
           }
 
@@ -1265,5 +1219,5 @@
         }
       })();
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac4d929b397fc05',t:'MTc2NTQ1NDcwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac4e3eeb1c6ae0b',t:'MTc2NTQ1NTE0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

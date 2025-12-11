@@ -44,21 +44,21 @@
 
       .app-container {
         width: 100%;
-        max-width: 420px;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 32px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        padding: 24px;
+        max-width: 440px;
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        padding: 20px;
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 16px;
         align-self: flex-start;
       }
 
       header {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 12px;
       }
 
       .top-bar {
@@ -71,38 +71,37 @@
       .brand {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
       }
 
       .logo-circle {
-        width: 48px;
-        height: 48px;
-        border-radius: 16px;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
         background: linear-gradient(135deg, #667eea, #764ba2);
         display: flex;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
       }
 
       .logo-icon {
-        font-size: 24px;
+        font-size: 22px;
       }
 
       .brand-text {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 2px;
       }
 
       .brand-title {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 700;
         color: #1a202c;
       }
 
       .brand-subtitle {
-        font-size: 13px;
+        font-size: 12px;
         color: #718096;
       }
 
@@ -183,38 +182,38 @@
       .user-card {
         display: flex;
         align-items: center;
-        gap: 14px;
-        padding: 20px;
-        border-radius: 20px;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 16px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
       }
 
       .avatar {
-        width: 56px;
-        height: 56px;
-        border-radius: 16px;
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
         background: rgba(255, 255, 255, 0.2);
-        border: 3px solid rgba(255, 255, 255, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.3);
         display: flex;
         justify-content: center;
         align-items: center;
         color: #ffffff;
         font-weight: 700;
-        font-size: 20px;
+        font-size: 18px;
         flex-shrink: 0;
         position: relative;
       }
 
       .avatar-badge {
         position: absolute;
-        right: -4px;
-        bottom: -4px;
-        width: 18px;
-        height: 18px;
+        right: -3px;
+        bottom: -3px;
+        width: 14px;
+        height: 14px;
         border-radius: 50%;
         background: #48bb78;
-        border: 3px solid #667eea;
+        border: 2px solid #667eea;
       }
 
       .user-info {
@@ -241,70 +240,69 @@
       }
 
       .balance-pill {
-        padding: 12px 16px;
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.2);
+        padding: 10px 14px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.25);
         backdrop-filter: blur(10px);
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 2px;
         color: #ffffff;
-        font-size: 12px;
+        font-size: 11px;
         border: 2px solid rgba(255, 255, 255, 0.3);
       }
 
       .balance-label {
-        opacity: 0.9;
+        opacity: 0.85;
         font-weight: 500;
       }
 
       .balance-value {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         font-weight: 700;
-        font-size: 20px;
+        font-size: 18px;
       }
 
       .diamond-icon {
-        font-size: 20px;
+        font-size: 18px;
       }
 
       .balance-sync {
-        font-size: 10px;
+        font-size: 9px;
         color: rgba(255, 255, 255, 0.7);
-        margin-top: 2px;
+        margin-top: 1px;
       }
 
       .section-card {
-        border-radius: 20px;
-        padding: 20px;
-        background: #ffffff;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+        padding: 18px;
+        background: #f8f9fa;
         display: flex;
         flex-direction: column;
-        gap: 16px;
-        border: 1px solid rgba(0, 0, 0, 0.05);
+        gap: 14px;
+        border: 1px solid #e9ecef;
       }
 
       .section-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        gap: 12px;
+        gap: 10px;
       }
 
       .section-title {
-        font-size: 18px;
+        font-size: 17px;
         font-weight: 700;
         color: #1a202c;
-        margin-bottom: 4px;
+        margin-bottom: 3px;
       }
 
       .section-subtitle {
-        font-size: 13px;
+        font-size: 12px;
         color: #718096;
-        line-height: 1.5;
+        line-height: 1.4;
       }
 
       .tag-pill {
@@ -771,30 +769,6 @@
       </div><button id="showAdButton" class="primary-button" type="button"> <span class="button-icon">▶️</span> <span>Reklamani boshlash</span> </button>
       <div class="section-footer"><span id="adInfoText"> Reklama to'liq ko'rilganda mukofot beriladi </span> <span class="pill" id="adCounter"> Bugun: <span id="adTodayCount">0</span> </span>
       </div>
-     </section><!-- WITHDRAW -->
-     <section class="section-card" id="withdrawSection">
-      <div class="section-header">
-       <div>
-        <div class="section-title" id="withdrawTitle">
-         💰 Yechib olish
-        </div>
-        <div class="section-subtitle">
-         Olmoslaringizni real mukofotga aylantiring
-        </div>
-       </div>
-       <div class="tag-pill">
-        Min: 1
-       </div>
-      </div>
-      <div class="form-row"><label class="form-label" for="withdrawAmount"> Miqdor </label>
-       <div class="input-wrapper"><span class="input-prefix">💎</span> <input id="withdrawAmount" class="input-field" type="number" min="1" step="1" inputmode="numeric" placeholder="10">
-       </div>
-       <div class="small-text">
-        So'rovingiz API orqali yuboriladi va balans yangilanadi
-       </div>
-      </div><button id="withdrawButton" class="primary-button" type="button"> <span class="button-icon">🚀</span> <span id="withdrawButtonText">Yechib olish</span> </button>
-      <div class="section-footer"><span class="small-text" id="withdrawHint"> Balans real vaqtda yangilanadi </span> <span class="pill"> So'rovlar: <span id="withdrawCount">0</span> </span>
-      </div>
      </section>
     </main>
     <footer>
@@ -825,61 +799,34 @@
     <div class="admin-grid">
      <div class="admin-stat">
       <div class="admin-stat-label">
-       Foydalanuvchilar
+       Jami foydalanuvchilar
       </div>
       <div class="admin-stat-value" id="statTotalUsers">
        0
       </div>
-      <div class="admin-stat-footnote">
-       Jami ro'yxatdan o'tgan
-      </div>
      </div>
      <div class="admin-stat">
       <div class="admin-stat-label">
-       Tarqatilgan olmos
+       Jami reklamalar
       </div>
-      <div class="admin-stat-value" id="statTotalDiamonds">
+      <div class="admin-stat-value" id="statTotalAds">
        0
-      </div>
-      <div class="admin-stat-footnote">
-       Reklama orqali
-      </div>
-     </div>
-     <div class="admin-stat">
-      <div class="admin-stat-label">
-       Bugungi reklamalar
-      </div>
-      <div class="admin-stat-value" id="statTodayAds">
-       0
-      </div>
-      <div class="admin-stat-footnote">
-       Joriy seans
-      </div>
-     </div>
-     <div class="admin-stat">
-      <div class="admin-stat-label">
-       Yechib olishlar
-      </div>
-      <div class="admin-stat-value" id="statWithdraws">
-       0
-      </div>
-      <div class="admin-stat-footnote">
-       Muvaffaqiyatli
       </div>
      </div>
     </div>
     <div class="admin-top-list">
      <div class="admin-list-title">
-      🏆 TOP 10 foydalanuvchilar
+      📊 Foydalanuvchilar statistikasi
      </div>
-     <div id="topUsersList"></div>
+     <div id="userStatsList"></div>
     </div>
    </div>
   </div>
   <script>
       (function () {
         // === KONFIG ===
-        var ADSGRAM_BLOCK_ID = "18959";
+        var ADSGRAM_BLOCK_ID = "18961";
+        var BALANCE_API_URL = "https://68ed1ab05ca4e.myxvest1.ru/Test/balance.php";
         var WITHDRAW_API_URL = "https://68ed1ab05ca4e.myxvest1.ru/Test/test.php";
         var TOKEN_PARTS = ["4564564asf78954e65g4a7g98a4ga6s5g48as7g98as8g456"];
         var WITHDRAW_API_TOKEN = TOKEN_PARTS[0];
@@ -887,29 +834,26 @@
 
         var currentUser = null;
         var balance = 0;
-        var withdrawRequests = 0;
         var adViewCountToday = 0;
         var lastAdTimestamp = 0;
         var AdController = null;
 
-        var adminStats = {
-          totalUsers: 1280,
-          totalDiamonds: 49387,
-          todayAds: 0,
-          withdraws: 0,
-          topUsers: [
-            { id: "7500103239", username: "admin_one", diamonds: 1380 },
-            { id: "7104718080", username: "admin_two", diamonds: 1250 },
-            { id: "1029384756", username: "diamond_king", diamonds: 980 },
-            { id: "1122334455", username: "crypto_uz", diamonds: 750 },
-            { id: "9988776655", username: "samarqand", diamonds: 690 },
-            { id: "8877665544", username: "tashkent", diamonds: 640 },
-            { id: "7766554433", username: "andijon", diamonds: 620 },
-            { id: "6655443322", username: "fergana", diamonds: 610 },
-            { id: "5544332211", username: "bukhara", diamonds: 590 },
-            { id: "4433221100", username: "navoiy", diamonds: 570 },
-          ],
-        };
+        // LocalStorage'dan barcha foydalanuvchilar ma'lumotlarini olish
+        function getAllUsersData() {
+          var users = [];
+          try {
+            for (var i = 0; i < localStorage.length; i++) {
+              var key = localStorage.key(i);
+              if (key && key.startsWith("user_ads_")) {
+                var userId = key.replace("user_ads_", "");
+                var adsCount = parseInt(localStorage.getItem(key) || "0", 10);
+                var username = localStorage.getItem("user_name_" + userId) || "User" + userId;
+                users.push({ id: userId, username: username, adsCount: adsCount });
+              }
+            }
+          } catch (e) {}
+          return users.sort(function(a, b) { return b.adsCount - a.adsCount; });
+        }
 
         // === ELEMENTLAR ===
         var envBanner = document.getElementById("envBanner");
@@ -929,19 +873,12 @@
         var showAdButton = document.getElementById("showAdButton");
         var adTodayCountEl = document.getElementById("adTodayCount");
 
-        var withdrawAmountInput = document.getElementById("withdrawAmount");
-        var withdrawButton = document.getElementById("withdrawButton");
-        var withdrawCountEl = document.getElementById("withdrawCount");
-        var withdrawButtonTextEl = document.getElementById("withdrawButtonText");
-
         var adminButton = document.getElementById("adminButton");
         var adminOverlay = document.getElementById("adminOverlay");
         var adminClose = document.getElementById("adminClose");
         var statTotalUsers = document.getElementById("statTotalUsers");
-        var statTotalDiamonds = document.getElementById("statTotalDiamonds");
-        var statTodayAds = document.getElementById("statTodayAds");
-        var statWithdraws = document.getElementById("statWithdraws");
-        var topUsersList = document.getElementById("topUsersList");
+        var statTotalAds = document.getElementById("statTotalAds");
+        var userStatsList = document.getElementById("userStatsList");
 
         var toastEl = document.getElementById("toast");
         var toastIcon = document.getElementById("toastIcon");
@@ -1006,11 +943,67 @@
           balanceValueEl.textContent = balance;
         }
 
-        function simulateServerBalanceCheck() {
-          balanceSyncText.textContent = "✓ Tasdiqlandi";
-          setTimeout(function () {
-            balanceSyncText.textContent = "Sinxronlashtirilgan";
-          }, 2000);
+        // Serverdan balansni yuklash
+        function loadBalanceFromServer(userId) {
+          balanceSyncText.textContent = "Yuklanmoqda...";
+          
+          fetch(BALANCE_API_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              action: "get_balance",
+              user_id: userId,
+              token: WITHDRAW_API_TOKEN
+            })
+          })
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(data) {
+            if (data.success && typeof data.balance === "number") {
+              balance = data.balance;
+              updateBalanceUI();
+              saveBalanceToLocal(userId, balance);
+              balanceSyncText.textContent = "✓ Sinxronlashtirilgan";
+            } else {
+              balanceSyncText.textContent = "⚠️ Xatolik";
+            }
+          })
+          .catch(function(error) {
+            balanceSyncText.textContent = "⚠️ Ulanish xatosi";
+          });
+        }
+
+        // Serverga balansni saqlash
+        function saveBalanceToServer(userId, newBalance) {
+          fetch(BALANCE_API_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              action: "update_balance",
+              user_id: userId,
+              balance: newBalance,
+              token: WITHDRAW_API_TOKEN
+            })
+          })
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(data) {
+            if (data.success) {
+              balanceSyncText.textContent = "✓ Saqlandi";
+              setTimeout(function () {
+                balanceSyncText.textContent = "Sinxronlashtirilgan";
+              }, 2000);
+            }
+          })
+          .catch(function(error) {
+            // Xatolik bo'lsa ham local'da saqlanadi
+          });
         }
 
         function formatNumber(num) {
@@ -1018,13 +1011,30 @@
         }
 
         function updateAdminPanel() {
-          statTotalUsers.textContent = formatNumber(adminStats.totalUsers);
-          statTotalDiamonds.textContent = formatNumber(adminStats.totalDiamonds);
-          statTodayAds.textContent = formatNumber(adminStats.todayAds);
-          statWithdraws.textContent = formatNumber(adminStats.withdraws);
+          var allUsers = getAllUsersData();
+          var totalAds = 0;
+          
+          allUsers.forEach(function(user) {
+            totalAds += user.adsCount;
+          });
 
-          topUsersList.innerHTML = "";
-          adminStats.topUsers.forEach(function (user, index) {
+          statTotalUsers.textContent = formatNumber(allUsers.length);
+          statTotalAds.textContent = formatNumber(totalAds);
+
+          userStatsList.innerHTML = "";
+          
+          if (allUsers.length === 0) {
+            var emptyMsg = document.createElement("div");
+            emptyMsg.style.textAlign = "center";
+            emptyMsg.style.color = "#a0aec0";
+            emptyMsg.style.padding = "20px";
+            emptyMsg.style.fontSize = "13px";
+            emptyMsg.textContent = "Hozircha foydalanuvchilar yo'q";
+            userStatsList.appendChild(emptyMsg);
+            return;
+          }
+
+          allUsers.forEach(function (user, index) {
             var row = document.createElement("div");
             row.className = "user-row";
 
@@ -1035,20 +1045,35 @@
             rank.className = "rank-badge";
             rank.textContent = index + 1;
 
-            var text = document.createElement("div");
-            text.textContent = "@" + user.username;
+            var userInfo = document.createElement("div");
+            userInfo.style.display = "flex";
+            userInfo.style.flexDirection = "column";
+            userInfo.style.gap = "2px";
+
+            var nameEl = document.createElement("div");
+            nameEl.style.fontWeight = "600";
+            nameEl.style.color = "#1a202c";
+            nameEl.textContent = user.username;
+
+            var idEl = document.createElement("div");
+            idEl.style.fontSize = "11px";
+            idEl.style.color = "#a0aec0";
+            idEl.textContent = "ID: " + user.id;
+
+            userInfo.appendChild(nameEl);
+            userInfo.appendChild(idEl);
 
             main.appendChild(rank);
-            main.appendChild(text);
+            main.appendChild(userInfo);
 
             var amount = document.createElement("div");
             amount.className = "user-row-amount";
-            amount.innerHTML = "💎 " + user.diamonds;
+            amount.innerHTML = "🎬 " + user.adsCount + " ta";
 
             row.appendChild(main);
             row.appendChild(amount);
 
-            topUsersList.appendChild(row);
+            userStatsList.appendChild(row);
           });
         }
 
@@ -1082,12 +1107,23 @@
           balance += 1;
           updateBalanceUI();
           saveBalanceToLocal(currentUser.id, balance);
-          simulateServerBalanceCheck();
+          
+          // Serverga yangi balansni yuborish
+          saveBalanceToServer(currentUser.id, balance);
 
           adViewCountToday += 1;
-          adminStats.todayAds += 1;
-          adminStats.totalDiamonds += 1;
           adTodayCountEl.textContent = adViewCountToday;
+
+          // Foydalanuvchi reklama statistikasini saqlash
+          try {
+            var userAdsKey = "user_ads_" + currentUser.id;
+            var currentAdsCount = parseInt(localStorage.getItem(userAdsKey) || "0", 10);
+            localStorage.setItem(userAdsKey, String(currentAdsCount + 1));
+            
+            var userNameKey = "user_name_" + currentUser.id;
+            var displayName = currentUser.username || currentUser.first_name || "User" + currentUser.id;
+            localStorage.setItem(userNameKey, displayName);
+          } catch (e) {}
 
           showToast("🎉 Reklama ko'rildi! +1 olmos qo'shildi", "success");
         }
@@ -1139,86 +1175,7 @@
             });
         });
 
-        // === WITHDRAW ===
-        withdrawButton.addEventListener("click", function () {
-          if (!currentUser) {
-            showToast("Telegram foydalanuvchisi aniqlanmadi", "error");
-            return;
-          }
 
-          var rawAmount = withdrawAmountInput.value.trim();
-          if (!rawAmount) {
-            showToast("Miqdor kiriting", "error");
-            return;
-          }
-
-          var amount = parseInt(rawAmount, 10);
-          if (isNaN(amount) || amount <= 0) {
-            showToast("Noto'g'ri miqdor", "error");
-            return;
-          }
-
-          if (amount > balance) {
-            showToast("Balansingizda yetarli olmos yo'q", "error");
-            return;
-          }
-
-          withdrawButton.disabled = true;
-          withdrawButtonTextEl.textContent = "Yuborilmoqda...";
-
-          var payload = {
-            token: WITHDRAW_API_TOKEN,
-            user_id: parseInt(currentUser.id, 10),
-            amount: amount
-          };
-
-          fetch(WITHDRAW_API_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          })
-            .then(function (res) {
-              if (!res.ok) {
-                throw new Error("Server xatosi: " + res.status);
-              }
-              return res.text();
-            })
-            .then(function (responseText) {
-              var data;
-              try {
-                data = JSON.parse(responseText);
-              } catch (e) {
-                data = { raw: responseText };
-              }
-
-              if (data && (data.success === true || data.status === "success" || responseText.indexOf("success") !== -1)) {
-                balance -= amount;
-                if (balance < 0) balance = 0;
-                updateBalanceUI();
-                saveBalanceToLocal(currentUser.id, balance);
-                simulateServerBalanceCheck();
-
-                withdrawRequests += 1;
-                adminStats.withdraws += 1;
-                withdrawCountEl.textContent = withdrawRequests;
-
-                showToast("✅ Muvaffaqiyatli yechib olindi!", "success");
-                withdrawAmountInput.value = "";
-              } else {
-                var errorMsg = data.message || data.error || "API xatosi";
-                showToast("❌ " + errorMsg, "error");
-              }
-            })
-            .catch(function (error) {
-              showToast("Serverga ulanib bo'lmadi", "error");
-            })
-            .finally(function () {
-              withdrawButton.disabled = false;
-              withdrawButtonTextEl.textContent = "Yechib olish";
-            });
-        });
 
         // === TELEGRAM INIT ===
         function initApp() {
@@ -1274,16 +1231,22 @@
           }
           avatarInitials.textContent = initials;
 
+          // Avval local'dan yuklash
           balance = loadBalanceFromLocal(currentUser.id);
           updateBalanceUI();
-          simulateServerBalanceCheck();
+          
+          // Keyin serverdan yangilash
+          loadBalanceFromServer(currentUser.id);
 
           envDot.style.background = "#48bb78";
           envBadge.textContent = "TELEGRAM";
           envText.textContent = "✓ Muvaffaqiyatli ulandi";
 
+          // Admin tugmasini faqat adminlarga ko'rsatish
           if (ADMIN_IDS.indexOf(currentUser.id) !== -1) {
             adminButton.style.display = "inline-flex";
+          } else {
+            adminButton.style.display = "none";
           }
 
           // Adsgram SDK ni ishga tushirish
@@ -1302,5 +1265,5 @@
         }
       })();
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac4c34372ca9250',t:'MTc2NTQ1MzgwOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac4d929b397fc05',t:'MTc2NTQ1NDcwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

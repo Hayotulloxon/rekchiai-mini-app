@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Diamond Rewards</title><!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script><!-- Reklama SDK -->
-  <script src="//libtl.com/sdk.js" data-zone="18959" data-sdk="show_18959"></script>
+  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <style>
       body {
         box-sizing: border-box;
@@ -1096,7 +1096,7 @@
         }
 
         function checkAdSDK() {
-          return typeof window.show_18959 === "function";
+          return typeof window.Adsgram !== "undefined";
         }
 
         showAdButton.addEventListener("click", function () {
@@ -1114,14 +1114,22 @@
           showAdButton.innerHTML = '<span class="button-icon">⏳</span><span>Yuklanmoqda...</span>';
 
           try {
-            // SDK Promise bilan ishlaydi
-            window.show_18959().then(function() {
-              // Reklama to'liq ko'rilganda mukofot berish
-              grantDiamondForAd();
-              showAdButton.disabled = false;
-              showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
+            // Adsgram SDK ishlatish
+            window.Adsgram.init({ blockId: "18959" }).then(function(adsgramInstance) {
+              adsgramInstance.show().then(function(result) {
+                // Reklama to'liq ko'rilganda mukofot berish
+                if (result.done) {
+                  grantDiamondForAd();
+                }
+                showAdButton.disabled = false;
+                showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
+              }).catch(function(error) {
+                showToast("Reklama yuklanishda xatolik", "error");
+                showAdButton.disabled = false;
+                showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
+              });
             }).catch(function(error) {
-              showToast("Reklama yuklanishda xatolik", "error");
+              showToast("Reklama SDK ishga tushmadi", "error");
               showAdButton.disabled = false;
               showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
             });
@@ -1313,5 +1321,5 @@
         }
       })();
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac4b983b3331961',t:'MTc2NTQ1MzQxMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac4bd7d46911961',t:'MTc2NTQ1MzU3Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

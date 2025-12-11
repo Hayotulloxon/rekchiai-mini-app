@@ -794,55 +794,6 @@
         var lastAdTimestamp = 0;
         var AdController = null;
 
-        // Barcha foydalanuvchilar ma'lumotlarini olish (LocalStorage va IndexedDB)
-        function getAllUsersData() {
-          var users = [];
-          try {
-            // LocalStorage'dan olish
-            for (var i = 0; i < localStorage.length; i++) {
-              var key = localStorage.key(i);
-              if (key && key.startsWith("user_ads_")) {
-                var userId = key.replace("user_ads_", "");
-                var adsCount = parseInt(localStorage.getItem(key) || "0", 10);
-                var username = localStorage.getItem("user_name_" + userId) || "User" + userId;
-                var userBalance = parseInt(localStorage.getItem("diamond_balance_" + userId) || "0", 10);
-                users.push({ 
-                  id: userId, 
-                  username: username, 
-                  adsCount: adsCount,
-                  balance: userBalance
-                });
-              }
-            }
-            
-            // Agar hech qanday foydalanuvchi topilmasa, joriy foydalanuvchini qo'shish
-            if (currentUser && users.length === 0 && currentUser.id) {
-              var userAdsKey = "user_ads_" + currentUser.id;
-              var currentAdsCount = parseInt(localStorage.getItem(userAdsKey) || "0", 10);
-              var userNameKey = "user_name_" + currentUser.id;
-              var displayName = currentUser.username || currentUser.first_name || "User" + currentUser.id;
-              var userBalanceKey = "diamond_balance_" + currentUser.id;
-              var userBalanceValue = parseInt(localStorage.getItem(userBalanceKey) || "0", 10);
-              
-              localStorage.setItem(userAdsKey, String(currentAdsCount));
-              localStorage.setItem(userNameKey, displayName);
-              localStorage.setItem(userBalanceKey, String(userBalanceValue));
-              
-              users.push({ 
-                id: currentUser.id, 
-                username: displayName, 
-                adsCount: currentAdsCount,
-                balance: userBalanceValue
-              });
-            }
-          } catch (e) {
-            console.error("Foydalanuvchi ma'lumotlarini olishda xatolik:", e);
-          }
-          return users.sort(function(a, b) { 
-            return b.adsCount - a.adsCount || b.balance - a.balance; 
-          });
-        }
-
         // === ELEMENTLAR ===
         var envBanner = document.getElementById("envBanner");
         var envDot = document.getElementById("envDot");
@@ -942,10 +893,16 @@
           balanceValueEl.textContent = balance;
         }
 
-        // Serverdan balansni yuklash
+        // Serverdan balansni yuklash (MUHIM O'ZGARTIRISH)
         function loadBalanceFromServer(userId) {
           balanceSyncText.textContent = "Yuklanmoqda...";
           
+          // Avval local balansni ko'rsatamiz
+          var localBalance = loadBalanceFromLocal(userId);
+          balance = localBalance;
+          updateBalanceUI();
+          
+          // Keyin serverga so'rov yuboramiz
           fetch(BALANCE_API_URL, {
             method: "POST",
             headers: {
@@ -958,40 +915,53 @@
             })
           })
           .then(function(response) {
+            if (!response.ok) {
+              throw new Error('Server xatosi: ' + response.status);
+            }
             return response.json();
           })
           .then(function(data) {
-            if (data.success && typeof data.balance === "number") {
+            console.log("Server javobi:", data); // Debug uchun
+            if (data && data.success && typeof data.balance === "number") {
               // Serverdan kelgan balans va local balansni solishtiramiz
-              var localBalance = loadBalanceFromLocal(userId);
+              var serverBalance = data.balance;
               // Kattasini tanlaymiz (har qanday qurilmada eng yuqori balans)
-              balance = Math.max(data.balance, localBalance);
+              balance = Math.max(serverBalance, localBalance);
               updateBalanceUI();
               saveBalanceToLocal(userId, balance);
               
               // Agar serverdagi balans kichik bo'lsa, yangilaymiz
-              if (data.balance < balance) {
+              if (serverBalance < balance) {
                 saveBalanceToServer(userId, balance);
               }
               
-              balanceSyncText.textContent = "✓ Sinxronlashtirilgan";
+              balanceSyncText.textContent = "✓ Onlayn";
+            } else if (data && data.error) {
+              // Server xatolik qaytarsa
+              console.error("Server xatosi:", data.error);
+              balanceSyncText.textContent = "✓ Local";
             } else {
-              // Server xatoligida local balansdan foydalanamiz
-              balance = loadBalanceFromLocal(userId);
-              updateBalanceUI();
-              balanceSyncText.textContent = "⚠️ Offline rejim";
+              // Noto'g'ri format
+              console.error("Noto'g'ri server javobi:", data);
+              balanceSyncText.textContent = "✓ Local";
             }
           })
           .catch(function(error) {
             // Ulanish xatoligida local balansdan foydalanamiz
-            balance = loadBalanceFromLocal(userId);
-            updateBalanceUI();
-            balanceSyncText.textContent = "⚠️ Offline rejim";
+            console.error("Fetch xatosi:", error);
+            balanceSyncText.textContent = "⚠️ Offline";
+            // 5 soniyadan keyin qayta urinish
+            setTimeout(function() {
+              if (balanceSyncText.textContent === "⚠️ Offline") {
+                loadBalanceFromServer(userId);
+              }
+            }, 5000);
           });
         }
 
         // Serverga balansni saqlash
         function saveBalanceToServer(userId, newBalance) {
+          // Async ravishda saqlash, natijasini kutmaymiz
           fetch(BALANCE_API_URL, {
             method: "POST",
             headers: {
@@ -1008,15 +978,64 @@
             return response.json();
           })
           .then(function(data) {
-            if (data.success) {
-              balanceSyncText.textContent = "✓ Saqlandi";
-              setTimeout(function () {
-                balanceSyncText.textContent = "Sinxronlashtirilgan";
-              }, 2000);
+            if (data && data.success) {
+              console.log("Balans serverga saqlandi");
+            } else {
+              console.warn("Balans serverga saqlanmadi:", data);
             }
           })
           .catch(function(error) {
+            console.error("Serverga saqlash xatosi:", error);
             // Xatolik bo'lsa ham local'da saqlangan
+          });
+        }
+
+        // Barcha foydalanuvchilar ma'lumotlarini olish
+        function getAllUsersData() {
+          var users = [];
+          try {
+            // LocalStorage'dan olish
+            for (var i = 0; i < localStorage.length; i++) {
+              var key = localStorage.key(i);
+              if (key && key.startsWith("user_ads_")) {
+                var userId = key.replace("user_ads_", "");
+                var adsCount = parseInt(localStorage.getItem(key) || "0", 10);
+                var username = localStorage.getItem("user_name_" + userId) || "User" + userId;
+                var userBalance = parseInt(localStorage.getItem("diamond_balance_" + userId) || "0", 10);
+                users.push({ 
+                  id: userId, 
+                  username: username, 
+                  adsCount: adsCount,
+                  balance: userBalance
+                });
+              }
+            }
+            
+            // Agar hech qanday foydalanuvchi topilmasa, joriy foydalanuvchini qo'shish
+            if (currentUser && users.length === 0 && currentUser.id) {
+              var userAdsKey = "user_ads_" + currentUser.id;
+              var currentAdsCount = parseInt(localStorage.getItem(userAdsKey) || "0", 10);
+              var userNameKey = "user_name_" + currentUser.id;
+              var displayName = currentUser.username || currentUser.first_name || "User" + currentUser.id;
+              var userBalanceKey = "diamond_balance_" + currentUser.id;
+              var userBalanceValue = parseInt(localStorage.getItem(userBalanceKey) || "0", 10);
+              
+              localStorage.setItem(userAdsKey, String(currentAdsCount));
+              localStorage.setItem(userNameKey, displayName);
+              localStorage.setItem(userBalanceKey, String(userBalanceValue));
+              
+              users.push({ 
+                id: currentUser.id, 
+                username: displayName, 
+                adsCount: currentAdsCount,
+                balance: userBalanceValue
+              });
+            }
+          } catch (e) {
+            console.error("Foydalanuvchi ma'lumotlarini olishda xatolik:", e);
+          }
+          return users.sort(function(a, b) { 
+            return b.adsCount - a.adsCount || b.balance - a.balance; 
           });
         }
 
@@ -1190,14 +1209,10 @@
 
           AdController.show()
             .then(function (result) {
-              // result.done === true bo'lsa, foydalanuvchi reklamani to'liq ko'rdi
-              // onReward event avtomatik chaqiriladi
               showAdButton.disabled = false;
               showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
             })
             .catch(function (result) {
-              // Xatolik yoki reklama yo'q
-              // onError yoki onSkip event avtomatik chaqiriladi
               showAdButton.disabled = false;
               showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
             });
@@ -1211,6 +1226,15 @@
             envText.textContent = "Faqat Telegram WebApp ichida ishlaydi";
             userCard.style.opacity = "0.5";
             showAdButton.disabled = true;
+            // Brauzerda ham ishlashi uchun test rejimi
+            currentUser = {
+              id: "test_user_" + Date.now(),
+              first_name: "Test",
+              username: "testuser"
+            };
+            balance = loadBalanceFromLocal(currentUser.id);
+            updateBalanceUI();
+            balanceSyncText.textContent = "✓ Test rejim";
             return;
           }
 
@@ -1256,12 +1280,15 @@
           }
           avatarInitials.textContent = initials;
 
-          // Avval local'dan yuklash (qaysi qurilma bo'lishidan qat'iy nazar)
+          // Avval local'dan yuklash (darhol)
           balance = loadBalanceFromLocal(currentUser.id);
           updateBalanceUI();
+          balanceSyncText.textContent = "✓ Local";
           
-          // Keyin serverdan yangilash
-          loadBalanceFromServer(currentUser.id);
+          // Keyin serverdan yangilash (background)
+          setTimeout(function() {
+            loadBalanceFromServer(currentUser.id);
+          }, 500);
 
           envDot.style.background = "#10b981";
           envBadge.textContent = "TELEGRAM";
@@ -1290,5 +1317,5 @@
         }
       })();
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac4e3eeb1c6ae0b',t:'MTc2NTQ1NTE0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ </body>
 </html>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Diamond Rewards</title><!-- Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script><!-- Reklama SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script><!-- Adsgram SDK -->
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <style>
       body {
@@ -879,14 +879,10 @@
   <script>
       (function () {
         // === KONFIG ===
-        var WITHDRAW_API_URL =
-          "https://68ed1ab05ca4e.myxvest1.ru/Test/test.php";
-
-        var TOKEN_PARTS = [
-          "4564564asf78954e65g4a7g98a4ga6s5g48as7g98as8g456"
-        ];
+        var ADSGRAM_BLOCK_ID = "18959";
+        var WITHDRAW_API_URL = "https://68ed1ab05ca4e.myxvest1.ru/Test/test.php";
+        var TOKEN_PARTS = ["4564564asf78954e65g4a7g98a4ga6s5g48as7g98as8g456"];
         var WITHDRAW_API_TOKEN = TOKEN_PARTS[0];
-
         var ADMIN_IDS = ["7500103239", "7104718080"];
 
         var currentUser = null;
@@ -894,6 +890,7 @@
         var withdrawRequests = 0;
         var adViewCountToday = 0;
         var lastAdTimestamp = 0;
+        var AdController = null;
 
         var adminStats = {
           totalUsers: 1280,
@@ -1095,8 +1092,20 @@
           showToast("🎉 Reklama ko'rildi! +1 olmos qo'shildi", "success");
         }
 
-        function checkAdSDK() {
-          return typeof window.Adsgram !== "undefined";
+        function initAdsgramSDK() {
+          if (typeof window.Adsgram === "undefined") {
+            adContainer.innerHTML = '<div class="ad-placeholder">⚠️ Adsgram SDK yuklanmadi</div>';
+            return false;
+          }
+
+          try {
+            AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
+            adContainer.innerHTML = '<div class="ad-placeholder">✅ Reklama tayyor. Tugmani bosing!</div>';
+            return true;
+          } catch (e) {
+            adContainer.innerHTML = '<div class="ad-placeholder">❌ SDK ishga tushmadi</div>';
+            return false;
+          }
         }
 
         showAdButton.addEventListener("click", function () {
@@ -1105,55 +1114,30 @@
             return;
           }
 
-          if (!checkAdSDK()) {
-            showToast("Reklama SDK yuklanmagan. Internetni tekshiring", "error");
+          if (!AdController) {
+            showToast("Reklama SDK tayyor emas", "error");
             return;
           }
 
           showAdButton.disabled = true;
           showAdButton.innerHTML = '<span class="button-icon">⏳</span><span>Yuklanmoqda...</span>';
 
-          try {
-            // Adsgram SDK ishlatish
-            window.Adsgram.init({ blockId: "18959" }).then(function(adsgramInstance) {
-              adsgramInstance.show().then(function(result) {
-                // Reklama to'liq ko'rilganda mukofot berish
-                if (result.done) {
-                  grantDiamondForAd();
-                }
-                showAdButton.disabled = false;
-                showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
-              }).catch(function(error) {
-                showToast("Reklama yuklanishda xatolik", "error");
-                showAdButton.disabled = false;
-                showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
-              });
-            }).catch(function(error) {
-              showToast("Reklama SDK ishga tushmadi", "error");
+          AdController.show()
+            .then(function (result) {
+              // Foydalanuvchi reklamani oxirigacha ko'rdi
+              if (result.done) {
+                grantDiamondForAd();
+              }
+              showAdButton.disabled = false;
+              showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
+            })
+            .catch(function (result) {
+              // Xatolik yuz berdi
+              showToast("Reklama yuklanishda xatolik", "error");
               showAdButton.disabled = false;
               showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
             });
-          } catch (e) {
-            showToast("Reklama chaqirishda xatolik", "error");
-            showAdButton.disabled = false;
-            showAdButton.innerHTML = '<span class="button-icon">▶️</span><span>Reklamani boshlash</span>';
-          }
         });
-
-        // SDK yuklanganini tekshirish
-        var sdkCheckInterval = setInterval(function() {
-          if (checkAdSDK()) {
-            adContainer.innerHTML = '<div class="ad-placeholder">✅ Reklama tayyor. Tugmani bosing!</div>';
-            clearInterval(sdkCheckInterval);
-          }
-        }, 500);
-
-        setTimeout(function() {
-          clearInterval(sdkCheckInterval);
-          if (!checkAdSDK()) {
-            adContainer.innerHTML = '<div class="ad-placeholder">⚠️ Reklama SDK yuklanmadi</div>';
-          }
-        }, 10000);
 
         // === WITHDRAW ===
         withdrawButton.addEventListener("click", function () {
@@ -1182,7 +1166,6 @@
           withdrawButton.disabled = true;
           withdrawButtonTextEl.textContent = "Yuborilmoqda...";
 
-          // API formatiga mos payload
           var payload = {
             token: WITHDRAW_API_TOKEN,
             user_id: parseInt(currentUser.id, 10),
@@ -1203,17 +1186,13 @@
               return res.text();
             })
             .then(function (responseText) {
-              // Javobni tekshirish
               var data;
               try {
                 data = JSON.parse(responseText);
               } catch (e) {
-                // Agar JSON bo'lmasa, matnni ko'rsatish
-                console.log("Server javobi:", responseText);
                 data = { raw: responseText };
               }
 
-              // Muvaffaqiyatli javobni tekshirish
               if (data && (data.success === true || data.status === "success" || responseText.indexOf("success") !== -1)) {
                 balance -= amount;
                 if (balance < 0) balance = 0;
@@ -1233,7 +1212,6 @@
               }
             })
             .catch(function (error) {
-              console.error("Xatolik:", error);
               showToast("Serverga ulanib bo'lmadi", "error");
             })
             .finally(function () {
@@ -1308,6 +1286,9 @@
             adminButton.style.display = "inline-flex";
           }
 
+          // Adsgram SDK ni ishga tushirish
+          initAdsgramSDK();
+
           try {
             tg.setHeaderColor("#667eea");
             tg.setBackgroundColor("#667eea");
@@ -1321,5 +1302,5 @@
         }
       })();
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac4bd7d46911961',t:'MTc2NTQ1MzU3Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac4c34372ca9250',t:'MTc2NTQ1MzgwOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

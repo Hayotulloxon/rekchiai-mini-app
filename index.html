@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diamond Rewards</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 <style>
 :root {
     --bg-primary: #0f172a;
@@ -141,24 +140,58 @@ body {
     cursor: pointer;
     display: none;
 }
-.admin-panel {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: none;
-    align-items: center;
-    justify-content: center;
+.ad-container {
+    background: rgba(124, 58, 237, 0.1);
+    border: 2px dashed rgba(124, 58, 237, 0.3);
+    border-radius: 12px;
     padding: 20px;
-    z-index: 1000;
+    text-align: center;
+    margin-bottom: 16px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
-.admin-content {
-    background: var(--bg-secondary);
-    border-radius: 20px;
-    padding: 24px;
-    max-width: 500px;
+.ad-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 12px;
+    margin: 8px 0;
     width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
+    text-align: left;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.ad-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.ad-item-title {
+    font-weight: bold;
+    font-size: 14px;
+}
+.ad-item-reward {
+    background: var(--success);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.ad-item-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+.ad-item-status {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+    display: inline-block;
 }
 .toast {
     position: fixed;
@@ -180,7 +213,7 @@ body {
         <div class="logo-circle">💎</div>
         <div>
             <h1>Diamond Rewards</h1>
-            <p style="color: var(--text-muted); font-size: 14px;">Click qiling - olmos oling</p>
+            <p style="color: var(--text-muted); font-size: 14px;">Reklamaga click qiling - olmos oling</p>
         </div>
         <button class="admin-button" id="adminButton">Admin</button>
     </div>
@@ -208,61 +241,58 @@ body {
     </div>
 
     <div class="section-card">
-        <h2 style="font-size: 18px; margin-bottom: 8px;">🔗 Reklamaga o'ting</h2>
-        <p style="color: var(--text-muted); margin-bottom: 16px;">Click qilganingiz uchun 1 olmos oling</p>
+        <h2 style="font-size: 18px; margin-bottom: 8px;">🔗 Reklamalarga o'ting</h2>
+        <p style="color: var(--text-muted); margin-bottom: 16px;">Har bir reklamaga click qilganingiz uchun 1 olmos oling</p>
         
-        <div style="background: rgba(124, 58, 237, 0.1); border: 2px dashed rgba(124, 58, 237, 0.3); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 16px;">
-            <div id="adStatus">Reklama yuklanmoqda...</div>
+        <div class="ad-container" id="adContainer">
+            <div style="color: var(--text-muted);" id="adStatus">
+                Reklamalar yuklanmoqda...
+            </div>
+            
+            <!-- Reklama elementlari -->
+            <div class="ad-item" id="adItem1" style="display: none;">
+                <div class="ad-item-header">
+                    <div class="ad-item-title">Reklama #1</div>
+                    <div class="ad-item-reward">+1 💎</div>
+                </div>
+                <div class="ad-item-desc">Reklamaga click qiling va 1 olmos oling</div>
+                <button class="ad-click-button" data-ad="1" style="background: var(--bg-gradient); border: none; border-radius: 8px; padding: 8px 16px; color: white; font-size: 12px; cursor: pointer; width: 100%;">Click qilish</button>
+            </div>
+            
+            <div class="ad-item" id="adItem2" style="display: none;">
+                <div class="ad-item-header">
+                    <div class="ad-item-title">Reklama #2</div>
+                    <div class="ad-item-reward">+1 💎</div>
+                </div>
+                <div class="ad-item-desc">Reklamaga click qiling va 1 olmos oling</div>
+                <button class="ad-click-button" data-ad="2" style="background: var(--bg-gradient); border: none; border-radius: 8px; padding: 8px 16px; color: white; font-size: 12px; cursor: pointer; width: 100%;">Click qilish</button>
+            </div>
+            
+            <div class="ad-item" id="adItem3" style="display: none;">
+                <div class="ad-item-header">
+                    <div class="ad-item-title">Reklama #3</div>
+                    <div class="ad-item-reward">+1 💎</div>
+                </div>
+                <div class="ad-item-desc">Reklamaga click qiling va 1 olmos oling</div>
+                <button class="ad-click-button" data-ad="3" style="background: var(--bg-gradient); border: none; border-radius: 8px; padding: 8px 16px; color: white; font-size: 12px; cursor: pointer; width: 100%;">Click qilish</button>
+            </div>
         </div>
-
-        <button class="primary-button" id="showAdButton">
-            <span>🔗</span>
-            <span>Reklamani ochish</span>
-        </button>
 
         <div style="display: flex; justify-content: space-between; margin-top: 16px; font-size: 14px; color: var(--text-muted);">
             <span>Click qilgandan keyin mukofot beriladi</span>
-            <span>Bugun: <span id="todayCount">0</span></span>
+            <span>Bugun: <span id="todayCount">0</span> click</span>
         </div>
     </div>
 
     <div style="text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-muted);">
-        Diamond Rewards • Server sinxronizatsiyasi
+        Diamond Rewards • Click = 1 💎
     </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<div class="admin-panel" id="adminPanel">
-    <div class="admin-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h2>📊 Admin Panel</h2>
-            <button style="background: none; border: none; color: var(--text-primary); font-size: 24px; cursor: pointer;" id="closeAdmin">×</button>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-            <div style="background: var(--bg-card); padding: 16px; border-radius: 12px;">
-                <div style="font-size: 14px; color: var(--text-muted);">Jami foydalanuvchilar</div>
-                <div style="font-size: 32px; font-weight: bold;" id="totalUsers">0</div>
-            </div>
-            <div style="background: var(--bg-card); padding: 16px; border-radius: 12px;">
-                <div style="font-size: 14px; color: var(--text-muted);">Jami clicklar</div>
-                <div style="font-size: 32px; font-weight: bold;" id="totalClicks">0</div>
-            </div>
-        </div>
-
-        <h3 style="margin-bottom: 16px;">👥 Barcha foydalanuvchilar</h3>
-        <div style="margin-top: 20px;" id="usersList">
-            <div style="text-align: center; padding: 40px; color: var(--text-muted);">
-                Yuklanmoqda...
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
 const CONFIG = {
-    ADSGRAM_BLOCK_ID: "18961",
     BALANCE_API_URL: 'https://68ed1ab05ca4e7.xvest1.ru/Test/balance.php',
     API_TOKEN: '4564564asf78954e65g4a7g98a4ga6s5g48as7g98as8g456',
     ADMIN_IDS: ['7500103239', '7104718080']
@@ -271,8 +301,7 @@ const CONFIG = {
 let currentUser = null;
 let balance = 0;
 let todayCount = 0;
-let lastAdTime = 0;
-let AdController = null;
+let adClickCooldown = {};
 
 const statusBanner = document.getElementById('statusBanner');
 const statusText = document.getElementById('statusText');
@@ -283,14 +312,8 @@ const userId = document.getElementById('userId');
 const balanceValue = document.getElementById('balanceValue');
 const balanceSync = document.getElementById('balanceSync');
 const adStatus = document.getElementById('adStatus');
-const showAdButton = document.getElementById('showAdButton');
+const adContainer = document.getElementById('adContainer');
 const todayCountEl = document.getElementById('todayCount');
-const adminButton = document.getElementById('adminButton');
-const adminPanel = document.getElementById('adminPanel');
-const closeAdmin = document.getElementById('closeAdmin');
-const totalUsers = document.getElementById('totalUsers');
-const totalClicks = document.getElementById('totalClicks');
-const usersList = document.getElementById('usersList');
 const toast = document.getElementById('toast');
 
 function showToast(message, type = 'success') {
@@ -342,124 +365,98 @@ async function updateBalance(userId, newBalance) {
     }
 }
 
-async function getAllUsers() {
-    try {
-        const response = await fetch(CONFIG.BALANCE_API_URL, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                action: 'get_all_users',
-                token: CONFIG.API_TOKEN
-            })
-        });
-        const data = await response.json();
-        return data.success ? data.users || [] : [];
-    } catch (error) {
-        console.error('Get users error:', error);
-        return [];
-    }
-}
-
-async function loadUserBalance() {
-    if (!currentUser) return;
-    balanceSync.textContent = 'Yuklanmoqda...';
-    try {
-        const serverBalance = await fetchBalance(currentUser.id);
-        balance = serverBalance;
-        balanceValue.textContent = balance;
-        balanceSync.textContent = '✓ Sinxron';
-    } catch (error) {
-        balanceSync.textContent = 'Server xatosi';
-    }
-}
-
-async function loadAdminPanel() {
-    const users = await getAllUsers();
-    totalUsers.textContent = users.length;
-    const totalClicksCount = users.reduce((sum, user) => sum + (user.click_count || 0), 0);
-    totalClicks.textContent = totalClicksCount;
-    usersList.innerHTML = '';
-    
-    if (users.length === 0) {
-        usersList.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);">Foydalanuvchilar topilmadi</div>';
+async function clickAd(adNumber) {
+    if (!currentUser) {
+        showToast('Foydalanuvchi aniqlanmadi', 'error');
         return;
     }
     
-    users.forEach((user) => {
-        const userRow = document.createElement('div');
-        userRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color);';
-        userRow.innerHTML = `
-            <div>
-                <div style="font-weight: bold;">${user.name || `User ${user.id}`}</div>
-                <div style="font-size: 12px; color: var(--text-muted);">ID: ${user.id}</div>
-            </div>
-            <div style="font-weight: bold;">
-                💎 ${user.balance || 0} | 🔗 ${user.click_count || 0}
-            </div>
-        `;
-        usersList.appendChild(userRow);
-    });
-}
-
-// Adsgram SDK
-function initAdsgramSDK() {
-    if (typeof window.Adsgram === 'undefined') {
-        adStatus.textContent = '❌ Adsgram SDK yuklanmadi';
-        return false;
+    // Cooldown tekshirish (5 soniya)
+    const now = Date.now();
+    if (adClickCooldown[adNumber] && now - adClickCooldown[adNumber] < 5000) {
+        showToast('Iltimos, 5 soniya kuting...', 'error');
+        return;
+    }
+    
+    // Cooldown qo'yish
+    adClickCooldown[adNumber] = now;
+    
+    // Reklama tugmasini disable qilish
+    const button = document.querySelector(`.ad-click-button[data-ad="${adNumber}"]`);
+    if (button) {
+        button.disabled = true;
+        button.textContent = '⏳ Ishlanmoqda...';
+        button.style.opacity = '0.5';
     }
     
     try {
-        AdController = window.Adsgram.init({ blockId: CONFIG.ADSGRAM_BLOCK_ID });
+        // Yangi balans
+        const newBalance = balance + 1;
+        const success = await updateBalance(currentUser.id, newBalance);
         
-        // Faqat mavjud eventlarni qo'shamiz
-        AdController.addEventListener('onReward', function() {
-            if (!currentUser) return;
+        if (success) {
+            // Balansni yangilash
+            balance = newBalance;
+            balanceValue.textContent = balance;
             
-            const now = Date.now();
-            if (now - lastAdTime < 2000) {
-                showToast("Iltimos, 2 soniya kuting...", "error");
-                return;
-            }
+            // Kunlik hisobni yangilash
+            todayCount++;
+            todayCountEl.textContent = todayCount;
             
-            lastAdTime = now;
+            // Toast ko'rsatish
+            showToast(`✅ Reklama #${adNumber} uchun +1 olmos qo'shildi!`, 'success');
             
-            // Balansni oshirish
-            const newBalance = balance + 1;
-            updateBalance(currentUser.id, newBalance).then(success => {
-                if (success) {
-                    balance = newBalance;
-                    balanceValue.textContent = balance;
-                    todayCount++;
-                    todayCountEl.textContent = todayCount;
-                    showToast('✅ +1 olmos qo\'shildi!', 'success');
-                } else {
-                    showToast('❌ Server xatosi', 'error');
-                }
-            });
-        });
+            // Click statistikasini saqlash
+            try {
+                const today = new Date().toDateString();
+                const key = `clicks_${currentUser.id}_${today}`;
+                const currentClicks = parseInt(localStorage.getItem(key) || '0');
+                localStorage.setItem(key, (currentClicks + 1).toString());
+            } catch (e) {}
+            
+        } else {
+            showToast('❌ Server xatosi', 'error');
+        }
         
-        AdController.addEventListener('onError', function(error) {
-            showToast('Reklama xatosi', 'error');
-        });
-        
-        AdController.addEventListener('onSkip', function() {
-            showToast('Reklama o\'tkazib yuborildi', 'error');
-        });
-        
-        adStatus.textContent = '✅ Reklama tayyor';
-        return true;
     } catch (error) {
-        console.error('SDK init error:', error);
-        adStatus.textContent = '❌ SDK ishga tushmadi';
-        return false;
+        showToast('❌ Xatolik yuz berdi', 'error');
+    } finally {
+        // 3 soniyadan keyin tugmani qayta faollashtirish
+        setTimeout(() => {
+            if (button) {
+                button.disabled = false;
+                button.textContent = 'Click qilish';
+                button.style.opacity = '1';
+            }
+        }, 3000);
     }
+}
+
+// Reklamalarni yuklash
+function loadAds() {
+    adStatus.textContent = '✅ 3 ta reklama tayyor';
+    
+    // 3 ta reklamani ko'rsatish
+    for (let i = 1; i <= 3; i++) {
+        const adItem = document.getElementById(`adItem${i}`);
+        if (adItem) {
+            adItem.style.display = 'block';
+        }
+    }
+    
+    // Click tugmalarini qo'shish
+    document.querySelectorAll('.ad-click-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const adNumber = this.getAttribute('data-ad');
+            clickAd(adNumber);
+        });
+    });
 }
 
 // Telegram init
 async function initApp() {
     if (!window.Telegram?.WebApp) {
         statusText.textContent = 'Faqat Telegram WebApp ichida ishlaydi';
-        showAdButton.disabled = true;
         return;
     }
     
@@ -479,50 +476,39 @@ async function initApp() {
         username: user.username || ''
     };
     
+    // UI ni yangilash
     const fullName = `${currentUser.first_name} ${currentUser.last_name}`.trim() || 'Telegram User';
     userName.textContent = fullName;
     userUsername.textContent = currentUser.username ? `@${currentUser.username}` : '@user';
     userId.textContent = `ID: ${currentUser.id}`;
     
+    // Avatar harflari
     const initials = (currentUser.first_name?.[0] || '') + (currentUser.last_name?.[0] || '') || 'U';
     avatar.textContent = initials.toUpperCase();
     
     statusText.textContent = '✅ Muvaffaqiyatli ulandi';
     
-    // Admin tekshirish
-    if (CONFIG.ADMIN_IDS.includes(currentUser.id)) {
-        adminButton.style.display = 'block';
+    // Balansni yuklash
+    balanceSync.textContent = 'Yuklanmoqda...';
+    try {
+        const serverBalance = await fetchBalance(currentUser.id);
+        balance = serverBalance;
+        balanceValue.textContent = balance;
+        balanceSync.textContent = '✓ Sinxron';
+    } catch (error) {
+        balanceSync.textContent = 'Server xatosi';
     }
     
-    // Balansni yuklash
-    await loadUserBalance();
+    // Reklamalarni yuklash
+    setTimeout(loadAds, 1000);
     
-    // Adsgram SDK ni ishga tushirish
-    initAdsgramSDK();
-    
-    // Reklama tugmasi
-    showAdButton.addEventListener('click', function() {
-        if (!currentUser || !AdController) {
-            showToast('Reklama tayyor emas', 'error');
-            return;
-        }
-        
-        showAdButton.disabled = true;
-        showAdButton.innerHTML = '<span>⏳</span><span>Ochilmoqda...</span>';
-        
-        AdController.show()
-            .then(function(result) {
-                console.log('Reklama ochildi:', result);
-                showAdButton.disabled = false;
-                showAdButton.innerHTML = '<span>🔗</span><span>Reklamani ochish</span>';
-            })
-            .catch(function(error) {
-                console.error('Reklama xatosi:', error);
-                showToast('Reklama ochilmadi', 'error');
-                showAdButton.disabled = false;
-                showAdButton.innerHTML = '<span>🔗</span><span>Reklamani ochish</span>';
-            });
-    });
+    // Kunlik hisobni yuklash
+    try {
+        const today = new Date().toDateString();
+        const key = `clicks_${currentUser.id}_${today}`;
+        todayCount = parseInt(localStorage.getItem(key) || '0');
+        todayCountEl.textContent = todayCount;
+    } catch (e) {}
     
     // Telegram theme
     try {
@@ -530,24 +516,6 @@ async function initApp() {
         tg.setBackgroundColor('#0f172a');
     } catch (e) {}
 }
-
-// Admin panel eventlari
-adminButton.addEventListener('click', () => {
-    if (CONFIG.ADMIN_IDS.includes(currentUser?.id)) {
-        adminPanel.style.display = 'flex';
-        loadAdminPanel();
-    }
-});
-
-closeAdmin.addEventListener('click', () => {
-    adminPanel.style.display = 'none';
-});
-
-adminPanel.addEventListener('click', (e) => {
-    if (e.target === adminPanel) {
-        adminPanel.style.display = 'none';
-    }
-});
 
 // Ilovani ishga tushirish
 if (document.readyState === 'loading') {

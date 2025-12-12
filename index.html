@@ -6,20 +6,29 @@
   <title>Diamond Rewards</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
       box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
     }
     
     @keyframes float {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
+      50% { transform: translateY(-15px); }
     }
     
-    @keyframes glow {
-      0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
-      50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.8); }
+    @keyframes pulse-glow {
+      0%, 100% { 
+        box-shadow: 0 0 30px rgba(139, 92, 246, 0.4),
+                    0 0 60px rgba(139, 92, 246, 0.2); 
+      }
+      50% { 
+        box-shadow: 0 0 50px rgba(139, 92, 246, 0.6),
+                    0 0 100px rgba(139, 92, 246, 0.3); 
+      }
     }
     
     @keyframes shimmer {
@@ -27,121 +36,239 @@
       100% { background-position: 1000px 0; }
     }
     
-    .float-animation {
-      animation: float 3s ease-in-out infinite;
+    @keyframes slideUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
     }
     
-    .glow-effect {
-      animation: glow 2s ease-in-out infinite;
+    @keyframes celebrate {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.2) rotate(-5deg); }
+      75% { transform: scale(1.2) rotate(5deg); }
+    }
+    
+    .float-animation {
+      animation: float 4s ease-in-out infinite;
+    }
+    
+    .pulse-glow {
+      animation: pulse-glow 3s ease-in-out infinite;
     }
     
     .shimmer-effect {
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
       background-size: 1000px 100%;
-      animation: shimmer 3s infinite;
+      animation: shimmer 2.5s infinite;
     }
     
-    .glass-card {
-      background: rgba(30, 41, 59, 0.6);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(139, 92, 246, 0.2);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    .slide-up {
+      animation: slideUp 0.5s ease-out;
     }
     
-    .neon-border {
-      box-shadow: 0 0 20px rgba(139, 92, 246, 0.5),
-                  inset 0 0 20px rgba(139, 92, 246, 0.1);
+    .app-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
     }
     
     .gradient-text {
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+    
+    .diamond-icon {
+      filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.8));
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+    }
+    
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0px);
+    }
+    
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .btn-primary:hover:not(:disabled)::before {
+      left: 100%;
     }
   </style>
   <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
  </head>
- <body class="h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-auto">
-  <div id="app" class="min-h-full w-full p-4"><!-- Loading State -->
-   <div id="loading" class="flex items-center justify-center min-h-screen">
-    <div class="text-center">
-     <div class="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-     <p class="text-purple-300">Yuklanmoqda...</p>
+ <body class="h-full gradient-bg text-white overflow-auto">
+  <div id="app" class="min-h-full w-full"><!-- Loading State -->
+   <div id="loading" class="flex items-center justify-center min-h-screen p-4">
+    <div class="text-center slide-up">
+     <div class="text-7xl mb-6 float-animation diamond-icon">
+      💎
+     </div>
+     <div class="w-20 h-20 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+     <p class="text-xl font-semibold">Diamond Rewards</p>
+     <p class="text-white/60 mt-2">Yuklanmoqda...</p>
     </div>
    </div><!-- Main Content -->
-   <div id="content" class="hidden max-w-md mx-auto"><!-- Header -->
-    <div class="glass-card rounded-3xl p-6 mb-6 neon-border">
-     <div class="flex items-center space-x-4">
-      <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center float-animation text-3xl shadow-lg">
-       💎
-      </div>
-      <div class="flex-1">
-       <h1 class="text-2xl font-bold gradient-text">Diamond Rewards</h1>
-       <p class="text-purple-300 text-sm">Olmos yig'ing va mukofot oling</p>
+   <div id="content" class="hidden"><!-- Top Bar -->
+    <div class="sticky top-0 z-50 backdrop-blur-xl bg-white/5 border-b border-white/10">
+     <div class="max-w-lg mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+       <div class="flex items-center space-x-3">
+        <div class="text-3xl diamond-icon">
+         💎
+        </div>
+        <div>
+         <h1 class="text-xl font-bold">Diamond Rewards</h1>
+         <p class="text-xs text-white/60">Reklama ko'ring, olmos yig'ing</p>
+        </div>
+       </div>
+       <div class="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full pulse-glow"><span id="diamond-count" class="text-2xl font-bold">0</span> <span class="text-xl diamond-icon">💎</span>
+       </div>
       </div>
      </div>
-    </div><!-- User Info Card -->
-    <div id="user-card" class="glass-card rounded-3xl p-6 mb-6 neon-border">
-     <div class="flex items-center justify-between">
+    </div><!-- Main Container -->
+    <div class="max-w-lg mx-auto px-4 py-6 space-y-4"><!-- User Profile Card -->
+     <div class="app-card p-5 slide-up">
       <div class="flex items-center space-x-4">
-       <div id="user-avatar" class="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+       <div id="user-avatar" class="w-16 h-16 bg-gradient-to-br from-white/20 to-white/5 rounded-2xl flex items-center justify-center text-2xl font-bold border border-white/20">
         👤
        </div>
-       <div>
+       <div class="flex-1">
         <h3 id="user-name" class="font-bold text-lg">Foydalanuvchi</h3>
-        <p id="user-id" class="text-purple-300 text-sm">ID: Loading...</p>
+        <p id="user-id" class="text-white/50 text-sm">ID: Loading...</p>
        </div>
       </div>
-      <div class="text-right">
-       <div class="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 rounded-xl glow-effect"><span id="diamond-count" class="text-2xl font-bold">0</span> <span class="text-xl">💎</span>
+     </div><!-- Ad Watch Section -->
+     <div class="app-card p-6 slide-up" style="animation-delay: 0.1s;"><!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+       <div class="flex items-center space-x-3">
+        <div class="text-3xl">
+         🎬
+        </div>
+        <div>
+         <h2 class="text-xl font-bold">Reklama ko'ring</h2>
+         <p class="text-white/60 text-sm">Olmos yig'ing</p>
+        </div>
+       </div>
+       <div class="bg-green-500/20 border border-green-500/30 px-3 py-1.5 rounded-full"><span class="text-green-400 font-bold text-sm">+1 💎</span>
+       </div>
+      </div><!-- Status Display -->
+      <div id="ad-status" class="bg-white/5 border border-white/10 rounded-2xl p-6 mb-5 text-center min-h-[100px] flex items-center justify-center">
+       <p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>
+      </div><!-- Watch Button --> <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-5 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg"> <span class="text-2xl">▶️</span> <span>Reklamani boshlash</span> </button>
+     </div><!-- Stats Section -->
+     <div class="app-card p-6 slide-up" style="animation-delay: 0.2s;">
+      <div class="flex items-center space-x-2 mb-5">
+       <div class="text-2xl">
+        📊
+       </div>
+       <h3 class="text-xl font-bold">Statistika</h3>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+       <div class="stat-card rounded-2xl p-5 text-center">
+        <div class="text-3xl mb-2">
+         🎬
+        </div>
+        <p class="text-white/60 text-xs mb-2">Ko'rilgan</p>
+        <p id="ads-watched" class="text-3xl font-bold">0</p>
+        <p class="text-white/40 text-xs mt-1">reklamalar</p>
+       </div>
+       <div class="stat-card rounded-2xl p-5 text-center">
+        <div class="text-3xl mb-2 diamond-icon">
+         💎
+        </div>
+        <p class="text-white/60 text-xs mb-2">Jami</p>
+        <p id="total-diamonds" class="text-3xl font-bold">0</p>
+        <p class="text-white/40 text-xs mt-1">olmoslar</p>
        </div>
       </div>
-     </div>
-    </div><!-- Ad Section -->
-    <div class="glass-card rounded-3xl p-6 mb-6 neon-border">
-     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-bold">🎬 Reklama ko'ring</h2>
-      <div class="bg-purple-600 px-3 py-1 rounded-full text-sm font-bold">
-       +1 💎
+     </div><!-- Admin Panel -->
+     <div id="admin-panel" class="hidden app-card p-6 border-2 border-yellow-500/30 slide-up" style="animation-delay: 0.3s;">
+      <div class="flex items-center space-x-3 mb-6">
+       <div class="text-3xl">
+        👑
+       </div>
+       <h2 class="text-xl font-bold">Admin Panel</h2>
+      </div><!-- Admin Stats -->
+      <div class="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-2xl p-5 mb-6">
+       <div class="flex items-center space-x-2 mb-4">
+        <div class="text-xl">
+         📈
+        </div>
+        <h3 class="font-bold">Umumiy statistika</h3>
+       </div>
+       <div class="grid grid-cols-3 gap-4 text-center">
+        <div>
+         <p class="text-2xl font-bold text-yellow-400" id="admin-total-users">0</p>
+         <p class="text-xs text-white/60 mt-1">Foydalanuvchi</p>
+        </div>
+        <div>
+         <p class="text-2xl font-bold text-yellow-400" id="admin-total-ads">0</p>
+         <p class="text-xs text-white/60 mt-1">Reklamalar</p>
+        </div>
+        <div>
+         <p class="text-2xl font-bold text-yellow-400" id="admin-total-diamonds">0</p>
+         <p class="text-xs text-white/60 mt-1">Olmoslar</p>
+        </div>
+       </div>
+      </div><!-- Users List -->
+      <div class="flex items-center space-x-2 mb-4">
+       <div class="text-xl">
+        👥
+       </div>
+       <h3 class="font-bold">Foydalanuvchilar</h3>
       </div>
-     </div>
-     <p class="text-purple-300 text-sm mb-4">Har bir reklama uchun 1 olmos oling</p>
-     <div id="ad-status" class="border-2 border-dashed border-purple-500 rounded-2xl p-6 mb-4 text-center">
-      <p class="text-purple-300">Reklama tayyor. Tugmani bosing!</p>
-     </div><button id="watch-ad-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg glow-effect flex items-center justify-center space-x-2"> <span class="text-xl">▶️</span> <span>Reklamani boshlash</span> </button>
-    </div><!-- Stats Card -->
-    <div class="glass-card rounded-3xl p-6 mb-6 neon-border">
-     <h3 class="text-lg font-bold mb-4 gradient-text">📊 Statistika</h3>
-     <div class="grid grid-cols-2 gap-4">
-      <div class="bg-gradient-to-br from-purple-600/30 to-indigo-600/30 rounded-xl p-4 text-center border border-purple-500/30">
-       <p class="text-purple-300 text-sm mb-1">Ko'rilgan reklamalar</p>
-       <p id="ads-watched" class="text-2xl font-bold">0</p>
+      <div id="users-list" class="space-y-3 max-h-96 overflow-y-auto">
       </div>
-      <div class="bg-gradient-to-br from-purple-600/30 to-indigo-600/30 rounded-xl p-4 text-center border border-purple-500/30">
-       <p class="text-purple-300 text-sm mb-1">Jami olmoslar</p>
-       <p id="total-diamonds" class="text-2xl font-bold">0</p>
-      </div>
-     </div>
-    </div><!-- Admin Panel -->
-    <div id="admin-panel" class="hidden glass-card rounded-3xl p-6 mb-6 neon-border border-2 border-yellow-500/50">
-     <h2 class="text-xl font-bold mb-4 flex items-center space-x-2"><span>👑</span> <span class="gradient-text">Admin Panel</span></h2>
-     <div class="bg-gradient-to-br from-yellow-600/20 to-orange-600/20 rounded-xl p-4 mb-4 border border-yellow-500/30">
-      <h3 class="font-bold mb-2">📈 Umumiy statistika</h3>
-      <div class="space-y-2 text-sm">
-       <p>Jami foydalanuvchilar: <span id="admin-total-users" class="font-bold text-yellow-400">0</span></p>
-       <p>Jami ko'rilgan reklamalar: <span id="admin-total-ads" class="font-bold text-yellow-400">0</span></p>
-       <p>Tarqatilgan olmoslar: <span id="admin-total-diamonds" class="font-bold text-yellow-400">0</span></p>
-      </div>
-     </div>
-     <h3 class="font-bold mb-3">👥 Foydalanuvchilar ro'yxati</h3>
-     <div id="users-list" class="space-y-2 max-h-96 overflow-y-auto">
      </div>
     </div><!-- Footer -->
-    <div class="text-center text-purple-400 text-sm py-4">
-     <p>Telegram Mini App • Diamond Rewards System</p>
+    <div class="text-center py-8 pb-12">
+     <div class="flex items-center justify-center space-x-2 text-white/40 text-sm mb-2"><span>⚡️</span> <span>Telegram Mini App</span>
+     </div>
+     <p class="text-white/30 text-xs">Diamond Rewards • v1.0</p>
     </div>
    </div>
   </div>
@@ -149,12 +276,15 @@
     const ADMIN_IDS = ['7500103239', '7104718080'];
     const AD_BLOCK_ID = '18961';
     const REWARD_AMOUNT = 1;
-    const STORAGE_KEY = 'diamond_rewards_data';
     
     let currentUser = null;
     let allUsers = [];
     let isAdmin = false;
     let AdController = null;
+
+    const defaultConfig = {
+      app_title: "Diamond Rewards"
+    };
 
     // Initialize Telegram Web App
     function initTelegram() {
@@ -168,10 +298,7 @@
           currentUser = {
             user_id: user.id.toString(),
             username: user.username || 'user',
-            first_name: user.first_name || 'User',
-            diamonds: 0,
-            ads_watched: 0,
-            last_ad_time: new Date().toISOString()
+            first_name: user.first_name || 'User'
           };
           isAdmin = ADMIN_IDS.includes(currentUser.user_id);
         } else {
@@ -179,10 +306,7 @@
           currentUser = {
             user_id: 'test_user_' + Math.floor(Math.random() * 10000),
             username: 'testuser',
-            first_name: 'Test User',
-            diamonds: 0,
-            ads_watched: 0,
-            last_ad_time: new Date().toISOString()
+            first_name: 'Test User'
           };
         }
       }
@@ -199,52 +323,53 @@
       }
     }
 
-    // LocalStorage management
-    function loadData() {
-      try {
-        const data = localStorage.getItem(STORAGE_KEY);
-        if (data) {
-          allUsers = JSON.parse(data);
-        }
-      } catch (e) {
-        console.error('Error loading data:', e);
-      }
-    }
-
-    function saveData() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(allUsers));
-      } catch (e) {
-        console.error('Error saving data:', e);
-      }
-    }
-
-    function findOrCreateUser() {
-      if (!currentUser) return null;
-      
-      let user = allUsers.find(u => u.user_id === currentUser.user_id);
-      
-      if (!user) {
-        user = { ...currentUser };
-        allUsers.push(user);
-        saveData();
-      }
-      
-      return user;
-    }
-
-    // Initialize App
-    async function initializeApp() {
-      initTelegram();
-      loadData();
-      initAdsgram();
-      
-      const user = findOrCreateUser();
-      
-      if (user) {
+    // Data SDK Handler
+    const dataHandler = {
+      onDataChanged(data) {
+        allUsers = data;
         updateUI();
         if (isAdmin) {
           updateAdminPanel();
+        }
+      }
+    };
+
+    // Initialize Data SDK and App
+    async function initializeApp() {
+      initTelegram();
+      initAdsgram();
+
+      // Initialize Data SDK
+      const initResult = await window.dataSdk.init(dataHandler);
+      if (!initResult.isOk) {
+        console.error('Failed to initialize Data SDK');
+        showError('Ma\'lumotlar bazasi ulanmadi');
+        return;
+      }
+
+      // Find or create current user
+      if (currentUser) {
+        const existingUser = allUsers.find(u => u.user_id === currentUser.user_id);
+        if (!existingUser) {
+          if (allUsers.length >= 999) {
+            showError('Maksimal foydalanuvchilar limitiga yetildi (999)');
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('content').classList.remove('hidden');
+            return;
+          }
+
+          const createResult = await window.dataSdk.create({
+            user_id: currentUser.user_id,
+            username: currentUser.username,
+            first_name: currentUser.first_name,
+            diamonds: 0,
+            ads_watched: 0,
+            last_ad_time: new Date().toISOString()
+          });
+          
+          if (!createResult.isOk) {
+            showError('Foydalanuvchi yaratishda xatolik');
+          }
         }
       }
 
@@ -286,16 +411,21 @@
 
       // Update users list
       const usersList = document.getElementById('users-list');
-      usersList.innerHTML = allUsers.map(user => `
-        <div class="bg-gradient-to-br from-purple-600/20 to-indigo-600/20 rounded-xl p-3 border border-purple-500/30">
+      usersList.innerHTML = allUsers.map((user, index) => `
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all">
           <div class="flex items-center justify-between">
-            <div>
-              <p class="font-bold">${user.first_name}</p>
-              <p class="text-xs text-purple-300">@${user.username} • ID: ${user.user_id}</p>
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 bg-gradient-to-br from-white/20 to-white/5 rounded-xl flex items-center justify-center text-sm font-bold border border-white/20">
+                ${user.first_name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p class="font-bold text-sm">${user.first_name}</p>
+                <p class="text-xs text-white/50">@${user.username}</p>
+              </div>
             </div>
             <div class="text-right">
-              <p class="text-sm"><span class="font-bold text-yellow-400">${user.diamonds}</span> 💎</p>
-              <p class="text-xs text-purple-300">${user.ads_watched} reklama</p>
+              <p class="text-lg font-bold text-yellow-400">${user.diamonds} 💎</p>
+              <p class="text-xs text-white/50">${user.ads_watched} reklama</p>
             </div>
           </div>
         </div>
@@ -305,7 +435,10 @@
     // Watch Ad Function
     async function watchAd() {
       const user = allUsers.find(u => u.user_id === currentUser.user_id);
-      if (!user) return;
+      if (!user) {
+        showError('Foydalanuvchi topilmadi');
+        return;
+      }
 
       const btn = document.getElementById('watch-ad-btn');
       const statusDiv = document.getElementById('ad-status');
@@ -324,7 +457,7 @@
       if (!AdController) {
         statusDiv.innerHTML = '<p class="text-red-400">Reklama tizimi yuklanmagan. Sahifani yangilang.</p>';
         btn.disabled = false;
-        btn.innerHTML = '<span class="text-xl">▶️</span><span>Reklamani boshlash</span>';
+        btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
         return;
       }
 
@@ -335,23 +468,27 @@
         await AdController.show();
         
         // User watched ad till the end - Give reward
-        user.diamonds += REWARD_AMOUNT;
-        user.ads_watched += 1;
-        user.last_ad_time = new Date().toISOString();
-        
-        saveData();
-        updateUI();
-        if (isAdmin) {
-          updateAdminPanel();
-        }
+        const updatedUser = {
+          ...user,
+          diamonds: user.diamonds + REWARD_AMOUNT,
+          ads_watched: user.ads_watched + 1,
+          last_ad_time: new Date().toISOString()
+        };
 
-        statusDiv.innerHTML = `
-          <div class="text-center">
-            <div class="text-4xl mb-2 animate-bounce">🎉</div>
-            <p class="text-green-400 font-bold">Tabriklaymiz! +${REWARD_AMOUNT} 💎</p>
-            <p class="text-sm text-purple-300 mt-1">Reklama to'liq ko'rildi</p>
-          </div>
-        `;
+        const updateResult = await window.dataSdk.update(updatedUser);
+        
+        if (updateResult.isOk) {
+          statusDiv.innerHTML = `
+            <div class="text-center slide-up">
+              <div class="text-6xl mb-3" style="animation: celebrate 0.6s ease-out;">🎉</div>
+              <p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p>
+              <p class="text-2xl font-bold mb-2">+${REWARD_AMOUNT} 💎</p>
+              <p class="text-sm text-white/60">Reklama to'liq ko'rildi</p>
+            </div>
+          `;
+        } else {
+          throw new Error('Mukofot berishda xatolik');
+        }
       } catch (error) {
         console.error('Ad error:', error);
         
@@ -364,16 +501,45 @@
         }
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '<span class="text-xl">▶️</span><span>Reklamani boshlash</span>';
+        btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
         
         setTimeout(() => {
-          statusDiv.innerHTML = '<p class="text-purple-300">Reklama tayyor. Tugmani bosing!</p>';
+          statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>';
         }, 3000);
+      }
+    }
+
+    function showError(message) {
+      const statusDiv = document.getElementById('ad-status');
+      if (statusDiv) {
+        statusDiv.innerHTML = `<p class="text-red-400">${message}</p>`;
       }
     }
 
     // Event Listeners
     document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
+
+    // Element SDK Implementation
+    async function onConfigChange(config) {
+      const title = config.app_title || defaultConfig.app_title;
+      document.title = title;
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["app_title", config.app_title || defaultConfig.app_title]
+        ])
+      });
+    }
 
     // Initialize on load
     if (document.readyState === 'loading') {
@@ -382,5 +548,5 @@
       initializeApp();
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9acccae2f0483d14',t:'MTc2NTUzODAwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9accdfc892f265b0',t:'MTc2NTUzODg2My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

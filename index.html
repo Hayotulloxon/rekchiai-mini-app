@@ -272,16 +272,34 @@
     </div>
    </div>
   </div>
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFzNDoLlxHEpJOuZO8nhc-D2SmUId2dEc",
+      authDomain: "rekchi-2dc2f.firebaseapp.com",
+      projectId: "rekchi-2dc2f",
+      storageBucket: "rekchi-2dc2f.firebasestorage.app",
+      messagingSenderId: "352655860270",
+      appId: "1:352655860270:web:e071c82f4b911c21c0b5bf",
+      measurementId: "G-4WVC8S5V3R"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     const ADMIN_IDS = ['7500103239', '7104718080'];
     const AD_BLOCK_ID = '18961';
     const REWARD_AMOUNT = 1;
-    const STORAGE_KEY = 'diamond_rewards_data';
     
     let currentUser = null;
     let allUsers = [];
     let isAdmin = false;
     let AdController = null;
+    let unsubscribeUsers = null;
 
     // Initialize Telegram Web App
     function initTelegram() {
@@ -295,10 +313,7 @@
           currentUser = {
             user_id: user.id.toString(),
             username: user.username || 'user',
-            first_name: user.first_name || 'User',
-            diamonds: 0,
-            ads_watched: 0,
-            last_ad_time: new Date().toISOString()
+            first_name: user.first_name || 'User'
           };
           isAdmin = ADMIN_IDS.includes(currentUser.user_id);
         } else {
@@ -306,10 +321,7 @@
           currentUser = {
             user_id: 'test_user_' + Math.floor(Math.random() * 10000),
             username: 'testuser',
-            first_name: 'Test User',
-            diamonds: 0,
-            ads_watched: 0,
-            last_ad_time: new Date().toISOString()
+            first_name: 'Test User'
           };
         }
       }
@@ -326,52 +338,85 @@
       }
     }
 
-    // LocalStorage management
-    function loadData() {
-      try {
-        const data = localStorage.getItem(STORAGE_KEY);
-        if (data) {
-          allUsers = JSON.parse(data);
-        }
-      } catch (e) {
-        console.error('Error loading data:', e);
-      }
-    }
-
-    function saveData() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(allUsers));
-      } catch (e) {
-        console.error('Error saving data:', e);
-      }
-    }
-
-    function findOrCreateUser() {
+    // Firebase Functions
+    async function loadOrCreateUser() {
       if (!currentUser) return null;
-      
-      let user = allUsers.find(u => u.user_id === currentUser.user_id);
-      
-      if (!user) {
-        user = { ...currentUser };
-        allUsers.push(user);
-        saveData();
+
+      try {
+        const userRef = doc(db, 'users', currentUser.user_id);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+          // Create new user
+          const newUser = {
+            user_id: currentUser.user_id,
+            username: currentUser.username,
+            first_name: currentUser.first_name,
+            diamonds: 0,
+            ads_watched: 0,
+            last_ad_time: new Date().toISOString(),
+            created_at: new Date().toISOString()
+          };
+          
+          await setDoc(userRef, newUser);
+          return newUser;
+        } else {
+          return userSnap.data();
+        }
+      } catch (error) {
+        console.error('Error loading user:', error);
+        showError('Ma\'lumotlar yuklanmadi');
+        return null;
       }
-      
-      return user;
+    }
+
+    async function updateUserData(updates) {
+      if (!currentUser) return false;
+
+      try {
+        const userRef = doc(db, 'users', currentUser.user_id);
+        await updateDoc(userRef, updates);
+        return true;
+      } catch (error) {
+        console.error('Error updating user:', error);
+        return false;
+      }
+    }
+
+    function subscribeToUsers() {
+      if (!isAdmin) return;
+
+      const usersRef = collection(db, 'users');
+      unsubscribeUsers = onSnapshot(usersRef, (snapshot) => {
+        allUsers = [];
+        snapshot.forEach((doc) => {
+          allUsers.push(doc.data());
+        });
+        updateAdminPanel();
+      });
     }
 
     // Initialize App
     async function initializeApp() {
       initTelegram();
-      loadData();
       initAdsgram();
-      
-      const user = findOrCreateUser();
+
+      const user = await loadOrCreateUser();
       
       if (user) {
-        updateUI();
+        updateUI(user);
+        
+        // Subscribe to user changes
+        const userRef = doc(db, 'users', currentUser.user_id);
+        onSnapshot(userRef, (doc) => {
+          if (doc.exists()) {
+            updateUI(doc.data());
+          }
+        });
+
         if (isAdmin) {
-          updateAdminPanel();
+          document.getElementById('admin-panel').classList.remove('hidden');
+          subscribeToUsers();
         }
       }
 
@@ -379,10 +424,7 @@
       document.getElementById('content').classList.remove('hidden');
     }
 
-    function updateUI() {
-      if (!currentUser) return;
-
-      const user = allUsers.find(u => u.user_id === currentUser.user_id);
+    function updateUI(user) {
       if (!user) return;
 
       // Update user info
@@ -392,14 +434,9 @@
       document.getElementById('user-id').textContent = `ID: ${user.user_id}`;
       
       // Update diamonds
-      document.getElementById('diamond-count').textContent = user.diamonds;
-      document.getElementById('total-diamonds').textContent = user.diamonds;
-      document.getElementById('ads-watched').textContent = user.ads_watched;
-
-      // Show admin panel if admin
-      if (isAdmin) {
-        document.getElementById('admin-panel').classList.remove('hidden');
-      }
+      document.getElementById('diamond-count').textContent = user.diamonds || 0;
+      document.getElementById('total-diamonds').textContent = user.diamonds || 0;
+      document.getElementById('ads-watched').textContent = user.ads_watched || 0;
     }
 
     function updateAdminPanel() {
@@ -413,31 +450,32 @@
 
       // Update users list
       const usersList = document.getElementById('users-list');
-      usersList.innerHTML = allUsers.map((user, index) => `
-        <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 bg-gradient-to-br from-white/20 to-white/5 rounded-xl flex items-center justify-center text-sm font-bold border border-white/20">
-                ${user.first_name.charAt(0).toUpperCase()}
+      usersList.innerHTML = allUsers
+        .sort((a, b) => (b.diamonds || 0) - (a.diamonds || 0))
+        .map((user) => `
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-white/20 to-white/5 rounded-xl flex items-center justify-center text-sm font-bold border border-white/20">
+                  ${user.first_name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p class="font-bold text-sm">${user.first_name}</p>
+                  <p class="text-xs text-white/50">@${user.username}</p>
+                </div>
               </div>
-              <div>
-                <p class="font-bold text-sm">${user.first_name}</p>
-                <p class="text-xs text-white/50">@${user.username}</p>
+              <div class="text-right">
+                <p class="text-lg font-bold text-yellow-400">${user.diamonds || 0} 💎</p>
+                <p class="text-xs text-white/50">${user.ads_watched || 0} reklama</p>
               </div>
-            </div>
-            <div class="text-right">
-              <p class="text-lg font-bold text-yellow-400">${user.diamonds} 💎</p>
-              <p class="text-xs text-white/50">${user.ads_watched} reklama</p>
             </div>
           </div>
-        </div>
-      `).join('');
+        `).join('');
     }
 
     // Watch Ad Function
     async function watchAd() {
-      const user = allUsers.find(u => u.user_id === currentUser.user_id);
-      if (!user) return;
+      if (!currentUser) return;
 
       const btn = document.getElementById('watch-ad-btn');
       const statusDiv = document.getElementById('ad-status');
@@ -463,28 +501,33 @@
       try {
         statusDiv.innerHTML = '<p class="text-green-400 font-bold">🎬 Reklama ko\'rsatilmoqda...</p>';
         
-        // Show Ad - Rewarded format
+        // Show Ad
         await AdController.show();
         
-        // User watched ad till the end - Give reward
-        user.diamonds += REWARD_AMOUNT;
-        user.ads_watched += 1;
-        user.last_ad_time = new Date().toISOString();
-        
-        saveData();
-        updateUI();
-        if (isAdmin) {
-          updateAdminPanel();
-        }
+        // Get current user data
+        const userRef = doc(db, 'users', currentUser.user_id);
+        const userSnap = await getDoc(userRef);
+        const userData = userSnap.data();
 
-        statusDiv.innerHTML = `
-          <div class="text-center slide-up">
-            <div class="text-6xl mb-3" style="animation: celebrate 0.6s ease-out;">🎉</div>
-            <p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p>
-            <p class="text-2xl font-bold mb-2">+${REWARD_AMOUNT} 💎</p>
-            <p class="text-sm text-white/60">Reklama to'liq ko'rildi</p>
-          </div>
-        `;
+        // Update with reward
+        const success = await updateUserData({
+          diamonds: (userData.diamonds || 0) + REWARD_AMOUNT,
+          ads_watched: (userData.ads_watched || 0) + 1,
+          last_ad_time: new Date().toISOString()
+        });
+
+        if (success) {
+          statusDiv.innerHTML = `
+            <div class="text-center slide-up">
+              <div class="text-6xl mb-3" style="animation: celebrate 0.6s ease-out;">🎉</div>
+              <p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p>
+              <p class="text-2xl font-bold mb-2">+${REWARD_AMOUNT} 💎</p>
+              <p class="text-sm text-white/60">Reklama to'liq ko'rildi</p>
+            </div>
+          `;
+        } else {
+          throw new Error('Mukofot berishda xatolik');
+        }
       } catch (error) {
         console.error('Ad error:', error);
         
@@ -505,6 +548,13 @@
       }
     }
 
+    function showError(message) {
+      const statusDiv = document.getElementById('ad-status');
+      if (statusDiv) {
+        statusDiv.innerHTML = `<p class="text-red-400">${message}</p>`;
+      }
+    }
+
     // Event Listeners
     document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
 
@@ -514,6 +564,13 @@
     } else {
       initializeApp();
     }
+
+    // Cleanup on unload
+    window.addEventListener('beforeunload', () => {
+      if (unsubscribeUsers) {
+        unsubscribeUsers();
+      }
+    });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9accebf20211ae0b',t:'MTc2NTUzOTM2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9acd036080993d14',t:'MTc2NTU0MDMyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

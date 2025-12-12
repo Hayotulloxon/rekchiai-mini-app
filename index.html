@@ -614,9 +614,13 @@
       withdrawStatus.innerHTML = '<p class="text-yellow-400">⏳ Yechilmoqda...</p>';
 
       try {
-        // Call external API
+        // Call external API with AbortController for timeout
         const apiUrl = 'https://68ed1ab05ca4e.myxvest1.ru/Test/add_balance.php';
         const apiKey = '4564123:hkjhfadfhieapkdnga';
+        
+        // ✅ To'g'ri timeout qo'llash
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
 
         const response = await fetch(apiUrl, {
           method: 'POST',
@@ -630,8 +634,14 @@
             type: 'diamonds',
             description: "Reklama ko'rib topgan"
           }),
-          timeout: 10000
+          signal: controller.signal  // ✅ To'g'ri signal
         });
+
+        clearTimeout(timeoutId); // Timeout ni tozalash
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
 
         const result = await response.json();
 
@@ -648,7 +658,7 @@
               <div class="text-4xl mb-2">🎉</div>
               <p class="text-green-400 font-bold">Muvaffaqiyatli!</p>
               <p class="text-white/80 mt-1">${amount} olmos yechib olindi</p>
-              <p class="text-xs text-white/50 mt-2">Yangi balans: ${result.new_balance}</p>
+              <p class="text-xs text-white/50 mt-2">Yangi balans: ${result.new_balance || 'N/A'}</p>
             </div>
           `;
           
@@ -660,7 +670,17 @@
         }
       } catch (error) {
         console.error('❌ Withdrawal error:', error);
-        withdrawStatus.innerHTML = `<p class="text-red-400">❌ Xatolik: ${error.message}</p>`;
+        
+        let errorMessage = 'Noma\'lum xatolik';
+        if (error.name === 'AbortError') {
+          errorMessage = 'So\'rov vaqti tugadi (10 soniya)';
+        } else if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Internet aloqasi yo\'q';
+        } else {
+          errorMessage = error.message;
+        }
+        
+        withdrawStatus.innerHTML = `<p class="text-red-400">❌ Xatolik: ${errorMessage}</p>`;
       } finally {
         withdrawBtn.disabled = false;
         withdrawBtn.innerHTML = '<span class="text-2xl">💰</span><span>Yechib olish</span>';
@@ -680,5 +700,5 @@
       initializeAppMain();
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ace57bda2b93d14',t:'MTc2NTU1NDI2Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ace60bd63243d14',t:'MTc2NTU1NDYzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

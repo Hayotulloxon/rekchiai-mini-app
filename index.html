@@ -579,120 +579,197 @@
     }
 
     async function withdrawDiamonds() {
-      if (!currentUser) return;
+    if (!currentUser) return;
 
-      const withdrawBtn = document.getElementById('withdraw-btn');
-      const withdrawStatus = document.getElementById('withdraw-status');
-      const amountInput = document.getElementById('withdraw-amount');
-      const amount = parseInt(amountInput.value);
+    const withdrawBtn = document.getElementById('withdraw-btn');
+    const withdrawStatus = document.getElementById('withdraw-status');
+    const amountInput = document.getElementById('withdraw-amount');
+    const amount = parseInt(amountInput.value);
 
-      // Validation
-      if (!amount || amount < 1) {
+    // Validation
+    if (!amount || amount < 1) {
         withdrawStatus.classList.remove('hidden');
         withdrawStatus.innerHTML = '<p class="text-orange-400">❌ Minimal yechish 1 olmos</p>';
         setTimeout(() => withdrawStatus.classList.add('hidden'), 3000);
         return;
-      }
+    }
 
-      // Check user balance
-      const userRef = ref(db, 'users/' + currentUser.user_id);
-      const snapshot = await get(userRef);
-      const userData = snapshot.val();
-      const currentDiamonds = userData.diamonds || 0;
+    // Check user balance
+    const userRef = ref(db, 'users/' + currentUser.user_id);
+    const snapshot = await get(userRef);
+    const userData = snapshot.val();
+    const currentDiamonds = userData.diamonds || 0;
 
-      if (amount > currentDiamonds) {
+    if (amount > currentDiamonds) {
         withdrawStatus.classList.remove('hidden');
         withdrawStatus.innerHTML = '<p class="text-orange-400">❌ Olmoslar yetarli emas</p>';
         setTimeout(() => withdrawStatus.classList.add('hidden'), 3000);
         return;
-      }
+    }
 
-      // Start withdrawal
-      withdrawBtn.disabled = true;
-      withdrawBtn.innerHTML = '<div class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
-      withdrawStatus.classList.remove('hidden');
-      withdrawStatus.innerHTML = '<p class="text-yellow-400">⏳ Yechilmoqda...</p>';
+    // Start withdrawal
+    withdrawBtn.disabled = true;
+    withdrawBtn.innerHTML = '<div class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
+    withdrawStatus.classList.remove('hidden');
+    withdrawStatus.innerHTML = '<p class="text-yellow-400">⏳ Yechilmoqda...</p>';
 
-      try {
-        // Call external API with CORS Proxy
+    try {
+        // ✅ 1. To'g'ri API URL
         const apiUrl = 'https://68ed1ab05ca4e.myxvest1.ru/Test/add_balance.php';
-        const apiKey = '4564123:hkjhfadfhieapkdnga';
         
-        // ✅ CORS Proxy qo'shildi
-        const corsProxy = 'https://corsproxy.io/?';
-        const fullUrl = corsProxy + encodeURIComponent(apiUrl);
+        // ✅ 2. Kalitni tozalash
+        const cleanApiKey = (key) => {
+            return key
+                .trim()
+                .replace(/\s+/g, '') // Barcha boshliqlarni olib tashlash
+                .replace(/['"]/g, ''); // Qo'shtirnoqlarni olib tashlash
+        };
         
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-        const response = await fetch(fullUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+        const apiKey = cleanApiKey('4564123:hkjhfadfhieapkdnga');
+        
+        console.log('🔑 Using API Key:', `"${apiKey}"`);
+        console.log('🔑 Key length:', apiKey.length);
+        
+        // ✅ 3. Ma'lumotlarni tayyorlash
+        const requestData = {
             key: apiKey,
-            user_id: currentUser.user_id,
+            user_id: currentUser.user_id.toString(), // String formatda bo'lishi kerak
             amount: amount,
             type: 'diamonds',
             description: "Reklama ko'rib topgan"
-          }),
-          signal: controller.signal
+        };
+        
+        console.log('📤 Sending request:', requestData);
+        
+        // ✅ 4. CORS Proxy bilan (agar kerak bo'lsa)
+        const useProxy = true; // Proxy kerak bo'lsa true qiling
+        let fetchUrl = apiUrl;
+        
+        if (useProxy) {
+            // Bir nechta CORS proxy variantlari
+            const proxies = [
+                'https://api.allorigins.win/raw?url=',
+                'https://corsproxy.io/?',
+                'https://proxy.cors.sh/'
+            ];
+            
+            fetchUrl = proxies[0] + encodeURIComponent(apiUrl);
+            console.log('🔄 Using CORS proxy');
+        }
+        
+        // ✅ 5. Timeout bilan fetch
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+        const response = await fetch(fetchUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Origin': window.location.origin
+            },
+            body: JSON.stringify(requestData),
+            signal: controller.signal,
+            mode: useProxy ? 'cors' : 'no-cors'
         });
 
         clearTimeout(timeoutId);
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        console.log('📥 Response status:', response.status, response.statusText);
+        
+        // ✅ 6. Javobni o'qish
+        let resultText = await response.text();
+        console.log('📄 Raw response:', resultText);
+        
+        let result;
+        try {
+            result = JSON.parse(resultText);
+        } catch (e) {
+            console.error('❌ JSON parse error:', e);
+            throw new Error('Invalid JSON response: ' + resultText.substring(0, 100));
         }
 
-        const result = await response.json();
+        if (!response.ok) {
+            console.error('❌ HTTP error:', response.status, result);
+            throw new Error(`HTTP ${response.status}: ${result?.error || 'Server error'}`);
+        }
 
         if (result.success) {
-          // Update Firebase - deduct diamonds
-          await updateUserData({
-            diamonds: currentDiamonds - amount,
-            last_withdraw_time: new Date().toISOString(),
-            total_withdrawn: (userData.total_withdrawn || 0) + amount
-          });
+            // ✅ 7. Firebase'ni yangilash
+            await updateUserData({
+                diamonds: currentDiamonds - amount,
+                last_withdraw_time: new Date().toISOString(),
+                total_withdrawn: (userData.total_withdrawn || 0) + amount
+            });
 
-          withdrawStatus.innerHTML = `
-            <div class="text-center">
-              <div class="text-4xl mb-2">🎉</div>
-              <p class="text-green-400 font-bold">Muvaffaqiyatli!</p>
-              <p class="text-white/80 mt-1">${amount} olmos yechib olindi</p>
-              <p class="text-xs text-white/50 mt-2">Yangi balans: ${result.new_balance || 'N/A'}</p>
-            </div>
-          `;
-          
-          amountInput.value = '';
-          
-          console.log('✅ Withdrawal successful:', result);
+            withdrawStatus.innerHTML = `
+                <div class="text-center">
+                    <div class="text-4xl mb-2">🎉</div>
+                    <p class="text-green-400 font-bold">Muvaffaqiyatli!</p>
+                    <p class="text-white/80 mt-1">${amount} olmos yechib olindi</p>
+                    <p class="text-xs text-white/50 mt-2">
+                        Yangi bot balans: ${result.new_balance || 'N/A'} 💎
+                    </p>
+                    <p class="text-xs text-white/50">
+                        Web App qolgani: ${currentDiamonds - amount} 💎
+                    </p>
+                </div>
+            `;
+            
+            amountInput.value = '';
+            
+            console.log('✅ Withdrawal successful:', result);
+            
+            // ✅ 8. Balansni yangilash
+            setTimeout(() => {
+                location.reload(); // Balansni yangilash uchun
+            }, 2000);
+            
         } else {
-          throw new Error(result.error || 'API xatosi');
+            console.error('❌ API error:', result);
+            throw new Error(result.error || 'API returned failure');
         }
-      } catch (error) {
+        
+    } catch (error) {
         console.error('❌ Withdrawal error:', error);
         
         let errorMessage = 'Noma\'lum xatolik';
         if (error.name === 'AbortError') {
-          errorMessage = 'So\'rov vaqti tugadi (10 soniya)';
-        } else if (error.message.includes('Failed to fetch')) {
-          errorMessage = 'Internet aloqasi yo\'q';
+            errorMessage = 'So\'rov vaqti tugadi (15 soniya)';
+        } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            errorMessage = 'Internet aloqasi yo\'q yoki CORS muammosi';
+        } else if (error.message.includes('wrong token') || error.message.includes('Invalid key')) {
+            errorMessage = 'API kaliti noto\'g\'ri. Iltimos, admin bilan bog\'laning.';
         } else {
-          errorMessage = error.message;
+            errorMessage = error.message;
         }
         
-        withdrawStatus.innerHTML = `<p class="text-red-400">❌ Xatolik: ${errorMessage}</p>`;
-      } finally {
+        withdrawStatus.innerHTML = `
+            <div class="text-center">
+                <div class="text-3xl mb-2">❌</div>
+                <p class="text-red-400 font-bold">Xatolik!</p>
+                <p class="text-white/80 mt-1">${errorMessage}</p>
+                <p class="text-xs text-white/50 mt-2">
+                    Iltimos, qayta urinib ko'ring yoki admin bilan bog'laning.
+                </p>
+            </div>
+        `;
+        
+        // Error details for debugging
+        console.error('Full error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack
+        });
+    } finally {
         withdrawBtn.disabled = false;
         withdrawBtn.innerHTML = '<span class="text-2xl">💰</span><span>Yechib olish</span>';
         
         setTimeout(() => {
-          withdrawStatus.classList.add('hidden');
-        }, 5000);
-      }
+            withdrawStatus.classList.add('hidden');
+        }, 8000);
     }
+}
 
     document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
     document.getElementById('withdraw-btn')?.addEventListener('click', withdrawDiamonds);

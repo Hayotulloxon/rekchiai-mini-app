@@ -7,6 +7,9 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    window.process = { env: { NODE_ENV: 'production' } };
+  </script>
   <style>
     body {
       box-sizing: border-box;
@@ -239,14 +242,15 @@
    </div>
   </div>
   <script type="module">
-    // Firebase imports
+    // Firebase imports - REALTIME DATABASE
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
     // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyAFzNDoLlxHEpJOuZO8nhc-D2SmUId2dEc",
       authDomain: "rekchi-2dc2f.firebaseapp.com",
+      databaseURL: "https://rekchi-2dc2f-default-rtdb.firebaseio.com",
       projectId: "rekchi-2dc2f",
       storageBucket: "rekchi-2dc2f.firebasestorage.app",
       messagingSenderId: "352655860270",
@@ -256,7 +260,7 @@
 
     // Initialize Firebase
     const firebaseApp = initializeApp(firebaseConfig);
-    const db = getFirestore(firebaseApp);
+    const db = getDatabase(firebaseApp);
 
     const ADMIN_IDS = ['7500103239', '7104718080'];
     const AD_BLOCK_ID = '18961';
@@ -266,7 +270,6 @@
     let allUsers = [];
     let isAdmin = false;
     let AdController = null;
-    let unsubscribeUsers = null;
 
     // Initialize Telegram Web App
     function initTelegram() {
@@ -283,9 +286,9 @@
             first_name: user.first_name || 'User'
           };
           isAdmin = ADMIN_IDS.includes(currentUser.user_id);
-          console.log('Telegram user loaded:', currentUser);
+          console.log('✅ Telegram user loaded:', currentUser);
         } else {
-          console.log('No Telegram user, using test user');
+          console.log('⚠️ No Telegram user, using test user');
           currentUser = {
             user_id: 'test_' + Date.now(),
             username: 'testuser',
@@ -299,27 +302,26 @@
     function initAdsgram() {
       if (window.Adsgram) {
         AdController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
-        console.log('Adsgram initialized successfully');
+        console.log('✅ Adsgram initialized');
       } else {
-        console.log('Waiting for Adsgram...');
         setTimeout(initAdsgram, 500);
       }
     }
 
-    // Firebase Functions
+    // Firebase Realtime Database Functions
     async function loadOrCreateUser() {
       if (!currentUser) {
-        console.error('No current user');
+        console.error('❌ No current user');
         return null;
       }
 
       try {
-        console.log('Loading user from Firestore:', currentUser.user_id);
-        const userRef = doc(db, 'users', currentUser.user_id);
-        const userSnap = await getDoc(userRef);
+        console.log('📡 Loading user from Realtime Database:', currentUser.user_id);
+        const userRef = ref(db, 'users/' + currentUser.user_id);
+        const snapshot = await get(userRef);
 
-        if (!userSnap.exists()) {
-          console.log('Creating new user');
+        if (!snapshot.exists()) {
+          console.log('➕ Creating new user');
           const newUser = {
             user_id: currentUser.user_id,
             username: currentUser.username,
@@ -330,15 +332,15 @@
             created_at: new Date().toISOString()
           };
           
-          await setDoc(userRef, newUser);
-          console.log('New user created');
+          await set(userRef, newUser);
+          console.log('✅ New user created');
           return newUser;
         } else {
-          console.log('User loaded from Firestore');
-          return userSnap.data();
+          console.log('✅ User loaded');
+          return snapshot.val();
         }
       } catch (error) {
-        console.error('Error loading user:', error);
+        console.error('❌ Error loading user:', error);
         showError('Ma\'lumotlar yuklanmadi: ' + error.message);
         return null;
       }
@@ -348,12 +350,12 @@
       if (!currentUser) return false;
 
       try {
-        const userRef = doc(db, 'users', currentUser.user_id);
-        await updateDoc(userRef, updates);
-        console.log('User updated:', updates);
+        const userRef = ref(db, 'users/' + currentUser.user_id);
+        await update(userRef, updates);
+        console.log('✅ User updated:', updates);
         return true;
       } catch (error) {
-        console.error('Error updating user:', error);
+        console.error('❌ Error updating user:', error);
         return false;
       }
     }
@@ -361,22 +363,25 @@
     function subscribeToUsers() {
       if (!isAdmin) return;
 
-      const usersRef = collection(db, 'users');
-      unsubscribeUsers = onSnapshot(usersRef, (snapshot) => {
+      const usersRef = ref(db, 'users');
+      onValue(usersRef, (snapshot) => {
         allUsers = [];
-        snapshot.forEach((doc) => {
-          allUsers.push(doc.data());
-        });
-        console.log('Admin: loaded', allUsers.length, 'users');
-        updateAdminPanel();
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          Object.keys(data).forEach(key => {
+            allUsers.push(data[key]);
+          });
+          console.log('👑 Admin: loaded', allUsers.length, 'users');
+          updateAdminPanel();
+        }
       }, (error) => {
-        console.error('Error subscribing to users:', error);
+        console.error('❌ Error subscribing to users:', error);
       });
     }
 
     // Initialize App
     async function initializeAppMain() {
-      console.log('Initializing app...');
+      console.log('🚀 Initializing app...');
       
       initTelegram();
       initAdsgram();
@@ -387,18 +392,18 @@
         updateUI(user);
         
         // Subscribe to user changes
-        const userRef = doc(db, 'users', currentUser.user_id);
-        onSnapshot(userRef, (doc) => {
-          if (doc.exists()) {
-            console.log('User data updated from Firestore');
-            updateUI(doc.data());
+        const userRef = ref(db, 'users/' + currentUser.user_id);
+        onValue(userRef, (snapshot) => {
+          if (snapshot.exists()) {
+            console.log('🔄 User data updated');
+            updateUI(snapshot.val());
           }
         }, (error) => {
-          console.error('Error subscribing to user:', error);
+          console.error('❌ Error subscribing to user:', error);
         });
 
         if (isAdmin) {
-          console.log('Admin mode activated');
+          console.log('👑 Admin mode activated');
           document.getElementById('admin-panel').classList.remove('hidden');
           subscribeToUsers();
         }
@@ -406,7 +411,7 @@
 
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('content').classList.remove('hidden');
-      console.log('App initialized successfully');
+      console.log('✅ App initialized');
     }
 
     function updateUI(user) {
@@ -483,9 +488,9 @@
         
         await AdController.show();
         
-        const userRef = doc(db, 'users', currentUser.user_id);
-        const userSnap = await getDoc(userRef);
-        const userData = userSnap.data();
+        const userRef = ref(db, 'users/' + currentUser.user_id);
+        const snapshot = await get(userRef);
+        const userData = snapshot.val();
 
         const success = await updateUserData({
           diamonds: (userData.diamonds || 0) + REWARD_AMOUNT,
@@ -506,7 +511,7 @@
           throw new Error('Mukofot berishda xatolik');
         }
       } catch (error) {
-        console.error('Ad error:', error);
+        console.error('❌ Ad error:', error);
         
         if (error && error.error) {
           statusDiv.innerHTML = `<p class="text-red-400">Xatolik: ${error.description || 'Reklama yuklanmadi'}</p>`;
@@ -539,12 +544,6 @@
     } else {
       initializeAppMain();
     }
-
-    window.addEventListener('beforeunload', () => {
-      if (unsubscribeUsers) {
-        unsubscribeUsers();
-      }
-    });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9acd262f86f9dcc9',t:'MTc2NTU0MTc0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9acd33dec56eae0b',t:'MTc2NTU0MjMwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

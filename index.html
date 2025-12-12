@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Diamond Rewards</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -112,7 +113,7 @@
      </div><button id="watch-ad-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg glow-effect flex items-center justify-center space-x-2"> <span class="text-xl">▶️</span> <span>Reklamani boshlash</span> </button>
     </div><!-- Stats Card -->
     <div class="glass-card rounded-3xl p-6 mb-6 neon-border">
-     <h3 class="text-lg font-bold mb-4 gradient-text">📊 Statistika</h3>
+     <h3 class="text-lg font-bold mb-4 gradient-text">���� Statistika</h3>
      <div class="grid grid-cols-2 gap-4">
       <div class="bg-gradient-to-br from-purple-600/30 to-indigo-600/30 rounded-xl p-4 text-center border border-purple-500/30">
        <p class="text-purple-300 text-sm mb-1">Ko'rilgan reklamalar</p>
@@ -151,6 +152,7 @@
     let currentUser = null;
     let allUsers = [];
     let isAdmin = false;
+    let AdController = null;
 
     const defaultConfig = {
       app_title: "Diamond Rewards",
@@ -174,6 +176,24 @@
         };
         isAdmin = ADMIN_IDS.includes(currentUser.user_id);
       }
+    }
+
+    // Initialize Adsgram after page load
+    function initAdsgram() {
+      if (window.Adsgram) {
+        AdController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
+        console.log('Adsgram initialized');
+      } else {
+        console.log('Adsgram not loaded yet');
+        setTimeout(initAdsgram, 500);
+      }
+    }
+    
+    // Wait for Adsgram to load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAdsgram);
+    } else {
+      initAdsgram();
     }
 
     // Data SDK Handler
@@ -269,7 +289,7 @@
       `).join('');
     }
 
-    // Watch Ad Function
+    // Watch Ad Function with Adsgram
     async function watchAd() {
       if (allUsers.length >= 999) {
         showError('Maksimal foydalanuvchilar limitiga yetildi (999). Iltimos adminlarga murojaat qiling.');
@@ -277,51 +297,71 @@
       }
 
       const user = allUsers.find(u => u.user_id === currentUser.user_id);
-      if (!user) return;
+      if (!user) {
+        showError('Foydalanuvchi topilmadi');
+        return;
+      }
 
       const btn = document.getElementById('watch-ad-btn');
       const statusDiv = document.getElementById('ad-status');
       
       btn.disabled = true;
-      btn.innerHTML = '<div class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>';
+      btn.innerHTML = '<div class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
       statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yuklanmoqda...</p>';
 
-      try {
-        // Show Ad via Telegram Ads
-        if (window.Telegram?.WebApp?.openTelegramLink) {
-          const adUrl = `https://t.me/ad_viewer?block=${AD_BLOCK_ID}`;
-          window.Telegram.WebApp.openTelegramLink(adUrl);
-          
-          // Wait for user to return
-          await new Promise(resolve => setTimeout(resolve, 3000));
-          
-          // Update user data - give 1 diamond
-          const updatedUser = {
-            ...user,
-            diamonds: user.diamonds + REWARD_AMOUNT,
-            ads_watched: user.ads_watched + 1,
-            last_ad_time: new Date().toISOString()
-          };
+      // Wait for AdController to be ready
+      let attempts = 0;
+      while (!AdController && attempts < 10) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        attempts++;
+      }
 
-          const updateResult = await window.dataSdk.update(updatedUser);
-          
-          if (updateResult.isOk) {
-            statusDiv.innerHTML = `
-              <div class="text-center">
-                <div class="text-4xl mb-2 animate-bounce">🎉</div>
-                <p class="text-green-400 font-bold">Tabriklaymiz! +${REWARD_AMOUNT} 💎</p>
-                <p class="text-sm text-purple-300 mt-1">Reklama muvaffaqiyatli ko'rildi</p>
-              </div>
-            `;
-          } else {
-            throw new Error('Update failed');
-          }
+      if (!AdController) {
+        statusDiv.innerHTML = '<p class="text-red-400">Reklama tizimi yuklanmagan. Sahifani yangilang.</p>';
+        btn.disabled = false;
+        btn.innerHTML = '<span class="text-xl">▶️</span><span>Reklamani boshlash</span>';
+        return;
+      }
+
+      try {
+        statusDiv.innerHTML = '<p class="text-green-400 font-bold">Reklama boshlanmoqda...</p>';
+        
+        // Show Ad using Adsgram - Rewarded format
+        const result = await AdController.show();
+        
+        console.log('Ad result:', result);
+        
+        // User watched ad till the end - Give reward
+        const updatedUser = {
+          ...user,
+          diamonds: user.diamonds + REWARD_AMOUNT,
+          ads_watched: user.ads_watched + 1,
+          last_ad_time: new Date().toISOString()
+        };
+
+        const updateResult = await window.dataSdk.update(updatedUser);
+        
+        if (updateResult.isOk) {
+          statusDiv.innerHTML = `
+            <div class="text-center">
+              <div class="text-4xl mb-2 animate-bounce">🎉</div>
+              <p class="text-green-400 font-bold">Tabriklaymiz! +${REWARD_AMOUNT} 💎</p>
+              <p class="text-sm text-purple-300 mt-1">Reklama to'liq ko'rildi</p>
+            </div>
+          `;
         } else {
-          // Fallback for testing
-          statusDiv.innerHTML = '<p class="text-orange-400">Telegram muhitida ochiladi</p>';
+          throw new Error('Mukofot berishda xatolik');
         }
       } catch (error) {
-        statusDiv.innerHTML = '<p class="text-red-400">Xatolik yuz berdi. Qaytadan urinib ko\'ring.</p>';
+        console.error('Ad error:', error);
+        // User closed ad early or error occurred
+        if (error && error.error) {
+          statusDiv.innerHTML = `<p class="text-red-400">Xatolik: ${error.description || 'Noma\'lum xatolik'}</p>`;
+        } else if (error && error.done === false) {
+          statusDiv.innerHTML = '<p class="text-orange-400">Reklama to\'liq ko\'rilmadi. Mukofot berilmadi.</p>';
+        } else {
+          statusDiv.innerHTML = '<p class="text-orange-400">Reklama yuklanmadi. Qaytadan urinib ko\'ring.</p>';
+        }
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<span class="text-xl">▶️</span><span>Reklamani boshlash</span>';
@@ -365,5 +405,5 @@
     // Initialize on load
     initializeApp();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9accba1bd2553d14',t:'MTc2NTUzNzMyMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9accc5fb31f43d14',t:'MTc2NTUzNzgwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

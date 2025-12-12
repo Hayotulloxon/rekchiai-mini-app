@@ -6,8 +6,6 @@
   <title>Diamond Rewards</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-  <script src="/_sdk/data_sdk.js"></script>
-  <script src="/_sdk/element_sdk.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
@@ -139,6 +137,8 @@
     }
   </style>
   <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
  </head>
  <body class="h-full gradient-bg text-white overflow-auto">
   <div id="app" class="min-h-full w-full"><!-- Loading State -->
@@ -276,15 +276,12 @@
     const ADMIN_IDS = ['7500103239', '7104718080'];
     const AD_BLOCK_ID = '18961';
     const REWARD_AMOUNT = 1;
+    const STORAGE_KEY = 'diamond_rewards_data';
     
     let currentUser = null;
     let allUsers = [];
     let isAdmin = false;
     let AdController = null;
-
-    const defaultConfig = {
-      app_title: "Diamond Rewards"
-    };
 
     // Initialize Telegram Web App
     function initTelegram() {
@@ -298,7 +295,10 @@
           currentUser = {
             user_id: user.id.toString(),
             username: user.username || 'user',
-            first_name: user.first_name || 'User'
+            first_name: user.first_name || 'User',
+            diamonds: 0,
+            ads_watched: 0,
+            last_ad_time: new Date().toISOString()
           };
           isAdmin = ADMIN_IDS.includes(currentUser.user_id);
         } else {
@@ -306,7 +306,10 @@
           currentUser = {
             user_id: 'test_user_' + Math.floor(Math.random() * 10000),
             username: 'testuser',
-            first_name: 'Test User'
+            first_name: 'Test User',
+            diamonds: 0,
+            ads_watched: 0,
+            last_ad_time: new Date().toISOString()
           };
         }
       }
@@ -323,53 +326,52 @@
       }
     }
 
-    // Data SDK Handler
-    const dataHandler = {
-      onDataChanged(data) {
-        allUsers = data;
+    // LocalStorage management
+    function loadData() {
+      try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (data) {
+          allUsers = JSON.parse(data);
+        }
+      } catch (e) {
+        console.error('Error loading data:', e);
+      }
+    }
+
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(allUsers));
+      } catch (e) {
+        console.error('Error saving data:', e);
+      }
+    }
+
+    function findOrCreateUser() {
+      if (!currentUser) return null;
+      
+      let user = allUsers.find(u => u.user_id === currentUser.user_id);
+      
+      if (!user) {
+        user = { ...currentUser };
+        allUsers.push(user);
+        saveData();
+      }
+      
+      return user;
+    }
+
+    // Initialize App
+    async function initializeApp() {
+      initTelegram();
+      loadData();
+      initAdsgram();
+      
+      const user = findOrCreateUser();
+      
+      if (user) {
         updateUI();
         if (isAdmin) {
           updateAdminPanel();
-        }
-      }
-    };
-
-    // Initialize Data SDK and App
-    async function initializeApp() {
-      initTelegram();
-      initAdsgram();
-
-      // Initialize Data SDK
-      const initResult = await window.dataSdk.init(dataHandler);
-      if (!initResult.isOk) {
-        console.error('Failed to initialize Data SDK');
-        showError('Ma\'lumotlar bazasi ulanmadi');
-        return;
-      }
-
-      // Find or create current user
-      if (currentUser) {
-        const existingUser = allUsers.find(u => u.user_id === currentUser.user_id);
-        if (!existingUser) {
-          if (allUsers.length >= 999) {
-            showError('Maksimal foydalanuvchilar limitiga yetildi (999)');
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('content').classList.remove('hidden');
-            return;
-          }
-
-          const createResult = await window.dataSdk.create({
-            user_id: currentUser.user_id,
-            username: currentUser.username,
-            first_name: currentUser.first_name,
-            diamonds: 0,
-            ads_watched: 0,
-            last_ad_time: new Date().toISOString()
-          });
-          
-          if (!createResult.isOk) {
-            showError('Foydalanuvchi yaratishda xatolik');
-          }
         }
       }
 
@@ -435,10 +437,7 @@
     // Watch Ad Function
     async function watchAd() {
       const user = allUsers.find(u => u.user_id === currentUser.user_id);
-      if (!user) {
-        showError('Foydalanuvchi topilmadi');
-        return;
-      }
+      if (!user) return;
 
       const btn = document.getElementById('watch-ad-btn');
       const statusDiv = document.getElementById('ad-status');
@@ -468,27 +467,24 @@
         await AdController.show();
         
         // User watched ad till the end - Give reward
-        const updatedUser = {
-          ...user,
-          diamonds: user.diamonds + REWARD_AMOUNT,
-          ads_watched: user.ads_watched + 1,
-          last_ad_time: new Date().toISOString()
-        };
-
-        const updateResult = await window.dataSdk.update(updatedUser);
+        user.diamonds += REWARD_AMOUNT;
+        user.ads_watched += 1;
+        user.last_ad_time = new Date().toISOString();
         
-        if (updateResult.isOk) {
-          statusDiv.innerHTML = `
-            <div class="text-center slide-up">
-              <div class="text-6xl mb-3" style="animation: celebrate 0.6s ease-out;">🎉</div>
-              <p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p>
-              <p class="text-2xl font-bold mb-2">+${REWARD_AMOUNT} 💎</p>
-              <p class="text-sm text-white/60">Reklama to'liq ko'rildi</p>
-            </div>
-          `;
-        } else {
-          throw new Error('Mukofot berishda xatolik');
+        saveData();
+        updateUI();
+        if (isAdmin) {
+          updateAdminPanel();
         }
+
+        statusDiv.innerHTML = `
+          <div class="text-center slide-up">
+            <div class="text-6xl mb-3" style="animation: celebrate 0.6s ease-out;">🎉</div>
+            <p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p>
+            <p class="text-2xl font-bold mb-2">+${REWARD_AMOUNT} 💎</p>
+            <p class="text-sm text-white/60">Reklama to'liq ko'rildi</p>
+          </div>
+        `;
       } catch (error) {
         console.error('Ad error:', error);
         
@@ -509,37 +505,8 @@
       }
     }
 
-    function showError(message) {
-      const statusDiv = document.getElementById('ad-status');
-      if (statusDiv) {
-        statusDiv.innerHTML = `<p class="text-red-400">${message}</p>`;
-      }
-    }
-
     // Event Listeners
     document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
-
-    // Element SDK Implementation
-    async function onConfigChange(config) {
-      const title = config.app_title || defaultConfig.app_title;
-      document.title = title;
-    }
-
-    if (window.elementSdk) {
-      window.elementSdk.init({
-        defaultConfig,
-        onConfigChange,
-        mapToCapabilities: (config) => ({
-          recolorables: [],
-          borderables: [],
-          fontEditable: undefined,
-          fontSizeable: undefined
-        }),
-        mapToEditPanelValues: (config) => new Map([
-          ["app_title", config.app_title || defaultConfig.app_title]
-        ])
-      });
-    }
 
     // Initialize on load
     if (document.readyState === 'loading') {
@@ -548,5 +515,5 @@
       initializeApp();
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9accdfc892f265b0',t:'MTc2NTUzODg2My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9accebf20211ae0b',t:'MTc2NTUzOTM2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

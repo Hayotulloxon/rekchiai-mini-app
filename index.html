@@ -213,16 +213,16 @@
         </div>
        </div>
        <div class="h-px bg-white/10 my-3"></div>
-       <div class="flex items-center justify-between text-sm"><span class="text-white/60">Minimal yechish:</span> <span class="font-bold text-yellow-400">50 💎</span>
+       <div class="flex items-center justify-between text-sm"><span class="text-white/60">Minimal yechish:</span> <span class="font-bold text-yellow-400">1 💎</span>
        </div>
       </div><!-- Withdraw Input -->
       <div class="mb-5"><label for="withdraw-amount" class="block text-sm text-white/60 mb-2">Yechish miqdori</label>
-       <div class="relative"><input type="number" id="withdraw-amount" placeholder="0" min="1" step="10" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg font-bold focus:outline-none focus:border-green-500/50 focus:ring-2 focus:ring-green-500/20 transition-all">
+       <div class="relative"><input type="number" id="withdraw-amount" placeholder="0" min="1" step="1" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg font-bold focus:outline-none focus:border-green-500/50 focus:ring-2 focus:ring-green-500/20 transition-all">
         <div class="absolute right-5 top-1/2 -translate-y-1/2 text-2xl">
          💎
         </div>
        </div>
-       <p class="text-xs text-white/40 mt-2">1 olmos = 1 so'm</p>
+       <p class="text-xs text-white/40 mt-2">Olmoslaringizni yechib oling</p>
       </div><!-- Withdraw Status -->
       <div id="withdraw-status" class="hidden bg-white/5 border border-white/10 rounded-2xl p-4 mb-5 text-center text-sm"></div><!-- Withdraw Button --> <button id="withdraw-btn" class="btn-primary w-full text-white font-bold py-5 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed"> <span class="text-2xl">💰</span> <span>Yechib olish</span> </button>
      </div><!-- Admin Panel -->
@@ -461,7 +461,7 @@
       
       // Update withdraw button state
       const withdrawBtn = document.getElementById('withdraw-btn');
-      if (diamonds < 50) {
+      if (diamonds < 1) {
         withdrawBtn.disabled = true;
       } else {
         withdrawBtn.disabled = false;
@@ -587,9 +587,9 @@
       const amount = parseInt(amountInput.value);
 
       // Validation
-      if (!amount || amount < 50) {
+      if (!amount || amount < 1) {
         withdrawStatus.classList.remove('hidden');
-        withdrawStatus.innerHTML = '<p class="text-orange-400">❌ Minimal yechish 50 olmos</p>';
+        withdrawStatus.innerHTML = '<p class="text-orange-400">❌ Minimal yechish 1 olmos</p>';
         setTimeout(() => withdrawStatus.classList.add('hidden'), 3000);
         return;
       }
@@ -680,5 +680,5 @@
       initializeAppMain();
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ace4ed3d1b43d14',t:'MTc2NTU1Mzg5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ace57bda2b93d14',t:'MTc2NTU1NDI2Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

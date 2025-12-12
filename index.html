@@ -614,15 +614,18 @@
       withdrawStatus.innerHTML = '<p class="text-yellow-400">⏳ Yechilmoqda...</p>';
 
       try {
-        // Call external API with AbortController for timeout
+        // Call external API with CORS Proxy
         const apiUrl = 'https://68ed1ab05ca4e.myxvest1.ru/Test/add_balance.php';
         const apiKey = '4564123:hkjhfadfhieapkdnga';
         
-        // ✅ To'g'ri timeout qo'llash
+        // ✅ CORS Proxy qo'shildi
+        const corsProxy = 'https://corsproxy.io/?';
+        const fullUrl = corsProxy + encodeURIComponent(apiUrl);
+        
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-        const response = await fetch(apiUrl, {
+        const response = await fetch(fullUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -634,10 +637,10 @@
             type: 'diamonds',
             description: "Reklama ko'rib topgan"
           }),
-          signal: controller.signal  // ✅ To'g'ri signal
+          signal: controller.signal
         });
 
-        clearTimeout(timeoutId); // Timeout ni tozalash
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -700,5 +703,5 @@
       initializeAppMain();
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ace6f80217768ec',t:'MTc2NTU1NTIzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ace76aa45f668ec',t:'MTc2NTU1NTUyOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

@@ -65,6 +65,29 @@
             from { transform: translateY(10px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+        
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            min-width: 300px;
+            max-width: 90%;
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .notification.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
     </style>
 </head>
 <body class="h-full gradient-bg text-white overflow-auto">
@@ -205,10 +228,13 @@
             
             <!-- Footer -->
             <div class="text-center py-6 pb-8">
-                <p class="text-white/30 text-xs">Diamond Rewards • v2.0</p>
+                <p class="text-white/30 text-xs">Diamond Rewards • v3.0</p>
             </div>
         </div>
     </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification hidden"></div>
 
     <script type="module">
         // Firebase imports
@@ -303,8 +329,12 @@
                 try {
                     AdController = window.Adsgram.init({ 
                         blockId: AD_BLOCK_ID,
-                        onReward: () => console.log('✅ Reklama mukofoti berildi'),
-                        onClose: () => console.log('❌ Reklama yopildi')
+                        onReward: () => {
+                            console.log('✅ Reklama mukofoti berildi');
+                        },
+                        onClose: () => {
+                            console.log('❌ Reklama yopildi');
+                        }
                     });
                     console.log('✅ Adsgram ishga tushdi');
                 } catch (error) {
@@ -413,11 +443,11 @@
 
             // Avatar
             const avatar = document.getElementById('user-avatar');
-            const initials = user.first_name.charAt(0).toUpperCase();
+            const initials = user.first_name ? user.first_name.charAt(0).toUpperCase() : 'U';
             avatar.textContent = initials;
             
             // User info
-            document.getElementById('user-name').textContent = user.first_name;
+            document.getElementById('user-name').textContent = user.first_name || user.username || 'Foydalanuvchi';
             document.getElementById('user-id').textContent = `ID: ${user.user_id}`;
             
             // Stats
@@ -451,6 +481,31 @@
             `;
         }
 
+        // Notification system
+        function showNotification(message, type = 'info', duration = 3000) {
+            const container = document.getElementById('notification-container');
+            container.innerHTML = '';
+            container.className = `notification ${type} rounded-xl p-4 text-white font-medium shadow-lg`;
+            
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✅';
+            else if (type === 'error') icon = '❌';
+            else if (type === 'warning') icon = '⚠️';
+            
+            container.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <span class="text-xl">${icon}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            container.classList.remove('hidden');
+            
+            setTimeout(() => {
+                container.classList.add('hidden');
+            }, duration);
+        }
+
         // Reklama ko'rish
         async function watchAd() {
             if (!currentUser) {
@@ -459,7 +514,7 @@
             }
             
             if (adCooldown) {
-                showNotification('Iltimos, biroz kuting...', 'warning');
+                showNotification('Iltimos, biroz kuting (30 soniya)', 'warning');
                 return;
             }
 
@@ -540,141 +595,144 @@
             }
         }
 
-        // Notification function
-        function showNotification(message, type = 'info') {
-            // Simple alert for now
-            if (type === 'error') {
-                console.error('❌ ' + message);
-            } else if (type === 'success') {
-                console.log('✅ ' + message);
-            } else {
-                console.log('ℹ️ ' + message);
-            }
-        }
-
-        // ✅ YANGILANGAN: Withdrawal function
-        // ✅ YANGILANGAN: Withdrawal function
-async function withdrawDiamonds(userId, amount) {
-    console.log('🔄 Yechish boshlandi:', { userId, amount });
-    
-    if (!userId) {
-        return {
-            success: false,
-            message: 'Foydalanuvchi ID si topilmadi'
-        };
-    }
-    
-    if (!amount || amount < 1) {
-        return {
-            success: false,
-            message: 'Kamida 1 olmos kiriting'
-        };
-    }
-    
-    try {
-        // To'g'ridan-to'g'ri POST so'rov
-        const formData = new FormData();
-        formData.append('key', API_KEY);
-        formData.append('user_id', userId);
-        formData.append('amount', amount);
-        formData.append('action', 'withdraw'); // ✅ YANGI: action parametri
-        formData.append('username', currentUser.username || 'user');
-        formData.append('first_name', currentUser.first_name || 'Foydalanuvchi');
-        
-        console.log('📤 POST ma\'lumotlari:');
-        for (let pair of formData.entries()) {
-            console.log(`  ${pair[0]}: ${pair[1]}`);
-        }
-        
-        // Fetch so'rovi
-        const response = await fetch(WITHDRAW_API_URL, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json',
-            }
-        });
-        
-        console.log('📥 Javob holati:', response.status);
-        
-        // Javobni o'qish
-        const responseText = await response.text();
-        console.log('📄 Javob:', responseText.substring(0, 300));
-        
-        if (!response.ok) {
-            console.error('❌ HTTP xatosi:', response.status);
+        // ✅ YAXSHILANGAN: Withdrawal function
+        async function withdrawDiamonds(userId, amount) {
+            console.log('🔄 Yechish boshlandi:', { userId, amount });
             
-            return {
-                success: false,
-                message: `Server xatosi (${response.status})`,
-                status_code: response.status
-            };
-        }
-        
-        // JSON ni parse qilish
-        try {
-            const result = JSON.parse(responseText);
-            return result;
-        } catch (jsonError) {
-            console.error('❌ JSON parse xatosi:', jsonError);
-            
-            // Agar JSON bo'lmasa ham, muvaffaqiyatli deb hisoblash
-            if (responseText.includes('success') || responseText.includes('olmos')) {
-                return {
-                    success: true,
-                    message: 'Olmos yechib olindi!',
-                    raw_response: responseText.substring(0, 200)
-                };
-            }
-            
-            return {
-                success: false,
-                message: 'Server javobini o\'qib bo\'lmadi',
-                raw_response: responseText
-            };
-        }
-        
-    } catch (error) {
-        console.error('❌ Withdrawal xatosi:', error);
-        
-        // Offline rejim uchun Firebase bilan ishlash
-        try {
-            const userRef = ref(db, 'users/' + userId);
-            const snapshot = await get(userRef);
-            const userData = snapshot.val();
-            const currentBalance = userData?.diamonds || 0;
-            
-            if (currentBalance >= amount) {
-                const newBalance = currentBalance - amount;
-                
-                await update(userRef, {
-                    diamonds: newBalance,
-                    last_withdrawal: new Date().toISOString()
-                });
-                
-                return {
-                    success: true,
-                    message: 'Olmos yechib olindi! (Local rejim)',
-                    new_balance: newBalance,
-                    offline: true
-                };
-            } else {
+            if (!userId) {
                 return {
                     success: false,
-                    message: `Local: Yetarli olmos yo'q! Sizda: ${currentBalance} olmos`
+                    message: 'Foydalanuvchi ID si topilmadi'
                 };
             }
-        } catch (firebaseError) {
-            console.error('❌ Firebase xatosi:', firebaseError);
             
-            return {
-                success: false,
-                message: 'Internet aloqasi va lokal saqlashda xatolik',
-                error: error.message
-            };
+            if (!amount || amount < 1) {
+                return {
+                    success: false,
+                    message: 'Kamida 1 olmos kiriting'
+                };
+            }
+            
+            try {
+                // Firebase dan joriy balansni olish
+                const userRef = ref(db, 'users/' + userId);
+                const snapshot = await get(userRef);
+                const userData = snapshot.val();
+                const currentBalance = userData?.diamonds || 0;
+                
+                if (currentBalance < amount) {
+                    return {
+                        success: false,
+                        message: `Yeterli olmos yo'q! Sizda: ${currentBalance} olmos, Talab: ${amount} olmos`
+                    };
+                }
+                
+                // API ga GET so'rovi
+                const params = new URLSearchParams({
+                    key: API_KEY,
+                    user_id: userId,
+                    amount: amount,
+                    action: 'withdraw'
+                });
+                
+                const apiUrl = `${WITHDRAW_API_URL}?${params.toString()}`;
+                console.log('📤 API URL:', apiUrl);
+                
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                    mode: 'cors'
+                });
+                
+                console.log('📥 Javob holati:', response.status);
+                
+                let result;
+                try {
+                    const responseText = await response.text();
+                    console.log('📄 Javob:', responseText.substring(0, 500));
+                    
+                    if (responseText.includes('{') && responseText.includes('}')) {
+                        result = JSON.parse(responseText);
+                    } else {
+                        // Agar JSON bo'lmasa ham, muvaffaqiyatli deb hisoblash
+                        result = {
+                            success: responseText.includes('success') || responseText.includes('olmos'),
+                            message: responseText,
+                            raw_response: responseText.substring(0, 200)
+                        };
+                    }
+                } catch (parseError) {
+                    console.error('❌ Parse xatosi:', parseError);
+                    result = {
+                        success: response.ok,
+                        message: response.ok ? 'Olmos yechib olindi!' : 'Server xatosi'
+                    };
+                }
+                
+                // Agar API muvaffaqiyatli bo'lsa, Firebase balansni yangilash
+                if (result.success) {
+                    const newBalance = result.new_balance || (currentBalance - amount);
+                    
+                    await update(userRef, {
+                        diamonds: newBalance,
+                        last_withdrawal: new Date().toISOString()
+                    });
+                    
+                    return {
+                        success: true,
+                        message: result.message || 'Olmos yechib olindi!',
+                        new_balance: newBalance
+                    };
+                } else {
+                    return {
+                        success: false,
+                        message: result.message || 'API xatosi'
+                    };
+                }
+                
+            } catch (error) {
+                console.error('❌ Withdrawal xatosi:', error);
+                
+                // Fallback: Firebase bilan ishlash
+                try {
+                    const userRef = ref(db, 'users/' + userId);
+                    const snapshot = await get(userRef);
+                    const userData = snapshot.val();
+                    const currentBalance = userData?.diamonds || 0;
+                    
+                    if (currentBalance >= amount) {
+                        const newBalance = currentBalance - amount;
+                        
+                        await update(userRef, {
+                            diamonds: newBalance,
+                            last_withdrawal: new Date().toISOString()
+                        });
+                        
+                        return {
+                            success: true,
+                            message: 'Olmos yechib olindi! (Offline rejim)',
+                            new_balance: newBalance,
+                            offline: true
+                        };
+                    } else {
+                        return {
+                            success: false,
+                            message: `Yeterli olmos yo'q! Sizda: ${currentBalance} olmos`
+                        };
+                    }
+                } catch (firebaseError) {
+                    console.error('❌ Firebase xatosi:', firebaseError);
+                    
+                    return {
+                        success: false,
+                        message: 'Internet aloqasi va lokal saqlashda xatolik',
+                        error: error.message
+                    };
+                }
+            }
         }
-    }
-}
 
         // Withdraw button handler
         document.getElementById('withdraw-btn').addEventListener('click', async function() {
@@ -683,12 +741,12 @@ async function withdrawDiamonds(userId, amount) {
             const amount = parseInt(amountInput.value);
             
             if (!userId) {
-                alert('Foydalanuvchi topilmadi');
+                showNotification('Foydalanuvchi topilmadi', 'error');
                 return;
             }
             
             if (!amount || amount < 1) {
-                alert('Kamida 1 olmos kiriting');
+                showNotification('Kamida 1 olmos kiriting', 'warning');
                 amountInput.focus();
                 return;
             }
@@ -702,12 +760,12 @@ async function withdrawDiamonds(userId, amount) {
                 currentBalance = userData?.diamonds || 0;
                 
                 if (currentBalance < amount) {
-                    alert(`❌ Yetarli olmos yo'q!\n\nSizda: ${currentBalance} olmos\nKerak: ${amount} olmos`);
+                    showNotification(`❌ Yetarli olmos yo'q!\nSizda: ${currentBalance} olmos\nKerak: ${amount} olmos`, 'error');
                     return;
                 }
             } catch (error) {
                 console.error('❌ Balans tekshirish xatosi:', error);
-                alert('Balansni tekshirishda xatolik');
+                showNotification('Balansni tekshirishda xatolik', 'error');
                 return;
             }
             
@@ -732,39 +790,10 @@ async function withdrawDiamonds(userId, amount) {
                         <p class="text-sm mb-2">${result.message || 'Olmos yechib olindi'}</p>
                         ${result.new_balance !== undefined ? 
                           `<p class="text-xs text-white/60">Yangi balans: <span class="font-bold">${result.new_balance} 💎</span></p>` : ''}
-                        ${result.transaction_id || result.withdrawal_id ? 
-                          `<p class="text-xs text-white/40 mt-1">ID: ${result.transaction_id || result.withdrawal_id}</p>` : ''}
                     </div>
                 `;
                 
-                // Firebase balansni yangilash
-                if (result.new_balance !== undefined) {
-                    try {
-                        const userRef = ref(db, 'users/' + userId);
-                        await update(userRef, {
-                            diamonds: result.new_balance,
-                            last_withdrawal: new Date().toISOString()
-                        });
-                        
-                        console.log('✅ Firebase balans yangilandi:', result.new_balance);
-                    } catch (error) {
-                        console.error('❌ Firebase yangilash xatosi:', error);
-                    }
-                } else {
-                    // Agar new_balance kelmasa, hisoblab chiqamiz
-                    const newBalance = currentBalance - amount;
-                    try {
-                        const userRef = ref(db, 'users/' + userId);
-                        await update(userRef, {
-                            diamonds: newBalance,
-                            last_withdrawal: new Date().toISOString()
-                        });
-                        console.log('✅ Firebase balans yangilandi (hisoblab):', newBalance);
-                    } catch (error) {
-                        console.error('❌ Firebase yangilash xatosi:', error);
-                    }
-                }
-                
+                showNotification('Olmos muvaffaqiyatli yechib olindi!', 'success');
                 amountInput.value = '';
                 
             } else {
@@ -773,9 +802,9 @@ async function withdrawDiamonds(userId, amount) {
                         <div class="text-3xl mb-2">❌</div>
                         <p class="text-red-400 font-bold text-sm mb-1">Xatolik</p>
                         <p class="text-sm mb-2">${result.message || 'Noma\'lum xatolik'}</p>
-                        ${result.error ? `<p class="text-xs text-white/50">${result.error}</p>` : ''}
                     </div>
                 `;
+                showNotification(result.message || 'Xatolik yuz berdi', 'error');
             }
             
             btn.disabled = false;
@@ -808,8 +837,9 @@ async function withdrawDiamonds(userId, amount) {
             initializeAppMain();
         }
 
-        // Global function for error display
+        // Global functions
         window.showErrorMessage = showErrorMessage;
+        window.showNotification = showNotification;
     </script>
 </body>
 </html>

@@ -135,22 +135,38 @@
             box-shadow: 0 6px 20px rgba(0, 150, 255, 0.4);
         }
         
-        .avatar-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            display: block;
+        /* Perfect circular avatar container */
+        .avatar-container {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(135deg, #0096ff, #0066cc);
         }
         
-        .avatar-placeholder {
+        /* Avatar image that fills the circle */
+        .avatar-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: cover;
+        }
+        
+        /* Gradient avatar when no image */
+        .gradient-avatar {
             width: 100%;
             height: 100%;
+            background: linear-gradient(135deg, #0096ff, #0066cc);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-            border: 2px solid rgba(255, 255, 255, 0.1);
         }
         
         .input-field {
@@ -221,32 +237,33 @@
             color: white;
         }
         
-        /* Perfect circular image */
-        .circular-avatar {
-            border-radius: 50%;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .circular-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
-        
-        /* Smooth image loading */
+        /* Loading animation for avatar */
         .avatar-loading {
             background: linear-gradient(90deg, #2d2d2d 25%, #3d3d3d 50%, #2d2d2d 75%);
             background-size: 200% 100%;
             animation: loading 1.5s infinite;
+            border-radius: 50%;
         }
         
         @keyframes loading {
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
+        }
+        
+        /* Shine effect for avatar */
+        .avatar-shine::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .avatar-shine:hover::after {
+            left: 100%;
         }
     </style>
 </head>
@@ -292,7 +309,7 @@
                 <!-- User Profile Card -->
                 <div class="app-card p-5 slide-up">
                     <div class="flex items-center space-x-4">
-                        <div id="user-avatar" class="w-16 h-16 rounded-full flex items-center justify-center user-avatar">
+                        <div id="user-avatar" class="avatar-container user-avatar avatar-shine">
                             <!-- Avatar image will be loaded from Telegram -->
                         </div>
                         <div class="flex-1">
@@ -747,35 +764,23 @@
         function updateUI(user) {
             if (!user) return;
 
-            // Update avatar - to'liq dumaloq ichida
+            // Update avatar - butun aylanaga to'liq tushishi
             const avatarDiv = document.getElementById('user-avatar');
             
-            // Avval loading state
-            avatarDiv.innerHTML = `
-                <div class="circular-avatar avatar-loading"></div>
-            `;
-            
-            // Keyin rasmni yuklash
-            setTimeout(() => {
-                if (user.photo_url) {
-                    // Rasmini to'liq dumaloq ichiga sig'dirish
-                    avatarDiv.innerHTML = `
-                        <div class="circular-avatar">
-                            <img src="${user.photo_url}" 
-                                 alt="${user.first_name || 'Foydalanuvchi'}" 
-                                 class="avatar-image"
-                                 onload="this.parentElement.classList.remove('avatar-loading')"
-                                 onerror="this.onerror=null; this.parentElement.outerHTML='<div class=\"circular-avatar\" style=\"background: linear-gradient(135deg, #0096ff, #0066cc);\"></div>';">
-                        </div>
-                    `;
-                } else {
-                    // Gradient avatar yaratish
-                    avatarDiv.innerHTML = `
-                        <div class="circular-avatar" style="background: linear-gradient(135deg, #0096ff, #0066cc);">
-                        </div>
-                    `;
-                }
-            }, 300);
+            if (user.photo_url) {
+                // Rasmini butun aylanaga to'liq tushishi uchun
+                avatarDiv.innerHTML = `
+                    <img src="${user.photo_url}" 
+                         alt="${user.first_name || 'Foydalanuvchi'}" 
+                         class="avatar-image"
+                         onload="this.style.opacity='1'"
+                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\"gradient-avatar\"></div>'"
+                         style="opacity:0; transition: opacity 0.3s ease;">
+                `;
+            } else {
+                // Gradient avatar yaratish
+                avatarDiv.innerHTML = '<div class="gradient-avatar"></div>';
+            }
             
             // Update user info
             document.getElementById('user-name').textContent = user.first_name || 'Foydalanuvchi';
@@ -824,8 +829,9 @@
                                     ${user.photo_url ? 
                                         `<img src="${user.photo_url}" alt="${user.first_name}" 
                                              class="w-full h-full object-cover"
-                                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\"w-full h-full bg-gradient-to-br from-blue-500/20 to-blue-700/20\"></div>'">` :
-                                        `<div class="w-full h-full bg-gradient-to-br from-blue-500/20 to-blue-700/20"></div>`
+                                             style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); min-width:100%; min-height:100%;"
+                                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\"w-full h-full bg-gradient-to-br from-blue-500/20 to-blue-700/20 rounded-full\"></div>'">` :
+                                        `<div class="w-full h-full bg-gradient-to-br from-blue-500/20 to-blue-700/20 rounded-full"></div>`
                                     }
                                 </div>
                                 <div>

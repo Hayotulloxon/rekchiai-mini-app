@@ -77,17 +77,6 @@
             filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.8));
         }
         
-        .stat-card {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        }
-        
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
@@ -113,6 +102,17 @@
         .withdraw-error {
             background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(185, 28, 28, 0.15));
             border-color: rgba(239, 68, 68, 0.3);
+        }
+        
+        .user-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .avatar-placeholder {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
@@ -158,12 +158,13 @@
                 <!-- User Profile Card -->
                 <div class="app-card p-5 slide-up">
                     <div class="flex items-center space-x-4">
-                        <div id="user-avatar" class="w-16 h-16 bg-gradient-to-br from-white/20 to-white/5 rounded-2xl flex items-center justify-center text-2xl font-bold border border-white/20">
-                            👤
+                        <div id="user-avatar" class="w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden user-avatar">
+                            <!-- Avatar image or placeholder will be inserted here -->
                         </div>
                         <div class="flex-1">
                             <h3 id="user-name" class="font-bold text-lg">Foydalanuvchi</h3>
                             <p id="user-id" class="text-white/50 text-sm">ID: Loading...</p>
+                            <p id="user-username" class="text-white/60 text-xs mt-1">@username</p>
                         </div>
                     </div>
                 </div>
@@ -196,34 +197,6 @@
                         <span class="text-2xl">▶️</span>
                         <span>Reklamani boshlash</span>
                     </button>
-                </div>
-
-                <!-- Stats Section -->
-                <div class="app-card p-6 slide-up" style="animation-delay: 0.2s;">
-                    <div class="flex items-center space-x-2 mb-5">
-                        <div class="text-2xl">
-                            📊
-                        </div>
-                        <h3 class="text-xl font-bold">Statistika</h3>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="stat-card rounded-2xl p-5 text-center">
-                            <div class="text-3xl mb-2">
-                                🎬
-                            </div>
-                            <p class="text-white/60 text-xs mb-2">Ko'rilgan</p>
-                            <p id="ads-watched" class="text-3xl font-bold">0</p>
-                            <p class="text-white/40 text-xs mt-1">reklamalar</p>
-                        </div>
-                        <div class="stat-card rounded-2xl p-5 text-center">
-                            <div class="text-3xl mb-2 diamond-icon">
-                                💎
-                            </div>
-                            <p class="text-white/60 text-xs mb-2">Jami</p>
-                            <p id="total-diamonds" class="text-3xl font-bold">0</p>
-                            <p class="text-white/40 text-xs mt-1">olmoslar</p>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Withdraw Section -->
@@ -374,7 +347,10 @@
                     currentUser = {
                         user_id: user.id.toString(),
                         username: user.username || 'user',
-                        first_name: user.first_name || 'User'
+                        first_name: user.first_name || 'User',
+                        last_name: user.last_name || '',
+                        photo_url: user.photo_url || null,
+                        language_code: user.language_code || 'uz'
                     };
                     isAdmin = ADMIN_IDS.includes(currentUser.user_id);
                     console.log('✅ Telegram user loaded:', currentUser);
@@ -383,7 +359,10 @@
                     currentUser = {
                         user_id: 'test_' + Date.now(),
                         username: 'testuser',
-                        first_name: 'Test User'
+                        first_name: 'Test User',
+                        last_name: '',
+                        photo_url: null,
+                        language_code: 'uz'
                     };
                 }
             }
@@ -417,6 +396,9 @@
                         user_id: currentUser.user_id,
                         username: currentUser.username,
                         first_name: currentUser.first_name,
+                        last_name: currentUser.last_name,
+                        photo_url: currentUser.photo_url,
+                        language_code: currentUser.language_code,
                         diamonds: 0,
                         ads_watched: 0,
                         last_ad_time: new Date().toISOString(),
@@ -508,16 +490,31 @@
         function updateUI(user) {
             if (!user) return;
 
-            const initials = user.first_name.charAt(0).toUpperCase();
-            document.getElementById('user-avatar').textContent = initials;
+            // Update avatar
+            const avatarDiv = document.getElementById('user-avatar');
+            if (user.photo_url) {
+                // Telegram profil rasmni yuklash
+                avatarDiv.innerHTML = `
+                    <img src="${user.photo_url}" 
+                         alt="${user.first_name}" 
+                         class="w-full h-full object-cover"
+                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center text-2xl font-bold bg-gradient-to-br from-white/20 to-white/5 avatar-placeholder\'>${user.first_name.charAt(0).toUpperCase()}</div>'">
+                `;
+            } else {
+                // Rasm yo'q bo'lsa, initial harf
+                const initials = user.first_name.charAt(0).toUpperCase();
+                avatarDiv.innerHTML = `<div class="w-full h-full flex items-center justify-center text-2xl font-bold bg-gradient-to-br from-white/20 to-white/5 avatar-placeholder">${initials}</div>`;
+            }
+            
+            // Update user info
             document.getElementById('user-name').textContent = user.first_name;
             document.getElementById('user-id').textContent = `ID: ${user.user_id}`;
+            document.getElementById('user-username').textContent = `@${user.username || 'nousername'}`;
             
+            // Update diamond count
             const diamonds = user.diamonds || 0;
             document.getElementById('diamond-count').textContent = diamonds;
-            document.getElementById('total-diamonds').textContent = diamonds;
             document.getElementById('withdraw-diamonds').textContent = diamonds;
-            document.getElementById('ads-watched').textContent = user.ads_watched || 0;
             
             // Update withdraw button state
             const withdrawBtn = document.getElementById('withdraw-btn');
@@ -552,9 +549,14 @@
                     <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 bg-gradient-to-br from-white/20 to-white/5 rounded-xl flex items-center justify-center text-sm font-bold border border-white/20">
-                                    ${user.first_name?.charAt(0).toUpperCase() || 'U'}
-                                </div>
+                                ${user.photo_url ? 
+                                    `<div class="w-10 h-10 rounded-xl overflow-hidden">
+                                        <img src="${user.photo_url}" alt="${user.first_name}" class="w-full h-full object-cover">
+                                    </div>` :
+                                    `<div class="w-10 h-10 bg-gradient-to-br from-white/20 to-white/5 rounded-xl flex items-center justify-center text-sm font-bold border border-white/20">
+                                        ${user.first_name?.charAt(0).toUpperCase() || 'U'}
+                                    </div>`
+                                }
                                 <div>
                                     <p class="font-bold text-sm">${user.first_name || 'Foydalanuvchi'}</p>
                                     <p class="text-xs text-white/50">@${user.username || 'nousername'}</p>

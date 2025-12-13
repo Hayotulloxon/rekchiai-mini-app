@@ -11,7 +11,6 @@
         window.process = { env: { NODE_ENV: 'production' } };
     </script>
     <style>
-        /* Sizning CSS kodingiz o'zgartirilmagan */
         body {
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
@@ -319,31 +318,93 @@
         let isAdmin = false;
         let AdController = null;
 
-        // Initialize Telegram Web App
+        // ✅ YANGILANGAN: Telegram Web App ni tekshirish
         function initTelegram() {
+            console.log("🔍 Initializing Telegram WebApp...");
+            
             if (window.Telegram?.WebApp) {
-                window.Telegram.WebApp.ready();
-                window.Telegram.WebApp.expand();
-                const tg = window.Telegram.WebApp;
-                const user = tg.initDataUnsafe?.user;
+                console.log("✅ Telegram WebApp found");
                 
-                if (user) {
+                const tg = window.Telegram.WebApp;
+                
+                try {
+                    tg.ready();
+                    tg.expand();
+                    
+                    console.log("📱 Telegram WebApp initialized");
+                    console.log("📊 Platform:", tg.platform);
+                    console.log("🔧 Version:", tg.version);
+                    console.log("🌐 Init data:", tg.initData);
+                    
+                    // User ma'lumotlarini olish
+                    const user = tg.initDataUnsafe?.user;
+                    console.log("👤 User from initDataUnsafe:", user);
+                    
+                    if (user && user.id) {
+                        console.log("✅ Telegram user ID found:", user.id);
+                        currentUser = {
+                            user_id: user.id.toString(),
+                            username: user.username || 'user_' + user.id,
+                            first_name: user.first_name || 'User ' + user.id,
+                            telegram_id: user.id
+                        };
+                        
+                        isAdmin = ADMIN_IDS.includes(currentUser.user_id);
+                        console.log('✅ Telegram user loaded:', currentUser);
+                        
+                        // Telegram orqali kirganligini log qilish
+                        if (user.username) {
+                            console.log(`✅ User logged in via Telegram: @${user.username}`);
+                        }
+                    } else {
+                        console.log("⚠️ Telegram user not found in initDataUnsafe");
+                        console.log("🔍 Available initDataUnsafe keys:", Object.keys(tg.initDataUnsafe || {}));
+                        
+                        // Agar Telegram dan user olmasa, test user
+                        createTestUser();
+                    }
+                } catch (error) {
+                    console.error("❌ Telegram initialization error:", error);
+                    createTestUser();
+                }
+            } else {
+                console.log("❌ Telegram WebApp not found in window object");
+                createTestUser();
+            }
+            
+            // Debug uchun: LocalStorage dan user_id ni olish
+            const storedUserId = localStorage.getItem('test_user_id');
+            if (storedUserId) {
+                console.log("📝 Stored test user ID:", storedUserId);
+                if (!currentUser || !currentUser.user_id) {
                     currentUser = {
-                        user_id: user.id.toString(),
-                        username: user.username || 'user',
-                        first_name: user.first_name || 'User'
-                    };
-                    isAdmin = ADMIN_IDS.includes(currentUser.user_id);
-                    console.log('✅ Telegram user loaded:', currentUser);
-                } else {
-                    console.log('⚠️ No Telegram user, using test user');
-                    currentUser = {
-                        user_id: 'test_' + Date.now(),
+                        user_id: storedUserId,
                         username: 'testuser',
                         first_name: 'Test User'
                     };
+                    console.log("✅ Using stored test user:", currentUser);
                 }
             }
+        }
+        
+        function createTestUser() {
+            console.log("🔄 Creating test user...");
+            const urlParams = new URLSearchParams(window.location.search);
+            let testUserId = urlParams.get('user_id');
+            
+            if (!testUserId) {
+                testUserId = 'test_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+                localStorage.setItem('test_user_id', testUserId);
+                console.log("🆕 Generated new test user ID:", testUserId);
+            }
+            
+            currentUser = {
+                user_id: testUserId,
+                username: 'testuser',
+                first_name: 'Test User'
+            };
+            
+            console.log("✅ Test user created:", currentUser);
         }
 
         // Initialize Adsgram
@@ -358,8 +419,9 @@
 
         // Firebase Realtime Database Functions
         async function loadOrCreateUser() {
-            if (!currentUser) {
-                console.error('❌ No current user');
+            if (!currentUser || !currentUser.user_id) {
+                console.error('❌ No current user or user_id is empty!');
+                console.log('Current user object:', currentUser);
                 return null;
             }
 
@@ -369,22 +431,23 @@
                 const snapshot = await get(userRef);
 
                 if (!snapshot.exists()) {
-                    console.log('➕ Creating new user');
+                    console.log('➕ Creating new user in Firebase');
                     const newUser = {
                         user_id: currentUser.user_id,
                         username: currentUser.username,
                         first_name: currentUser.first_name,
-                        diamonds: 0,
+                        diamonds: 100, // Test uchun 100 olmos beramiz
                         ads_watched: 0,
                         last_ad_time: new Date().toISOString(),
-                        created_at: new Date().toISOString()
+                        created_at: new Date().toISOString(),
+                        last_login: new Date().toISOString()
                     };
                     
                     await set(userRef, newUser);
-                    console.log('✅ New user created');
+                    console.log('✅ New user created in Firebase');
                     return newUser;
                 } else {
-                    console.log('✅ User loaded');
+                    console.log('✅ User loaded from Firebase');
                     return snapshot.val();
                 }
             } catch (error) {
@@ -430,9 +493,16 @@
         // Initialize App
         async function initializeAppMain() {
             console.log('🚀 Initializing app...');
+            console.log('🔧 Current user before init:', currentUser);
             
             initTelegram();
             initAdsgram();
+
+            if (!currentUser || !currentUser.user_id) {
+                console.error('❌ Fatal: currentUser or user_id is still empty!');
+                showError('Foydalanuvchi ma\'lumotlari topilmadi. Sahifani yangilang.');
+                return;
+            }
 
             const user = await loadOrCreateUser();
             
@@ -480,9 +550,13 @@
             const withdrawBtn = document.getElementById('withdraw-btn');
             if (diamonds < 1) {
                 withdrawBtn.disabled = true;
+                withdrawBtn.title = "Yechish uchun kamida 1 olmos kerak";
             } else {
                 withdrawBtn.disabled = false;
+                withdrawBtn.title = "Olmoslarni yechib olish";
             }
+            
+            console.log('🔄 UI updated with diamonds:', diamonds);
         }
 
         function updateAdminPanel() {
@@ -597,76 +671,137 @@
 
         // ✅ YANGILANGAN: Yechib olish funksiyasi
         async function withdrawDiamonds(userId, amount) {
-            console.log('🔄 Withdraw started:', { userId, amount });
+            console.log('🔄 Withdraw started:', { 
+                userId, 
+                amount,
+                currentUser: currentUser,
+                timestamp: new Date().toISOString()
+            });
+            
+            // User ID ni tekshirish
+            if (!userId || userId === '') {
+                console.error('❌ User ID is empty!');
+                console.log('Available currentUser:', currentUser);
+                return {
+                    success: false,
+                    message: '❌ Foydalanuvchi ID si topilmadi. Iltimos, Telegram orqali qayta kirib ko\'ring.',
+                    error: 'Empty user_id'
+                };
+            }
+            
+            // Amount ni tekshirish
+            if (!amount || amount < 1) {
+                return {
+                    success: false,
+                    message: '❌ Iltimos, to\'g\'ri miqdor kiriting (kamida 1 olmos)',
+                    error: 'Invalid amount'
+                };
+            }
             
             try {
-                // 1. To'g'ri API endpoint ga so'rov yuboramiz
-                // withdraw.php FAKAT PHP kodidan iborat bo'lishi kerak
+                // 1. API endpoint
                 const apiUrl = 'https://68ed1ab05ca4e.myxvest1.ru/withdraw.php';
                 
-                // 2. CORS proxy ishlatamiz
-                const corsProxy = 'https://corsproxy.io/?';
-                const fullUrl = corsProxy + encodeURIComponent(apiUrl);
+                // 2. CORS proxy (agar kerak bo'lsa)
+                // const corsProxy = 'https://corsproxy.io/?';
+                // const fullUrl = corsProxy + encodeURIComponent(apiUrl);
+                const fullUrl = apiUrl; // To'g'ridan-to'g'ri
                 
-                console.log('📡 Sending to:', apiUrl);
-                console.log('🔑 API Key being sent:', '4564123:hkjhfadfhieapkdnga');
+                console.log('📡 Sending withdrawal request to:', fullUrl);
+                console.log('🔑 API Key:', '4564123:hkjhfadfhieapkdnga');
                 
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000);
-                
-                // 3. So'rovni tayyorlash
-                const formData = new URLSearchParams();
+                // 3. So'rovni tayyorlash - FormData yordamida
+                const formData = new FormData();
                 formData.append('key', '4564123:hkjhfadfhieapkdnga');
                 formData.append('user_id', userId);
                 formData.append('amount', amount);
+                formData.append('username', currentUser.username || 'user');
+                formData.append('first_name', currentUser.first_name || 'User');
                 formData.append('debug', 'true');
+                
+                console.log('📤 FormData contents:');
+                for (let pair of formData.entries()) {
+                    console.log(`${pair[0]}: ${pair[1]}`);
+                }
+                
+                // 4. Timeout bilan so'rov yuborish
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 20000);
                 
                 const response = await fetch(fullUrl, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: formData,
-                    signal: controller.signal
+                    body: formData, // FormData dan foydalanish
+                    signal: controller.signal,
+                    mode: 'cors'
                 });
                 
                 clearTimeout(timeoutId);
                 
                 console.log('📥 Response status:', response.status);
+                console.log('📥 Response headers:', response.headers);
                 
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('❌ HTTP error response:', errorText);
-                    throw new Error(`Server xatosi: ${response.status}`);
+                    
+                    let errorMessage = `Server xatosi: ${response.status}`;
+                    if (response.status === 404) {
+                        errorMessage = '❌ Server topilmadi. Admin bilan bog\'laning.';
+                    } else if (response.status === 500) {
+                        errorMessage = '❌ Server ichki xatosi. Keyinroq urinib ko\'ring.';
+                    }
+                    
+                    return {
+                        success: false,
+                        message: errorMessage,
+                        error: `HTTP ${response.status}`,
+                        response_text: errorText
+                    };
                 }
                 
                 const resultText = await response.text();
                 console.log('📄 Raw response:', resultText);
                 
-                // 4. JSON javobni parse qilish
+                // 5. JSON javobni parse qilish
                 let result;
                 try {
                     result = JSON.parse(resultText);
+                    console.log('✅ Parsed result:', result);
                 } catch (parseError) {
                     console.error('❌ JSON parse error:', parseError);
-                    console.error('❌ Response was:', resultText);
-                    throw new Error('Server noto\'g\'ri formatda javob qaytarmoqda (HTML chiqarmoqda)');
+                    console.error('❌ Response was:', resultText.substring(0, 500));
+                    
+                    // Agar HTML qaytsa
+                    if (resultText.includes('<!DOCTYPE') || resultText.includes('<html')) {
+                        return {
+                            success: false,
+                            message: '❌ Server noto\'g\'ri formatda javob qaytarmoqda (HTML chiqarmoqda). PHP faylini tekshiring.',
+                            error: 'Server returned HTML instead of JSON',
+                            response_preview: resultText.substring(0, 200)
+                        };
+                    }
+                    
+                    return {
+                        success: false,
+                        message: '❌ Server javobini o\'qib bo\'lmadi. Admin bilan bog\'laning.',
+                        error: 'Invalid JSON response',
+                        raw_response: resultText.substring(0, 300)
+                    };
                 }
                 
-                console.log('✅ Parsed result:', result);
                 return result;
                 
             } catch (error) {
                 console.error('❌ Withdrawal error:', error);
                 
-                let errorMessage = 'Noma\'lum xatolik';
+                let errorMessage = 'Noma\'lum xatolik yuz berdi';
                 
                 if (error.name === 'AbortError') {
-                    errorMessage = '⏳ So\'rov vaqti tugadi. Qayta urinib ko\'ring.';
-                } else if (error.message.includes('Failed to fetch')) {
-                    errorMessage = '📡 Internet aloqasi yo\'q. Qayta urinib ko\'ring.';
-                } else if (error.message.includes('noto\'g\'ri format')) {
-                    errorMessage = '🔄 Server noto\'g\'ri javob qaytarmoqda. Admin bilan bog\'laning.';
+                    errorMessage = '⏳ So\'rov vaqti tugadi. Internet tezligini tekshiring.';
+                } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    errorMessage = '📡 Internet aloqasi yo\'q yoki serverga ulanish imkoni yo\'q.';
+                } else if (error.message.includes('CORS')) {
+                    errorMessage = '🛡️ CORS muammosi. Server sozlamalarini tekshiring.';
                 } else {
                     errorMessage = '❌ Xatolik: ' + error.message;
                 }
@@ -674,7 +809,8 @@
                 return {
                     success: false,
                     message: errorMessage,
-                    error: error.message
+                    error: error.message,
+                    error_type: error.name
                 };
             }
         }
@@ -682,60 +818,118 @@
         // Tugma bosilganda
         document.getElementById('withdraw-btn').addEventListener('click', async function() {
             const userId = currentUser?.user_id;
-            const amount = parseInt(document.getElementById('withdraw-amount').value);
+            const amountInput = document.getElementById('withdraw-amount');
+            const amount = parseInt(amountInput.value);
             
-            if (!userId || !amount || amount < 1) {
-                alert('❌ Iltimos, to\'g\'ri miqdor kiriting');
+            console.log('💰 Withdraw button clicked:', { userId, amount });
+            
+            if (!userId) {
+                alert('❌ Foydalanuvchi topilmadi. Sahifani yangilang.');
                 return;
+            }
+            
+            if (!amount || amount < 1) {
+                alert('❌ Iltimos, to\'g\'ri miqdor kiriting (kamida 1 olmos)');
+                amountInput.focus();
+                return;
+            }
+            
+            // Firebase dan joriy balansni tekshirish
+            try {
+                const userRef = ref(db, 'users/' + userId);
+                const snapshot = await get(userRef);
+                const userData = snapshot.val();
+                const currentBalance = userData?.diamonds || 0;
+                
+                if (currentBalance < amount) {
+                    alert(`❌ Yetarli olmos yo'q!\n\nSizda: ${currentBalance} olmos\nKerak: ${amount} olmos`);
+                    return;
+                }
+            } catch (error) {
+                console.error('❌ Balance check error:', error);
             }
             
             // Tugmani disable qilish
             const btn = this;
+            const originalText = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<div class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
             
             // Statusni ko'rsatish
             const statusDiv = document.getElementById('withdraw-status');
             statusDiv.classList.remove('hidden');
-            statusDiv.innerHTML = '<p class="text-yellow-400">⏳ Yechib olinmoqda...</p>';
+            statusDiv.innerHTML = '<p class="text-yellow-400">⏳ Yechib olinmoqda. Iltimos kuting...</p>';
             
             // API ga so'rov yuborish
             const result = await withdrawDiamonds(userId, amount);
+            console.log('📊 Withdrawal result:', result);
             
             // Statusni yangilash
             if (result.success) {
                 statusDiv.innerHTML = `
-                    <div class="text-center">
-                        <div class="text-4xl mb-2">🎉</div>
-                        <p class="text-green-400 font-bold">Muvaffaqiyatli!</p>
-                        <p class="text-white/80 mt-1">${amount} olmos yechib olindi</p>
-                        <p class="text-xs text-white/50 mt-2">Yangi balans: ${result.new_balance || 'N/A'}</p>
+                    <div class="text-center slide-up">
+                        <div class="text-4xl mb-2" style="animation: celebrate 0.6s ease-out;">🎉</div>
+                        <p class="text-green-400 font-bold text-lg">${result.message || 'Muvaffaqiyatli!'}</p>
+                        <p class="text-white/80 mt-2">${amount} olmos yechib olindi</p>
+                        <p class="text-xs text-white/50 mt-2">Yangi balans: ${result.new_balance || 'N/A'} olmos</p>
+                        <p class="text-xs text-white/40 mt-1">ID: ${result.withdrawal_id || 'N/A'}</p>
                     </div>
                 `;
                 
-                // Balansni yangilash (agar yangi balans kelgan bo'lsa)
+                // Agar muvaffaqiyatli bo'lsa, Firebase balansini yangilash
                 if (result.new_balance !== undefined) {
-                    updateUI({ diamonds: result.new_balance });
+                    try {
+                        const userRef = ref(db, 'users/' + userId);
+                        await update(userRef, {
+                            diamonds: result.new_balance,
+                            last_withdrawal: new Date().toISOString()
+                        });
+                        console.log('✅ Firebase balance updated to:', result.new_balance);
+                        
+                        // UI ni yangilash
+                        updateUI({ 
+                            diamonds: result.new_balance,
+                            first_name: currentUser.first_name,
+                            user_id: userId,
+                            ads_watched: 0 // Bu yerda haqiqiy qiymatni olish kerak
+                        });
+                    } catch (updateError) {
+                        console.error('❌ Firebase update error:', updateError);
+                    }
                 }
                 
                 // Inputni tozalash
-                document.getElementById('withdraw-amount').value = '';
+                amountInput.value = '';
+                
             } else {
-                statusDiv.innerHTML = `<p class="text-red-400">❌ ${result.message || result.error}</p>`;
+                statusDiv.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-3xl mb-2">❌</div>
+                        <p class="text-red-400 font-bold">${result.message || 'Xatolik yuz berdi'}</p>
+                        ${result.error ? `<p class="text-xs text-white/50 mt-1">${result.error}</p>` : ''}
+                    </div>
+                `;
             }
             
             // Tugmani qayta yoqish
             btn.disabled = false;
-            btn.innerHTML = '<span class="text-2xl">💰</span><span>Yechib olish</span>';
+            btn.innerHTML = originalText;
             
-            // 5 soniyadan keyin statusni yashirish
+            // 8 soniyadan keyin statusni yashirish
             setTimeout(() => {
                 statusDiv.classList.add('hidden');
-            }, 5000);
+            }, 8000);
         });
 
         // Event listeners
         document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
+        
+        // Enter bosilganda yechish tugmasini bosish
+        document.getElementById('withdraw-amount').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('withdraw-btn').click();
+            }
+        });
 
         // Initialize app
         if (document.readyState === 'loading') {

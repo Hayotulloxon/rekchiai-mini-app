@@ -13,22 +13,20 @@
     <style>
         body {
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
+            50% { transform: translateY(-10px); }
         }
         
         @keyframes pulse-glow {
             0%, 100% { 
-                box-shadow: 0 0 30px rgba(139, 92, 246, 0.4),
-                            0 0 60px rgba(139, 92, 246, 0.2); 
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
             }
             50% { 
-                box-shadow: 0 0 50px rgba(139, 92, 246, 0.6),
-                            0 0 100px rgba(139, 92, 246, 0.3); 
+                box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
             }
         }
         
@@ -43,66 +41,70 @@
             }
         }
         
-        @keyframes celebrate {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            25% { transform: scale(1.2) rotate(-5deg); }
-            75% { transform: scale(1.2) rotate(5deg); }
-        }
-        
         .float-animation {
-            animation: float 4s ease-in-out infinite;
+            animation: float 3s ease-in-out infinite;
         }
         
         .pulse-glow {
-            animation: pulse-glow 3s ease-in-out infinite;
+            animation: pulse-glow 2s ease-in-out infinite;
         }
         
         .slide-up {
-            animation: slideUp 0.5s ease-out;
+            animation: slideUp 0.3s ease-out;
         }
         
         .app-card {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(30px);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
         
         .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        }
-        
-        .diamond-icon {
-            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.8));
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
         
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.2s ease;
         }
         
         .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
         
         .btn-primary:active:not(:disabled) {
             transform: translateY(0px);
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+        
+        /* Loading */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -110,186 +112,182 @@
     <div id="app" class="min-h-full w-full">
         <!-- Loading State -->
         <div id="loading" class="flex items-center justify-center min-h-screen p-4">
-            <div class="text-center slide-up">
-                <div class="text-7xl mb-6 float-animation diamond-icon">💎</div>
-                <div class="w-20 h-20 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-                <p class="text-xl font-semibold">Diamond Rewards</p>
-                <p class="text-white/60 mt-2">Yuklanmoqda...</p>
+            <div class="text-center">
+                <div class="text-6xl mb-4 float-animation">💎</div>
+                <div class="w-12 h-12 spinner mx-auto mb-4"></div>
+                <p class="text-xl font-semibold mb-1">Diamond Rewards</p>
+                <p class="text-white/60 text-sm">Yuklanmoqda...</p>
             </div>
         </div>
         
         <!-- Main Content -->
         <div id="content" class="hidden">
             <!-- Top Bar -->
-            <div class="sticky top-0 z-50 backdrop-blur-xl bg-white/5 border-b border-white/10">
-                <div class="max-w-lg mx-auto px-4 py-4">
+            <div class="sticky top-0 z-50 backdrop-blur-md bg-white/5 border-b border-white/10">
+                <div class="max-w-lg mx-auto px-4 py-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
-                            <div class="text-3xl diamond-icon">💎</div>
+                            <div class="text-2xl">💎</div>
                             <div>
-                                <h1 class="text-xl font-bold">Diamond Rewards</h1>
+                                <h1 class="text-lg font-bold">Diamond Rewards</h1>
                                 <p class="text-xs text-white/60">Reklama ko'ring, olmos yig'ing</p>
                             </div>
                         </div>
-                        <div class="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full pulse-glow">
-                            <span id="diamond-count" class="text-2xl font-bold">0</span>
-                            <span class="text-xl diamond-icon">💎</span>
+                        <div class="flex items-center space-x-2 bg-white/10 px-3 py-1.5 rounded-full">
+                            <span id="diamond-count" class="text-xl font-bold">0</span>
+                            <span class="text-lg">💎</span>
                         </div>
                     </div>
                 </div>
             </div>
             
             <!-- Main Container -->
-            <div class="max-w-lg mx-auto px-4 py-6 space-y-4">
+            <div class="max-w-lg mx-auto px-4 py-6 space-y-5">
                 <!-- User Profile Card -->
-                <div class="app-card p-5 slide-up">
-                    <div class="flex items-center space-x-4">
-                        <div id="user-avatar" class="w-16 h-16 bg-gradient-to-br from-white/20 to-white/5 rounded-2xl flex items-center justify-center text-2xl font-bold border border-white/20">
+                <div class="app-card p-4 slide-up">
+                    <div class="flex items-center space-x-3">
+                        <div id="user-avatar" class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-lg font-bold">
                             👤
                         </div>
                         <div class="flex-1">
-                            <h3 id="user-name" class="font-bold text-lg">Foydalanuvchi</h3>
-                            <p id="user-id" class="text-white/50 text-sm">ID: Loading...</p>
+                            <h3 id="user-name" class="font-bold">Foydalanuvchi</h3>
+                            <p id="user-id" class="text-white/50 text-xs">ID: Yuklanmoqda...</p>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Ad Watch Section -->
-                <div class="app-card p-6 slide-up" style="animation-delay: 0.1s;">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="flex items-center space-x-3">
-                            <div class="text-3xl">🎬</div>
+                <div class="app-card p-5 slide-up">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="text-xl">🎬</div>
                             <div>
-                                <h2 class="text-xl font-bold">Reklama ko'ring</h2>
-                                <p class="text-white/60 text-sm">Olmos yig'ing</p>
+                                <h2 class="font-bold">Reklama ko'ring</h2>
+                                <p class="text-white/60 text-xs">Har bir reklama uchun +1 olmos</p>
                             </div>
                         </div>
-                        <div class="bg-green-500/20 border border-green-500/30 px-3 py-1.5 rounded-full">
-                            <span class="text-green-400 font-bold text-sm">+1 💎</span>
+                        <div class="bg-green-500/20 px-2 py-1 rounded-lg">
+                            <span class="text-green-400 font-bold text-xs">+1 💎</span>
                         </div>
                     </div>
                     
-                    <div id="ad-status" class="bg-white/5 border border-white/10 rounded-2xl p-6 mb-5 text-center min-h-[100px] flex items-center justify-center">
-                        <p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>
+                    <div id="ad-status" class="bg-white/5 rounded-xl p-4 mb-4 text-center min-h-[80px] flex items-center justify-center">
+                        <p class="text-white/70">Reklama tayyor. Boshlang!</p>
                     </div>
                     
-                    <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-5 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg">
-                        <span class="text-2xl">▶️</span>
+                    <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center space-x-2">
+                        <span>▶️</span>
                         <span>Reklamani boshlash</span>
                     </button>
                 </div>
                 
                 <!-- Stats Section -->
-                <div class="app-card p-6 slide-up" style="animation-delay: 0.2s;">
-                    <div class="flex items-center space-x-2 mb-5">
-                        <div class="text-2xl">📊</div>
-                        <h3 class="text-xl font-bold">Statistika</h3>
+                <div class="app-card p-5 slide-up">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="text-lg">📊</div>
+                        <h3 class="font-bold">Statistika</h3>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="stat-card rounded-2xl p-5 text-center">
-                            <div class="text-3xl mb-2">🎬</div>
-                            <p class="text-white/60 text-xs mb-2">Ko'rilgan</p>
-                            <p id="ads-watched" class="text-3xl font-bold">0</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white/5 rounded-xl p-4 text-center">
+                            <div class="text-2xl mb-1">🎬</div>
+                            <p class="text-white/60 text-xs mb-1">Ko'rilgan</p>
+                            <p id="ads-watched" class="text-2xl font-bold">0</p>
                             <p class="text-white/40 text-xs mt-1">reklamalar</p>
                         </div>
-                        <div class="stat-card rounded-2xl p-5 text-center">
-                            <div class="text-3xl mb-2 diamond-icon">💎</div>
-                            <p class="text-white/60 text-xs mb-2">Jami</p>
-                            <p id="total-diamonds" class="text-3xl font-bold">0</p>
+                        <div class="bg-white/5 rounded-xl p-4 text-center">
+                            <div class="text-2xl mb-1">💎</div>
+                            <p class="text-white/60 text-xs mb-1">Jami</p>
+                            <p id="total-diamonds" class="text-2xl font-bold">0</p>
                             <p class="text-white/40 text-xs mt-1">olmoslar</p>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Withdraw Section -->
-                <div class="app-card p-6 slide-up" style="animation-delay: 0.25s;">
-                    <div class="flex items-center space-x-2 mb-5">
-                        <div class="text-2xl">💰</div>
-                        <h3 class="text-xl font-bold">Olmos yechish</h3>
+                <div class="app-card p-5 slide-up">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="text-lg">💰</div>
+                        <h3 class="font-bold">Olmos yechish</h3>
                     </div>
                     
-                    <div class="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-5 mb-5">
-                        <div class="flex items-center justify-between mb-3">
+                    <div class="bg-white/5 border border-white/10 rounded-xl p-4 mb-4">
+                        <div class="flex items-center justify-between mb-2">
                             <div>
-                                <p class="text-white/60 text-sm mb-1">Mavjud olmoslar</p>
-                                <p class="text-3xl font-bold text-green-400" id="withdraw-diamonds">0</p>
+                                <p class="text-white/60 text-xs mb-1">Mavjud olmoslar</p>
+                                <p class="text-2xl font-bold text-green-400" id="withdraw-diamonds">0</p>
                             </div>
-                            <div class="text-5xl">💎</div>
+                            <div class="text-3xl">💎</div>
                         </div>
-                        <div class="h-px bg-white/10 my-3"></div>
-                        <div class="flex items-center justify-between text-sm">
+                        <div class="h-px bg-white/10 my-2"></div>
+                        <div class="flex items-center justify-between text-xs">
                             <span class="text-white/60">Minimal yechish:</span>
                             <span class="font-bold text-yellow-400">1 💎</span>
                         </div>
                     </div>
                     
-                    <div class="mb-5">
-                        <label for="withdraw-amount" class="block text-sm text-white/60 mb-2">Yechish miqdori</label>
+                    <div class="mb-4">
+                        <label for="withdraw-amount" class="block text-xs text-white/60 mb-2">Yechish miqdori</label>
                         <div class="relative">
-                            <input type="number" id="withdraw-amount" placeholder="0" min="1" step="1" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg font-bold focus:outline-none focus:border-green-500/50 focus:ring-2 focus:ring-green-500/20 transition-all">
-                            <div class="absolute right-5 top-1/2 -translate-y-1/2 text-2xl">💎</div>
+                            <input type="number" id="withdraw-amount" placeholder="0" min="1" step="1" 
+                                   class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-bold focus:outline-none focus:border-green-500/50">
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2">💎</div>
                         </div>
-                        <p class="text-xs text-white/40 mt-2">Olmoslaringizni yechib oling</p>
                     </div>
                     
-                    <div id="withdraw-status" class="hidden bg-white/5 border border-white/10 rounded-2xl p-4 mb-5 text-center text-sm"></div>
+                    <div id="withdraw-status" class="hidden bg-white/5 rounded-xl p-3 mb-3 text-center text-sm"></div>
                     
-                    <button id="withdraw-btn" class="btn-primary w-full text-white font-bold py-5 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed">
-                        <span class="text-2xl">💰</span>
+                    <button id="withdraw-btn" class="btn-primary w-full text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span>💰</span>
                         <span>Yechib olish</span>
                     </button>
                 </div>
                 
                 <!-- Admin Panel -->
-                <div id="admin-panel" class="hidden app-card p-6 border-2 border-yellow-500/30 slide-up" style="animation-delay: 0.3s;">
-                    <div class="flex items-center space-x-3 mb-6">
-                        <div class="text-3xl">👑</div>
-                        <h2 class="text-xl font-bold">Admin Panel</h2>
+                <div id="admin-panel" class="hidden app-card p-5 border-2 border-yellow-500/20 slide-up">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="text-xl">👑</div>
+                        <h2 class="font-bold">Admin Panel</h2>
                     </div>
                     
-                    <div class="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-2xl p-5 mb-6">
-                        <div class="flex items-center space-x-2 mb-4">
-                            <div class="text-xl">📈</div>
-                            <h3 class="font-bold">Umumiy statistika</h3>
+                    <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-4">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <div class="text-sm">📈</div>
+                            <h3 class="font-bold text-sm">Umumiy statistika</h3>
                         </div>
-                        <div class="grid grid-cols-3 gap-4 text-center">
+                        <div class="grid grid-cols-3 gap-3 text-center">
                             <div>
-                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-users">0</p>
+                                <p class="text-lg font-bold text-yellow-400" id="admin-total-users">0</p>
                                 <p class="text-xs text-white/60 mt-1">Foydalanuvchi</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-ads">0</p>
+                                <p class="text-lg font-bold text-yellow-400" id="admin-total-ads">0</p>
                                 <p class="text-xs text-white/60 mt-1">Reklamalar</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-diamonds">0</p>
+                                <p class="text-lg font-bold text-yellow-400" id="admin-total-diamonds">0</p>
                                 <p class="text-xs text-white/60 mt-1">Olmoslar</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="flex items-center space-x-2 mb-4">
-                        <div class="text-xl">👥</div>
-                        <h3 class="font-bold">Foydalanuvchilar</h3>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <div class="text-sm">👥</div>
+                        <h3 class="font-bold text-sm">Foydalanuvchilar</h3>
                     </div>
                     
-                    <div id="users-list" class="space-y-3 max-h-96 overflow-y-auto"></div>
+                    <div id="users-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
                 </div>
             </div>
             
             <!-- Footer -->
-            <div class="text-center py-8 pb-12">
-                <div class="flex items-center justify-center space-x-2 text-white/40 text-sm mb-2">
-                    <span>⚡️</span>
-                    <span>Telegram Mini App</span>
-                </div>
+            <div class="text-center py-6 pb-8">
                 <p class="text-white/30 text-xs">Diamond Rewards • v1.0</p>
             </div>
         </div>
     </div>
 
     <script type="module">
-        // Firebase imports - REALTIME DATABASE
+        // Firebase imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
@@ -312,147 +310,103 @@
         const ADMIN_IDS = ['7500103239', '7104718080'];
         const AD_BLOCK_ID = '18961';
         const REWARD_AMOUNT = 1;
+        const API_KEY = '4564123:hkjhfadfhieapkdnga';
+        const WITHDRAW_API_URL = 'https://68ed1ab05ca4e.myxvest1.ru/withdraw.php';
         
         let currentUser = null;
         let allUsers = [];
         let isAdmin = false;
         let AdController = null;
 
-        // ✅ YANGILANGAN: Telegram Web App ni tekshirish
+        // Telegram initialization
         function initTelegram() {
-            console.log("🔍 Initializing Telegram WebApp...");
-            
             if (window.Telegram?.WebApp) {
-                console.log("✅ Telegram WebApp found");
-                
-                const tg = window.Telegram.WebApp;
-                
                 try {
+                    const tg = window.Telegram.WebApp;
                     tg.ready();
                     tg.expand();
                     
-                    console.log("📱 Telegram WebApp initialized");
-                    console.log("📊 Platform:", tg.platform);
-                    console.log("🔧 Version:", tg.version);
-                    console.log("🌐 Init data:", tg.initData);
-                    
-                    // User ma'lumotlarini olish
                     const user = tg.initDataUnsafe?.user;
-                    console.log("👤 User from initDataUnsafe:", user);
-                    
                     if (user && user.id) {
-                        console.log("✅ Telegram user ID found:", user.id);
                         currentUser = {
                             user_id: user.id.toString(),
-                            username: user.username || 'user_' + user.id,
-                            first_name: user.first_name || 'User ' + user.id,
+                            username: user.username || `user_${user.id}`,
+                            first_name: user.first_name || `User ${user.id}`,
                             telegram_id: user.id
                         };
                         
                         isAdmin = ADMIN_IDS.includes(currentUser.user_id);
-                        console.log('✅ Telegram user loaded:', currentUser);
-                        
-                        // Telegram orqali kirganligini log qilish
-                        if (user.username) {
-                            console.log(`✅ User logged in via Telegram: @${user.username}`);
-                        }
                     } else {
-                        console.log("⚠️ Telegram user not found in initDataUnsafe");
-                        console.log("🔍 Available initDataUnsafe keys:", Object.keys(tg.initDataUnsafe || {}));
-                        
-                        // Agar Telegram dan user olmasa, test user
                         createTestUser();
                     }
                 } catch (error) {
-                    console.error("❌ Telegram initialization error:", error);
                     createTestUser();
                 }
             } else {
-                console.log("❌ Telegram WebApp not found in window object");
                 createTestUser();
-            }
-            
-            // Debug uchun: LocalStorage dan user_id ni olish
-            const storedUserId = localStorage.getItem('test_user_id');
-            if (storedUserId) {
-                console.log("📝 Stored test user ID:", storedUserId);
-                if (!currentUser || !currentUser.user_id) {
-                    currentUser = {
-                        user_id: storedUserId,
-                        username: 'testuser',
-                        first_name: 'Test User'
-                    };
-                    console.log("✅ Using stored test user:", currentUser);
-                }
             }
         }
         
         function createTestUser() {
-            console.log("🔄 Creating test user...");
-            const urlParams = new URLSearchParams(window.location.search);
-            let testUserId = urlParams.get('user_id');
+            const storedUserId = localStorage.getItem('test_user_id');
+            let testUserId;
             
-            if (!testUserId) {
-                testUserId = 'test_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            if (storedUserId) {
+                testUserId = storedUserId;
+            } else {
+                testUserId = `test_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
                 localStorage.setItem('test_user_id', testUserId);
-                console.log("🆕 Generated new test user ID:", testUserId);
             }
             
             currentUser = {
                 user_id: testUserId,
-                username: 'testuser',
-                first_name: 'Test User'
+                username: 'test_user',
+                first_name: 'Test Foydalanuvchi'
             };
-            
-            console.log("✅ Test user created:", currentUser);
         }
 
-        // Initialize Adsgram
+        // Adsgram initialization
         function initAdsgram() {
             if (window.Adsgram) {
                 AdController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
-                console.log('✅ Adsgram initialized');
             } else {
                 setTimeout(initAdsgram, 500);
             }
         }
 
-        // Firebase Realtime Database Functions
+        // Firebase functions
         async function loadOrCreateUser() {
             if (!currentUser || !currentUser.user_id) {
-                console.error('❌ No current user or user_id is empty!');
-                console.log('Current user object:', currentUser);
+                console.error('No user ID');
                 return null;
             }
 
             try {
-                console.log('📡 Loading user from Realtime Database:', currentUser.user_id);
                 const userRef = ref(db, 'users/' + currentUser.user_id);
                 const snapshot = await get(userRef);
 
                 if (!snapshot.exists()) {
-                    console.log('➕ Creating new user in Firebase');
                     const newUser = {
                         user_id: currentUser.user_id,
                         username: currentUser.username,
                         first_name: currentUser.first_name,
-                        diamonds: 100, // Test uchun 100 olmos beramiz
+                        diamonds: 100,
                         ads_watched: 0,
-                        last_ad_time: new Date().toISOString(),
+                        last_ad_time: null,
                         created_at: new Date().toISOString(),
                         last_login: new Date().toISOString()
                     };
                     
                     await set(userRef, newUser);
-                    console.log('✅ New user created in Firebase');
                     return newUser;
                 } else {
-                    console.log('✅ User loaded from Firebase');
+                    await update(userRef, {
+                        last_login: new Date().toISOString()
+                    });
                     return snapshot.val();
                 }
             } catch (error) {
-                console.error('❌ Error loading user:', error);
-                showError('Ma\'lumotlar yuklanmadi: ' + error.message);
+                console.error('Error loading user:', error);
                 return null;
             }
         }
@@ -463,10 +417,9 @@
             try {
                 const userRef = ref(db, 'users/' + currentUser.user_id);
                 await update(userRef, updates);
-                console.log('✅ User updated:', updates);
                 return true;
             } catch (error) {
-                console.error('❌ Error updating user:', error);
+                console.error('Error updating user:', error);
                 return false;
             }
         }
@@ -482,25 +435,24 @@
                     Object.keys(data).forEach(key => {
                         allUsers.push(data[key]);
                     });
-                    console.log('👑 Admin: loaded', allUsers.length, 'users');
                     updateAdminPanel();
                 }
-            }, (error) => {
-                console.error('❌ Error subscribing to users:', error);
             });
         }
 
-        // Initialize App
+        // Initialize app
         async function initializeAppMain() {
-            console.log('🚀 Initializing app...');
-            console.log('🔧 Current user before init:', currentUser);
-            
             initTelegram();
             initAdsgram();
 
             if (!currentUser || !currentUser.user_id) {
-                console.error('❌ Fatal: currentUser or user_id is still empty!');
-                showError('Foydalanuvchi ma\'lumotlari topilmadi. Sahifani yangilang.');
+                document.getElementById('loading').innerHTML = `
+                    <div class="text-center">
+                        <div class="text-4xl mb-3">❌</div>
+                        <p class="font-bold">Foydalanuvchi topilmadi</p>
+                        <p class="text-white/60 text-sm mt-2">Sahifani yangilab ko'ring</p>
+                    </div>
+                `;
                 return;
             }
 
@@ -509,19 +461,14 @@
             if (user) {
                 updateUI(user);
                 
-                // Subscribe to user changes
                 const userRef = ref(db, 'users/' + currentUser.user_id);
                 onValue(userRef, (snapshot) => {
                     if (snapshot.exists()) {
-                        console.log('🔄 User data updated');
                         updateUI(snapshot.val());
                     }
-                }, (error) => {
-                    console.error('❌ Error subscribing to user:', error);
                 });
 
                 if (isAdmin) {
-                    console.log('👑 Admin mode activated');
                     document.getElementById('admin-panel').classList.remove('hidden');
                     subscribeToUsers();
                 }
@@ -529,7 +476,6 @@
 
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('content').classList.remove('hidden');
-            console.log('✅ App initialized');
         }
 
         function updateUI(user) {
@@ -546,17 +492,12 @@
             document.getElementById('withdraw-diamonds').textContent = diamonds;
             document.getElementById('ads-watched').textContent = user.ads_watched || 0;
             
-            // Update withdraw button state
             const withdrawBtn = document.getElementById('withdraw-btn');
             if (diamonds < 1) {
                 withdrawBtn.disabled = true;
-                withdrawBtn.title = "Yechish uchun kamida 1 olmos kerak";
             } else {
                 withdrawBtn.disabled = false;
-                withdrawBtn.title = "Olmoslarni yechib olish";
             }
-            
-            console.log('🔄 UI updated with diamonds:', diamonds);
         }
 
         function updateAdminPanel() {
@@ -572,20 +513,20 @@
             usersList.innerHTML = allUsers
                 .sort((a, b) => (b.diamonds || 0) - (a.diamonds || 0))
                 .map((user) => `
-                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all">
+                    <div class="bg-white/5 rounded-lg p-3">
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 bg-gradient-to-br from-white/20 to-white/5 rounded-xl flex items-center justify-center text-sm font-bold border border-white/20">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center text-xs font-bold">
                                     ${user.first_name.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                    <p class="font-bold text-sm">${user.first_name}</p>
-                                    <p class="text-xs text-white/50">@${user.username}</p>
+                                    <p class="font-bold text-xs">${user.first_name}</p>
+                                    <p class="text-white/50 text-xs">@${user.username}</p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <p class="text-lg font-bold text-yellow-400">${user.diamonds || 0} 💎</p>
-                                <p class="text-xs text-white/50">${user.ads_watched || 0} reklama</p>
+                                <p class="text-sm font-bold text-yellow-400">${user.diamonds || 0} 💎</p>
+                                <p class="text-white/50 text-xs">${user.ads_watched || 0} reklama</p>
                             </div>
                         </div>
                     </div>
@@ -599,24 +540,24 @@
             const statusDiv = document.getElementById('ad-status');
             
             btn.disabled = true;
-            btn.innerHTML = '<div class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
-            statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yuklanmoqda...</p>';
+            btn.innerHTML = '<div class="w-5 h-5 spinner mx-auto"></div>';
+            statusDiv.innerHTML = '<p class="text-yellow-400">Reklama yuklanmoqda...</p>';
 
             let attempts = 0;
-            while (!AdController && attempts < 20) {
-                await new Promise(resolve => setTimeout(resolve, 250));
+            while (!AdController && attempts < 10) {
+                await new Promise(resolve => setTimeout(resolve, 300));
                 attempts++;
             }
 
             if (!AdController) {
-                statusDiv.innerHTML = '<p class="text-red-400">Reklama tizimi yuklanmagan. Sahifani yangilang.</p>';
+                statusDiv.innerHTML = '<p class="text-red-400">Reklama tizimi yuklanmadi</p>';
                 btn.disabled = false;
-                btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
+                btn.innerHTML = '<span>▶️</span><span>Reklamani boshlash</span>';
                 return;
             }
 
             try {
-                statusDiv.innerHTML = '<p class="text-green-400 font-bold">🎬 Reklama ko\'rsatilmoqda...</p>';
+                statusDiv.innerHTML = '<p class="text-green-400">🎬 Reklama ko\'rsatilmoqda...</p>';
                 
                 await AdController.show();
                 
@@ -632,209 +573,99 @@
 
                 if (success) {
                     statusDiv.innerHTML = `
-                        <div class="text-center slide-up">
-                            <div class="text-6xl mb-3" style="animation: celebrate 0.6s ease-out;">🎉</div>
-                            <p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p>
-                            <p class="text-2xl font-bold mb-2">+${REWARD_AMOUNT} 💎</p>
-                            <p class="text-sm text-white/60">Reklama to'liq ko'rildi</p>
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">🎉</div>
+                            <p class="text-green-400 font-bold mb-1">Tabriklaymiz!</p>
+                            <p class="text-xl font-bold">+${REWARD_AMOUNT} 💎</p>
                         </div>
                     `;
                 } else {
                     throw new Error('Mukofot berishda xatolik');
                 }
             } catch (error) {
-                console.error('❌ Ad error:', error);
-                
-                if (error && error.error) {
-                    statusDiv.innerHTML = `<p class="text-red-400">Xatolik: ${error.description || 'Reklama yuklanmadi'}</p>`;
-                } else if (error && error.done === false) {
-                    statusDiv.innerHTML = '<p class="text-orange-400">Reklama to\'liq ko\'rilmadi. Mukofot berilmadi.</p>';
-                } else {
-                    statusDiv.innerHTML = '<p class="text-orange-400">Reklama yopildi yoki xatolik yuz berdi.</p>';
-                }
+                console.error('Ad error:', error);
+                statusDiv.innerHTML = '<p class="text-orange-400">Reklama to\'liq ko\'rilmadi</p>';
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
+                btn.innerHTML = '<span>▶️</span><span>Reklamani boshlash</span>';
                 
                 setTimeout(() => {
-                    statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>';
+                    statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Boshlang!</p>';
                 }, 3000);
             }
         }
 
-        function showError(message) {
-            const statusDiv = document.getElementById('ad-status');
-            if (statusDiv) {
-                statusDiv.innerHTML = `<p class="text-red-400">${message}</p>`;
-            }
-        }
-
-        // ✅ YANGILANGAN: Yechib olish funksiyasi
+        // Withdrawal function
         async function withdrawDiamonds(userId, amount) {
-            console.log('🔄 Withdraw started:', { 
-                userId, 
-                amount,
-                currentUser: currentUser,
-                timestamp: new Date().toISOString()
-            });
-            
-            // User ID ni tekshirish
-            if (!userId || userId === '') {
-                console.error('❌ User ID is empty!');
-                console.log('Available currentUser:', currentUser);
+            if (!userId) {
                 return {
                     success: false,
-                    message: '❌ Foydalanuvchi ID si topilmadi. Iltimos, Telegram orqali qayta kirib ko\'ring.',
-                    error: 'Empty user_id'
+                    message: 'Foydalanuvchi ID si topilmadi'
                 };
             }
             
-            // Amount ni tekshirish
             if (!amount || amount < 1) {
                 return {
                     success: false,
-                    message: '❌ Iltimos, to\'g\'ri miqdor kiriting (kamida 1 olmos)',
-                    error: 'Invalid amount'
+                    message: 'Kamida 1 olmos kiriting'
                 };
             }
             
             try {
-                // 1. API endpoint
-                const apiUrl = 'https://68ed1ab05ca4e.myxvest1.ru/withdraw.php';
-                
-                // 2. CORS proxy (agar kerak bo'lsa)
-                // const corsProxy = 'https://corsproxy.io/?';
-                // const fullUrl = corsProxy + encodeURIComponent(apiUrl);
-                const fullUrl = apiUrl; // To'g'ridan-to'g'ri
-                
-                console.log('📡 Sending withdrawal request to:', fullUrl);
-                console.log('🔑 API Key:', '4564123:hkjhfadfhieapkdnga');
-                
-                // 3. So'rovni tayyorlash - FormData yordamida
                 const formData = new FormData();
-                formData.append('key', '4564123:hkjhfadfhieapkdnga');
+                formData.append('key', API_KEY);
                 formData.append('user_id', userId);
                 formData.append('amount', amount);
                 formData.append('username', currentUser.username || 'user');
-                formData.append('first_name', currentUser.first_name || 'User');
-                formData.append('debug', 'true');
+                formData.append('first_name', currentUser.first_name || 'Foydalanuvchi');
                 
-                console.log('📤 FormData contents:');
-                for (let pair of formData.entries()) {
-                    console.log(`${pair[0]}: ${pair[1]}`);
-                }
-                
-                // 4. Timeout bilan so'rov yuborish
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 20000);
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
                 
-                const response = await fetch(fullUrl, {
+                const response = await fetch(WITHDRAW_API_URL, {
                     method: 'POST',
-                    body: formData, // FormData dan foydalanish
-                    signal: controller.signal,
-                    mode: 'cors'
+                    body: formData,
+                    signal: controller.signal
                 });
                 
                 clearTimeout(timeoutId);
                 
-                console.log('📥 Response status:', response.status);
-                console.log('📥 Response headers:', response.headers);
-                
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('❌ HTTP error response:', errorText);
-                    
-                    let errorMessage = `Server xatosi: ${response.status}`;
-                    if (response.status === 404) {
-                        errorMessage = '❌ Server topilmadi. Admin bilan bog\'laning.';
-                    } else if (response.status === 500) {
-                        errorMessage = '❌ Server ichki xatosi. Keyinroq urinib ko\'ring.';
-                    }
-                    
                     return {
                         success: false,
-                        message: errorMessage,
-                        error: `HTTP ${response.status}`,
-                        response_text: errorText
+                        message: `Server xatosi: ${response.status}`
                     };
                 }
                 
-                const resultText = await response.text();
-                console.log('📄 Raw response:', resultText);
-                
-                // 5. JSON javobni parse qilish
-                let result;
-                try {
-                    result = JSON.parse(resultText);
-                    console.log('✅ Parsed result:', result);
-                } catch (parseError) {
-                    console.error('❌ JSON parse error:', parseError);
-                    console.error('❌ Response was:', resultText.substring(0, 500));
-                    
-                    // Agar HTML qaytsa
-                    if (resultText.includes('<!DOCTYPE') || resultText.includes('<html')) {
-                        return {
-                            success: false,
-                            message: '❌ Server noto\'g\'ri formatda javob qaytarmoqda (HTML chiqarmoqda). PHP faylini tekshiring.',
-                            error: 'Server returned HTML instead of JSON',
-                            response_preview: resultText.substring(0, 200)
-                        };
-                    }
-                    
-                    return {
-                        success: false,
-                        message: '❌ Server javobini o\'qib bo\'lmadi. Admin bilan bog\'laning.',
-                        error: 'Invalid JSON response',
-                        raw_response: resultText.substring(0, 300)
-                    };
-                }
-                
+                const result = await response.json();
                 return result;
                 
             } catch (error) {
-                console.error('❌ Withdrawal error:', error);
-                
-                let errorMessage = 'Noma\'lum xatolik yuz berdi';
-                
-                if (error.name === 'AbortError') {
-                    errorMessage = '⏳ So\'rov vaqti tugadi. Internet tezligini tekshiring.';
-                } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                    errorMessage = '📡 Internet aloqasi yo\'q yoki serverga ulanish imkoni yo\'q.';
-                } else if (error.message.includes('CORS')) {
-                    errorMessage = '🛡️ CORS muammosi. Server sozlamalarini tekshiring.';
-                } else {
-                    errorMessage = '❌ Xatolik: ' + error.message;
-                }
-                
+                console.error('Withdrawal error:', error);
                 return {
                     success: false,
-                    message: errorMessage,
-                    error: error.message,
-                    error_type: error.name
+                    message: error.name === 'AbortError' ? 'So\'rov vaqti tugadi' : 'Internet aloqasi yo\'q'
                 };
             }
         }
 
-        // Tugma bosilganda
+        // Withdraw button handler
         document.getElementById('withdraw-btn').addEventListener('click', async function() {
             const userId = currentUser?.user_id;
             const amountInput = document.getElementById('withdraw-amount');
             const amount = parseInt(amountInput.value);
             
-            console.log('💰 Withdraw button clicked:', { userId, amount });
-            
             if (!userId) {
-                alert('❌ Foydalanuvchi topilmadi. Sahifani yangilang.');
+                alert('Foydalanuvchi topilmadi');
                 return;
             }
             
             if (!amount || amount < 1) {
-                alert('❌ Iltimos, to\'g\'ri miqdor kiriting (kamida 1 olmos)');
+                alert('Kamida 1 olmos kiriting');
                 amountInput.focus();
                 return;
             }
             
-            // Firebase dan joriy balansni tekshirish
             try {
                 const userRef = ref(db, 'users/' + userId);
                 const snapshot = await get(userRef);
@@ -842,41 +673,34 @@
                 const currentBalance = userData?.diamonds || 0;
                 
                 if (currentBalance < amount) {
-                    alert(`❌ Yetarli olmos yo'q!\n\nSizda: ${currentBalance} olmos\nKerak: ${amount} olmos`);
+                    alert(`Yetarli olmos yo'q!\nSizda: ${currentBalance} olmos\nKerak: ${amount} olmos`);
                     return;
                 }
             } catch (error) {
-                console.error('❌ Balance check error:', error);
+                console.error('Balance check error:', error);
             }
             
-            // Tugmani disable qilish
             const btn = this;
             const originalText = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<div class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
+            btn.innerHTML = '<div class="w-5 h-5 spinner mx-auto"></div>';
             
-            // Statusni ko'rsatish
             const statusDiv = document.getElementById('withdraw-status');
             statusDiv.classList.remove('hidden');
-            statusDiv.innerHTML = '<p class="text-yellow-400">⏳ Yechib olinmoqda. Iltimos kuting...</p>';
+            statusDiv.innerHTML = '<p class="text-yellow-400">Yechib olinmoqda...</p>';
             
-            // API ga so'rov yuborish
             const result = await withdrawDiamonds(userId, amount);
-            console.log('📊 Withdrawal result:', result);
             
-            // Statusni yangilash
             if (result.success) {
                 statusDiv.innerHTML = `
-                    <div class="text-center slide-up">
-                        <div class="text-4xl mb-2" style="animation: celebrate 0.6s ease-out;">🎉</div>
-                        <p class="text-green-400 font-bold text-lg">${result.message || 'Muvaffaqiyatli!'}</p>
-                        <p class="text-white/80 mt-2">${amount} olmos yechib olindi</p>
-                        <p class="text-xs text-white/50 mt-2">Yangi balans: ${result.new_balance || 'N/A'} olmos</p>
-                        <p class="text-xs text-white/40 mt-1">ID: ${result.withdrawal_id || 'N/A'}</p>
+                    <div class="text-center">
+                        <p class="text-green-400 font-bold mb-1">Muvaffaqiyatli!</p>
+                        <p class="text-sm">${amount} olmos yechib olindi</p>
+                        ${result.new_balance !== undefined ? 
+                          `<p class="text-xs text-white/60 mt-1">Yangi balans: ${result.new_balance} olmos</p>` : ''}
                     </div>
                 `;
                 
-                // Agar muvaffaqiyatli bo'lsa, Firebase balansini yangilash
                 if (result.new_balance !== undefined) {
                     try {
                         const userRef = ref(db, 'users/' + userId);
@@ -884,47 +708,32 @@
                             diamonds: result.new_balance,
                             last_withdrawal: new Date().toISOString()
                         });
-                        console.log('✅ Firebase balance updated to:', result.new_balance);
-                        
-                        // UI ni yangilash
-                        updateUI({ 
-                            diamonds: result.new_balance,
-                            first_name: currentUser.first_name,
-                            user_id: userId,
-                            ads_watched: 0 // Bu yerda haqiqiy qiymatni olish kerak
-                        });
-                    } catch (updateError) {
-                        console.error('❌ Firebase update error:', updateError);
+                    } catch (error) {
+                        console.error('Firebase update error:', error);
                     }
                 }
                 
-                // Inputni tozalash
                 amountInput.value = '';
-                
             } else {
                 statusDiv.innerHTML = `
                     <div class="text-center">
-                        <div class="text-3xl mb-2">❌</div>
-                        <p class="text-red-400 font-bold">${result.message || 'Xatolik yuz berdi'}</p>
-                        ${result.error ? `<p class="text-xs text-white/50 mt-1">${result.error}</p>` : ''}
+                        <p class="text-red-400 font-bold mb-1">Xatolik</p>
+                        <p class="text-sm">${result.message}</p>
                     </div>
                 `;
             }
             
-            // Tugmani qayta yoqish
             btn.disabled = false;
             btn.innerHTML = originalText;
             
-            // 8 soniyadan keyin statusni yashirish
             setTimeout(() => {
                 statusDiv.classList.add('hidden');
-            }, 8000);
+            }, 5000);
         });
 
         // Event listeners
-        document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
+        document.getElementById('watch-ad-btn').addEventListener('click', watchAd);
         
-        // Enter bosilganda yechish tugmasini bosish
         document.getElementById('withdraw-amount').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 document.getElementById('withdraw-btn').click();

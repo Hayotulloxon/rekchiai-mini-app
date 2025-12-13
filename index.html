@@ -7,9 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        window.process = { env: { NODE_ENV: 'production' } };
-    </script>
     <style>
         body {
             box-sizing: border-box;
@@ -185,42 +182,6 @@
                         <span>Yechib olish</span>
                     </button>
                 </div>
-                
-                <!-- Admin Panel -->
-                <div id="admin-panel" class="hidden app-card p-5 border-2 border-yellow-500/20">
-                    <div class="flex items-center space-x-2 mb-4">
-                        <div class="text-xl">👑</div>
-                        <h2 class="font-bold">Admin Panel</h2>
-                    </div>
-                    
-                    <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-4">
-                        <div class="flex items-center space-x-2 mb-3">
-                            <div class="text-sm">📈</div>
-                            <h3 class="font-bold text-sm">Umumiy statistika</h3>
-                        </div>
-                        <div class="grid grid-cols-3 gap-3 text-center">
-                            <div>
-                                <p class="text-lg font-bold text-yellow-400" id="admin-total-users">0</p>
-                                <p class="text-xs text-white/60 mt-1">Foydalanuvchi</p>
-                            </div>
-                            <div>
-                                <p class="text-lg font-bold text-yellow-400" id="admin-total-ads">0</p>
-                                <p class="text-xs text-white/60 mt-1">Reklamalar</p>
-                            </div>
-                            <div>
-                                <p class="text-lg font-bold text-yellow-400" id="admin-total-diamonds">0</p>
-                                <p class="text-xs text-white/60 mt-1">Olmoslar</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center space-x-2 mb-3">
-                        <div class="text-sm">👥</div>
-                        <h3 class="font-bold text-sm">Foydalanuvchilar</h3>
-                    </div>
-                    
-                    <div id="users-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
-                </div>
             </div>
             
             <!-- Footer -->
@@ -368,22 +329,6 @@
             }
         }
 
-        function subscribeToUsers() {
-            if (!isAdmin) return;
-
-            const usersRef = ref(db, 'users');
-            onValue(usersRef, (snapshot) => {
-                allUsers = [];
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    Object.keys(data).forEach(key => {
-                        allUsers.push(data[key]);
-                    });
-                    updateAdminPanel();
-                }
-            });
-        }
-
         // Initialize app
         async function initializeAppMain() {
             initTelegram();
@@ -411,11 +356,6 @@
                         updateUI(snapshot.val());
                     }
                 });
-
-                if (isAdmin) {
-                    document.getElementById('admin-panel').classList.remove('hidden');
-                    subscribeToUsers();
-                }
             }
 
             document.getElementById('loading').classList.add('hidden');
@@ -442,39 +382,6 @@
             } else {
                 withdrawBtn.disabled = false;
             }
-        }
-
-        function updateAdminPanel() {
-            const totalUsers = allUsers.length;
-            const totalAds = allUsers.reduce((sum, u) => sum + (u.ads_watched || 0), 0);
-            const totalDiamonds = allUsers.reduce((sum, u) => sum + (u.diamonds || 0), 0);
-
-            document.getElementById('admin-total-users').textContent = totalUsers;
-            document.getElementById('admin-total-ads').textContent = totalAds;
-            document.getElementById('admin-total-diamonds').textContent = totalDiamonds;
-
-            const usersList = document.getElementById('users-list');
-            usersList.innerHTML = allUsers
-                .sort((a, b) => (b.diamonds || 0) - (a.diamonds || 0))
-                .map((user) => `
-                    <div class="bg-white/5 rounded-lg p-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-2">
-                                <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center text-xs font-bold">
-                                    ${user.first_name.charAt(0).toUpperCase()}
-                                </div>
-                                <div>
-                                    <p class="font-bold text-xs">${user.first_name}</p>
-                                    <p class="text-white/50 text-xs">@${user.username}</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm font-bold text-yellow-400">${user.diamonds || 0} 💎</p>
-                                <p class="text-white/50 text-xs">${user.ads_watched || 0} reklama</p>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
         }
 
         async function watchAd() {
@@ -539,7 +446,7 @@
             }
         }
 
-        // ✅ YANGILANGAN: Withdrawal function - CORS muammosini hal qiladi
+        // ✅ YANGILANGAN: Withdrawal function
         async function withdrawDiamonds(userId, amount) {
             console.log('🔄 Yechish boshlandi:', { userId, amount });
             
@@ -558,10 +465,6 @@
             }
             
             try {
-                // Proxy orqali yuborish (CORS muammosini hal qilish uchun)
-                const proxyUrl = 'https://api.allorigins.win/raw?url=';
-                const targetUrl = encodeURIComponent(WITHDRAW_API_URL);
-                
                 const formData = new FormData();
                 formData.append('key', API_KEY);
                 formData.append('user_id', userId);
@@ -569,69 +472,27 @@
                 formData.append('username', currentUser.username || 'user');
                 formData.append('first_name', currentUser.first_name || 'Foydalanuvchi');
                 
-                // Proxy orqali so'rov yuborish
-                const response = await fetch(proxyUrl + targetUrl, {
+                console.log('📤 FormData tarkibi:');
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+                
+                const response = await fetch(WITHDRAW_API_URL, {
                     method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json',
-                    }
+                    body: formData
                 });
                 
                 console.log('📥 Response status:', response.status);
                 
                 if (!response.ok) {
-                    // Agar proxy bilan xatolik bo'lsa, to'g'ridan-to'g'ri urinib ko'ramiz
-                    try {
-                        console.log('🔄 Proxy bilan xatolik, to\'g\'ridan-to\'g\'ri urinib ko\'ramiz');
-                        
-                        // To'g'ridan-to'g'ri so'rov
-                        const directResponse = await fetch(WITHDRAW_API_URL, {
-                            method: 'POST',
-                            body: formData,
-                            mode: 'no-cors' // CORS muammosidan qochish uchun
-                        });
-                        
-                        // no-cors mode da javobni o'qiy olmaymiz, shuning uchun oddiy muvaffaqiyatli deb hisoblaymiz
-                        return {
-                            success: true,
-                            message: 'Olmos yechib olindi!',
-                            new_balance: 0
-                        };
-                        
-                    } catch (directError) {
-                        console.error('❌ Direct request error:', directError);
-                        
-                        // Firebase ga yozish orqali ishlatamiz (offline mode)
-                        try {
-                            const userRef = ref(db, 'users/' + userId);
-                            const snapshot = await get(userRef);
-                            const userData = snapshot.val();
-                            const currentBalance = userData?.diamonds || 0;
-                            
-                            if (currentBalance >= amount) {
-                                const newBalance = currentBalance - amount;
-                                
-                                await update(userRef, {
-                                    diamonds: newBalance,
-                                    last_withdrawal: new Date().toISOString()
-                                });
-                                
-                                return {
-                                    success: true,
-                                    message: 'Olmos yechib olindi! (Offline rejim)',
-                                    new_balance: newBalance
-                                };
-                            }
-                        } catch (firebaseError) {
-                            console.error('❌ Firebase error:', firebaseError);
-                        }
-                        
-                        return {
-                            success: false,
-                            message: 'Serverga ulanib bo\'lmadi. Keyinroq urinib ko\'ring.'
-                        };
-                    }
+                    const errorText = await response.text();
+                    console.error('❌ HTTP xatosi:', errorText);
+                    
+                    return {
+                        success: false,
+                        message: `Server xatosi: ${response.status}`,
+                        error_details: errorText
+                    };
                 }
                 
                 const resultText = await response.text();
@@ -642,43 +503,29 @@
                     return result;
                 } catch (jsonError) {
                     console.error('❌ JSON parse error:', jsonError);
+                    
+                    // Agar HTML qaytsa
+                    if (resultText.includes('<!DOCTYPE') || resultText.includes('<html')) {
+                        return {
+                            success: false,
+                            message: 'Server HTML qaytardi. PHP faylni tekshiring.',
+                            raw_response: resultText.substring(0, 200)
+                        };
+                    }
+                    
                     return {
                         success: false,
-                        message: 'Server javobini o\'qib bo\'lmadi'
+                        message: 'Server javobini o\'qib bo\'lmadi',
+                        raw_response: resultText
                     };
                 }
                 
             } catch (error) {
                 console.error('❌ Withdrawal error:', error);
                 
-                // Offline rejimda Firebase bilan ishlash
-                try {
-                    const userRef = ref(db, 'users/' + userId);
-                    const snapshot = await get(userRef);
-                    const userData = snapshot.val();
-                    const currentBalance = userData?.diamonds || 0;
-                    
-                    if (currentBalance >= amount) {
-                        const newBalance = currentBalance - amount;
-                        
-                        await update(userRef, {
-                            diamonds: newBalance,
-                            last_withdrawal: new Date().toISOString()
-                        });
-                        
-                        return {
-                            success: true,
-                            message: 'Olmos yechib olindi! (Offline rejim)',
-                            new_balance: newBalance
-                        };
-                    }
-                } catch (firebaseError) {
-                    console.error('❌ Firebase error in catch:', firebaseError);
-                }
-                
                 return {
                     success: false,
-                    message: 'Xatolik yuz berdi. Internet aloqasini tekshiring.'
+                    message: 'Internet aloqasi yo\'q yoki serverga ulanib bo\'lmadi'
                 };
             }
         }
@@ -737,15 +584,27 @@
                         <p class="text-sm mb-2">${result.message}</p>
                         ${result.new_balance !== undefined ? 
                           `<p class="text-xs text-white/60">Yangi balans: <span class="font-bold">${result.new_balance} 💎</span></p>` : ''}
+                        ${result.withdrawal_id ? 
+                          `<p class="text-xs text-white/40 mt-1">ID: ${result.withdrawal_id}</p>` : ''}
                     </div>
                 `;
                 
-                // UI ni yangilash
+                // Firebase balansni yangilash
                 if (result.new_balance !== undefined) {
-                    const userRef = ref(db, 'users/' + userId);
-                    const snapshot = await get(userRef);
-                    if (snapshot.exists()) {
-                        updateUI(snapshot.val());
+                    try {
+                        const userRef = ref(db, 'users/' + userId);
+                        await update(userRef, {
+                            diamonds: result.new_balance,
+                            last_withdrawal: new Date().toISOString()
+                        });
+                        
+                        // UI ni yangilash
+                        const updatedSnapshot = await get(userRef);
+                        if (updatedSnapshot.exists()) {
+                            updateUI(updatedSnapshot.val());
+                        }
+                    } catch (error) {
+                        console.error('Firebase update error:', error);
                     }
                 }
                 

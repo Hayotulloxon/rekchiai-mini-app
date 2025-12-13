@@ -65,29 +65,6 @@
             from { transform: translateY(10px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        
-        /* Notification styles */
-        .notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            min-width: 300px;
-            max-width: 90%;
-        }
-        
-        .notification.success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-        
-        .notification.error {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        }
-        
-        .notification.warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        }
     </style>
 </head>
 <body class="h-full gradient-bg text-white overflow-auto">
@@ -134,6 +111,7 @@
                         <div class="flex-1">
                             <h3 id="user-name" class="font-bold">Foydalanuvchi</h3>
                             <p id="user-id" class="text-white/50 text-xs">ID: Yuklanmoqda...</p>
+                            <p id="bot-user-id" class="text-white/40 text-xs mt-1 hidden">Bot ID: <span id="bot-id-text"></span></p>
                         </div>
                     </div>
                 </div>
@@ -195,7 +173,7 @@
                     <div class="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-4 mb-4">
                         <div class="flex items-center justify-between mb-2">
                             <div>
-                                <p class="text-white/60 text-xs mb-1">Mavjud olmoslar</p>
+                                <p class="text-white/60 text-xs mb-1">Mavjud olmoslar (Firebase)</p>
                                 <p class="text-2xl font-bold text-green-400" id="withdraw-diamonds">0</p>
                             </div>
                             <div class="text-3xl pulse">💎</div>
@@ -204,6 +182,9 @@
                         <div class="flex items-center justify-between text-xs">
                             <span class="text-white/60">Minimal yechish:</span>
                             <span class="font-bold text-yellow-400">1 💎</span>
+                        </div>
+                        <div class="mt-2 text-xs text-white/50">
+                            <p>💡 Yechish botdagi balansni kamaytiradi</p>
                         </div>
                     </div>
                     
@@ -214,7 +195,15 @@
                                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-bold focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/30 transition-all">
                             <div class="absolute right-4 top-1/2 -translate-y-1/2 text-lg">💎</div>
                         </div>
-                        <p class="text-xs text-white/40 mt-2">Olmoslaringizni yechib oling</p>
+                        <p class="text-xs text-white/40 mt-2">Botdagi balansdan yechib oling</p>
+                    </div>
+                    
+                    <!-- Bot User ID Input (agar kerak bo'lsa) -->
+                    <div id="bot-user-input" class="mb-4 hidden">
+                        <label for="bot-user-id-input" class="block text-xs text-white/60 mb-2">Botdagi User ID</label>
+                        <input type="text" id="bot-user-id-input" 
+                               class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500">
+                        <p class="text-xs text-white/40 mt-1">Bot bazasidagi foydalanuvchi ID sini kiriting</p>
                     </div>
                     
                     <div id="withdraw-status" class="hidden bg-white/5 rounded-xl p-3 mb-3 text-center text-sm slide-in"></div>
@@ -223,18 +212,32 @@
                         <span>💰</span>
                         <span>Yechib olish</span>
                     </button>
+                    
+                    <!-- Debug Info -->
+                    <div class="mt-3 text-center">
+                        <button id="show-debug-btn" class="text-xs text-white/50 hover:text-white/70">
+                            Debug ma'lumotlari
+                        </button>
+                        <div id="debug-info" class="hidden text-left text-xs bg-black/20 p-3 rounded-lg mt-2">
+                            <p><strong>Mini App ID:</strong> <span id="debug-mini-id"></span></p>
+                            <p><strong>Bot ID (yuboriladigan):</strong> <span id="debug-bot-id"></span></p>
+                            <p><strong>Botda bor ID lar:</strong></p>
+                            <ul id="bot-user-list" class="mt-1 pl-4">
+                                <li>test_user_123 (test)</li>
+                                <li>7500103239 (admin)</li>
+                                <li>7104718080 (admin)</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
             
             <!-- Footer -->
             <div class="text-center py-6 pb-8">
-                <p class="text-white/30 text-xs">Diamond Rewards • v3.0</p>
+                <p class="text-white/30 text-xs">Diamond Rewards • v3.1</p>
             </div>
         </div>
     </div>
-
-    <!-- Notification Container -->
-    <div id="notification-container" class="notification hidden"></div>
 
     <script type="module">
         // Firebase imports
@@ -329,12 +332,8 @@
                 try {
                     AdController = window.Adsgram.init({ 
                         blockId: AD_BLOCK_ID,
-                        onReward: () => {
-                            console.log('✅ Reklama mukofoti berildi');
-                        },
-                        onClose: () => {
-                            console.log('❌ Reklama yopildi');
-                        }
+                        onReward: () => console.log('✅ Reklama mukofoti berildi'),
+                        onClose: () => console.log('❌ Reklama yopildi')
                     });
                     console.log('✅ Adsgram ishga tushdi');
                 } catch (error) {
@@ -368,7 +367,8 @@
                         last_ad_time: null,
                         created_at: new Date().toISOString(),
                         last_login: new Date().toISOString(),
-                        total_earned: 100
+                        total_earned: 100,
+                        bot_user_id: getBotUserId() // Botdagi ID ni saqlaymiz
                     };
                     
                     await set(userRef, newUser);
@@ -405,6 +405,30 @@
             }
         }
 
+        // ❗️ MUHIM FUNKSIYA: Botdagi User ID ni olish
+        function getBotUserId() {
+            // Bu funksiya mini app user_id ni botdagi user_id ga convert qiladi
+            // Sizning holatingizga qarab o'zgartirishingiz kerak
+            
+            const miniUserId = currentUser?.user_id;
+            
+            // Agar test foydalanuvchi bo'lsa
+            if (miniUserId.startsWith('test_')) {
+                return 'test_user_123'; // Test uchun botdagi ID
+            }
+            
+            // Agar Telegram foydalanuvchi bo'lsa
+            // Ko'pincha Telegram ID botdagi ID bilan bir xil bo'ladi
+            // Lekin ba'zida format farq qilishi mumkin
+            if (currentUser?.telegram_id) {
+                // Misol: Telegram ID 12345678, botda 12345678 yoki "user_12345678"
+                return currentUser.telegram_id.toString();
+            }
+            
+            // Default holda mini app ID sini qaytaramiz
+            return miniUserId;
+        }
+
         // Initialize app
         async function initializeAppMain() {
             console.log('🚀 Dastur ishga tushirilmoqda...');
@@ -430,6 +454,9 @@
                         updateUI(snapshot.val());
                     }
                 });
+                
+                // Bot ID ni ko'rsatish
+                showBotUserId();
             }
 
             // Show content
@@ -468,6 +495,19 @@
             }
         }
 
+        function showBotUserId() {
+            const botUserId = getBotUserId();
+            document.getElementById('bot-id-text').textContent = botUserId;
+            document.getElementById('bot-user-id').classList.remove('hidden');
+            
+            // Debug info
+            document.getElementById('debug-mini-id').textContent = currentUser?.user_id || 'N/A';
+            document.getElementById('debug-bot-id').textContent = botUserId;
+            
+            // Bot user ID input ga ham qo'yamiz
+            document.getElementById('bot-user-id-input').value = botUserId;
+        }
+
         function showErrorMessage(message) {
             document.getElementById('loading').innerHTML = `
                 <div class="text-center">
@@ -481,40 +521,15 @@
             `;
         }
 
-        // Notification system
-        function showNotification(message, type = 'info', duration = 3000) {
-            const container = document.getElementById('notification-container');
-            container.innerHTML = '';
-            container.className = `notification ${type} rounded-xl p-4 text-white font-medium shadow-lg`;
-            
-            let icon = 'ℹ️';
-            if (type === 'success') icon = '✅';
-            else if (type === 'error') icon = '❌';
-            else if (type === 'warning') icon = '⚠️';
-            
-            container.innerHTML = `
-                <div class="flex items-center space-x-3">
-                    <span class="text-xl">${icon}</span>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            container.classList.remove('hidden');
-            
-            setTimeout(() => {
-                container.classList.add('hidden');
-            }, duration);
-        }
-
         // Reklama ko'rish
         async function watchAd() {
             if (!currentUser) {
-                showNotification('Foydalanuvchi topilmadi', 'error');
+                alert('Foydalanuvchi topilmadi');
                 return;
             }
             
             if (adCooldown) {
-                showNotification('Iltimos, biroz kuting (30 soniya)', 'warning');
+                alert('Iltimos, biroz kuting (30 soniya)');
                 return;
             }
 
@@ -536,7 +551,7 @@
                 statusDiv.innerHTML = '<p class="text-red-400">Reklama tizimi yuklanmadi</p>';
                 btn.disabled = false;
                 btn.innerHTML = '<span>▶️</span><span>Reklamani boshlash</span>';
-                showNotification('Reklama tizimi yuklanmadi', 'error');
+                alert('Reklama tizimi yuklanmadi');
                 return;
             }
 
@@ -569,7 +584,7 @@
                         </div>
                     `;
                     
-                    showNotification(`${REWARD_AMOUNT} olmos qo'shildi!`, 'success');
+                    alert(`${REWARD_AMOUNT} olmos qo'shildi!`);
                     
                     // Cooldown
                     adCooldown = true;
@@ -584,7 +599,7 @@
             } catch (error) {
                 console.error('❌ Reklama xatosi:', error);
                 statusDiv.innerHTML = '<p class="text-orange-400">Reklama to\'liq ko\'rilmadi</p>';
-                showNotification('Reklama to\'liq ko\'rilmadi', 'warning');
+                alert('Reklama to\'liq ko\'rilmadi');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<span>▶️</span><span>Reklamani boshlash</span>';
@@ -595,14 +610,14 @@
             }
         }
 
-        // ✅ YAXSHILANGAN: Withdrawal function
-        async function withdrawDiamonds(userId, amount) {
-            console.log('🔄 Yechish boshlandi:', { userId, amount });
+        // ✅ TO'G'RI: Botdagi user_id bilan ishlash
+        async function withdrawDiamonds(botUserId, amount) {
+            console.log('🔄 Yechish boshlandi:', { botUserId, amount });
             
-            if (!userId) {
+            if (!botUserId) {
                 return {
                     success: false,
-                    message: 'Foydalanuvchi ID si topilmadi'
+                    message: 'Botdagi foydalanuvchi ID si topilmadi'
                 };
             }
             
@@ -614,139 +629,92 @@
             }
             
             try {
-                // Firebase dan joriy balansni olish
-                const userRef = ref(db, 'users/' + userId);
-                const snapshot = await get(userRef);
-                const userData = snapshot.val();
-                const currentBalance = userData?.diamonds || 0;
+                // POST so'rov yuborish
+                const formData = new FormData();
+                formData.append('key', API_KEY);
+                formData.append('user_id', botUserId); // ❗️ Botdagi user_id
+                formData.append('amount', amount);
+                formData.append('action', 'withdraw');
                 
-                if (currentBalance < amount) {
-                    return {
-                        success: false,
-                        message: `Yeterli olmos yo'q! Sizda: ${currentBalance} olmos, Talab: ${amount} olmos`
-                    };
-                }
-                
-                // API ga GET so'rovi
-                const params = new URLSearchParams({
-                    key: API_KEY,
-                    user_id: userId,
-                    amount: amount,
-                    action: 'withdraw'
+                console.log('📤 Botga so\'rov:', { 
+                    botUserId, 
+                    amount,
+                    apiKey: API_KEY.substring(0, 10) + '...'
                 });
                 
-                const apiUrl = `${WITHDRAW_API_URL}?${params.toString()}`;
-                console.log('📤 API URL:', apiUrl);
-                
-                const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                    },
-                    mode: 'cors'
+                const response = await fetch(WITHDRAW_API_URL, {
+                    method: 'POST',
+                    body: formData
                 });
                 
                 console.log('📥 Javob holati:', response.status);
                 
+                let responseText = '';
+                try {
+                    responseText = await response.text();
+                    console.log('📄 Javob matni:', responseText.substring(0, 500));
+                } catch (textError) {
+                    console.error('❌ Javob matnini o'qish xatosi:', textError);
+                }
+                
                 let result;
                 try {
-                    const responseText = await response.text();
-                    console.log('📄 Javob:', responseText.substring(0, 500));
-                    
-                    if (responseText.includes('{') && responseText.includes('}')) {
+                    if (responseText && responseText.includes('{') && responseText.includes('}')) {
                         result = JSON.parse(responseText);
                     } else {
-                        // Agar JSON bo'lmasa ham, muvaffaqiyatli deb hisoblash
+                        // Agar JSON bo'lmasa
                         result = {
-                            success: responseText.includes('success') || responseText.includes('olmos'),
-                            message: responseText,
-                            raw_response: responseText.substring(0, 200)
+                            success: response.ok && (responseText.includes('success') || responseText.includes('muvaffaqiyatli')),
+                            message: responseText || 'Server javobi yo\'q',
+                            status: response.status
                         };
                     }
                 } catch (parseError) {
-                    console.error('❌ Parse xatosi:', parseError);
+                    console.error('❌ JSON parse xatosi:', parseError);
                     result = {
-                        success: response.ok,
-                        message: response.ok ? 'Olmos yechib olindi!' : 'Server xatosi'
+                        success: false,
+                        message: 'Server javobini tushunib bo\'lmadi',
+                        error: parseError.message,
+                        raw_response: responseText.substring(0, 200)
                     };
                 }
                 
-                // Agar API muvaffaqiyatli bo'lsa, Firebase balansni yangilash
-                if (result.success) {
-                    const newBalance = result.new_balance || (currentBalance - amount);
-                    
-                    await update(userRef, {
-                        diamonds: newBalance,
-                        last_withdrawal: new Date().toISOString()
-                    });
-                    
-                    return {
-                        success: true,
-                        message: result.message || 'Olmos yechib olindi!',
-                        new_balance: newBalance
-                    };
-                } else {
-                    return {
-                        success: false,
-                        message: result.message || 'API xatosi'
-                    };
-                }
+                console.log('💰 Bot javobi (parse qilingan):', result);
+                return result;
                 
             } catch (error) {
                 console.error('❌ Withdrawal xatosi:', error);
-                
-                // Fallback: Firebase bilan ishlash
-                try {
-                    const userRef = ref(db, 'users/' + userId);
-                    const snapshot = await get(userRef);
-                    const userData = snapshot.val();
-                    const currentBalance = userData?.diamonds || 0;
-                    
-                    if (currentBalance >= amount) {
-                        const newBalance = currentBalance - amount;
-                        
-                        await update(userRef, {
-                            diamonds: newBalance,
-                            last_withdrawal: new Date().toISOString()
-                        });
-                        
-                        return {
-                            success: true,
-                            message: 'Olmos yechib olindi! (Offline rejim)',
-                            new_balance: newBalance,
-                            offline: true
-                        };
-                    } else {
-                        return {
-                            success: false,
-                            message: `Yeterli olmos yo'q! Sizda: ${currentBalance} olmos`
-                        };
-                    }
-                } catch (firebaseError) {
-                    console.error('❌ Firebase xatosi:', firebaseError);
-                    
-                    return {
-                        success: false,
-                        message: 'Internet aloqasi va lokal saqlashda xatolik',
-                        error: error.message
-                    };
-                }
+                return {
+                    success: false,
+                    message: 'Server bilan aloqa xatosi: ' + error.message
+                };
             }
         }
 
         // Withdraw button handler
         document.getElementById('withdraw-btn').addEventListener('click', async function() {
-            const userId = currentUser?.user_id;
+            const miniUserId = currentUser?.user_id;
             const amountInput = document.getElementById('withdraw-amount');
             const amount = parseInt(amountInput.value);
             
-            if (!userId) {
-                showNotification('Foydalanuvchi topilmadi', 'error');
+            // Botdagi user_id ni olish (input dan yoki avtomatik)
+            let botUserId = document.getElementById('bot-user-id-input').value;
+            if (!botUserId) {
+                botUserId = getBotUserId();
+            }
+            
+            if (!miniUserId) {
+                alert('Foydalanuvchi topilmadi');
+                return;
+            }
+            
+            if (!botUserId) {
+                alert('Botdagi foydalanuvchi ID si topilmadi');
                 return;
             }
             
             if (!amount || amount < 1) {
-                showNotification('Kamida 1 olmos kiriting', 'warning');
+                alert('Kamida 1 olmos kiriting');
                 amountInput.focus();
                 return;
             }
@@ -754,18 +722,18 @@
             // Firebase balansni tekshirish
             let currentBalance = 0;
             try {
-                const userRef = ref(db, 'users/' + userId);
+                const userRef = ref(db, 'users/' + miniUserId);
                 const snapshot = await get(userRef);
                 const userData = snapshot.val();
                 currentBalance = userData?.diamonds || 0;
                 
                 if (currentBalance < amount) {
-                    showNotification(`❌ Yetarli olmos yo'q!\nSizda: ${currentBalance} olmos\nKerak: ${amount} olmos`, 'error');
+                    alert(`❌ Firebase'da yetarli olmos yo'q!\n\nSizda: ${currentBalance} olmos\nKerak: ${amount} olmos`);
                     return;
                 }
             } catch (error) {
                 console.error('❌ Balans tekshirish xatosi:', error);
-                showNotification('Balansni tekshirishda xatolik', 'error');
+                alert('Firebase balansni tekshirishda xatolik');
                 return;
             }
             
@@ -776,10 +744,21 @@
             
             const statusDiv = document.getElementById('withdraw-status');
             statusDiv.classList.remove('hidden');
-            statusDiv.innerHTML = '<p class="text-yellow-400">⏳ Yechib olinmoqda. Iltimos kuting...</p>';
+            statusDiv.innerHTML = `
+                <div class="text-center">
+                    <p class="text-yellow-400">⏳ Yechib olinmoqda...</p>
+                    <p class="text-xs text-white/50 mt-1">Bot ID: ${botUserId}</p>
+                </div>
+            `;
             
             // Withdraw jarayoni
-            const result = await withdrawDiamonds(userId, amount);
+            console.log('🚀 Withdraw boshlanmoqda:', {
+                miniUserId,
+                botUserId,
+                amount
+            });
+            
+            const result = await withdrawDiamonds(botUserId, amount);
             console.log('💰 Yechish natijasi:', result);
             
             if (result.success) {
@@ -789,11 +768,33 @@
                         <p class="text-green-400 font-bold text-sm mb-1">Muvaffaqiyatli!</p>
                         <p class="text-sm mb-2">${result.message || 'Olmos yechib olindi'}</p>
                         ${result.new_balance !== undefined ? 
-                          `<p class="text-xs text-white/60">Yangi balans: <span class="font-bold">${result.new_balance} 💎</span></p>` : ''}
+                          `<p class="text-xs text-white/60">Botdagi yangi balans: <span class="font-bold">${result.new_balance} 💎</span></p>` : ''}
+                        ${result.withdrawal_id ? 
+                          `<p class="text-xs text-white/40 mt-1">Tranzaksiya ID: ${result.withdrawal_id}</p>` : ''}
                     </div>
                 `;
                 
-                showNotification('Olmos muvaffaqiyatli yechib olindi!', 'success');
+                // Agar muvaffaqiyatli bo'lsa, Firebase balansni ham yangilaymiz
+                try {
+                    const userRef = ref(db, 'users/' + miniUserId);
+                    const snapshot = await get(userRef);
+                    const userData = snapshot.val();
+                    const currentFirebaseBalance = userData?.diamonds || 0;
+                    
+                    if (currentFirebaseBalance >= amount) {
+                        const newFirebaseBalance = currentFirebaseBalance - amount;
+                        await update(userRef, {
+                            diamonds: newFirebaseBalance,
+                            last_withdrawal: new Date().toISOString(),
+                            last_bot_withdrawal: new Date().toISOString(),
+                            bot_withdrawal_amount: amount
+                        });
+                        console.log('✅ Firebase balans yangilandi:', newFirebaseBalance);
+                    }
+                } catch (firebaseError) {
+                    console.error('❌ Firebase yangilash xatosi:', firebaseError);
+                }
+                
                 amountInput.value = '';
                 
             } else {
@@ -802,18 +803,18 @@
                         <div class="text-3xl mb-2">❌</div>
                         <p class="text-red-400 font-bold text-sm mb-1">Xatolik</p>
                         <p class="text-sm mb-2">${result.message || 'Noma\'lum xatolik'}</p>
+                        ${result.error ? `<p class="text-xs text-white/50">${result.error}</p>` : ''}
                     </div>
                 `;
-                showNotification(result.message || 'Xatolik yuz berdi', 'error');
             }
             
             btn.disabled = false;
             btn.innerHTML = originalText;
             
-            // 5 soniyadan keyin statusni yashirish
+            // 10 soniyadan keyin statusni yashirish
             setTimeout(() => {
                 statusDiv.classList.add('hidden');
-            }, 5000);
+            }, 10000);
         });
 
         // Event listeners
@@ -825,9 +826,17 @@
             }
         });
 
-        // Inputga fokus berish
-        document.getElementById('withdraw-amount').addEventListener('focus', function() {
-            this.select();
+        // Debug info ko'rsatish
+        document.getElementById('show-debug-btn').addEventListener('click', function() {
+            const debugInfo = document.getElementById('debug-info');
+            debugInfo.classList.toggle('hidden');
+        });
+
+        // Bot user ID ni o'zgartirish
+        document.getElementById('bot-user-id-input').addEventListener('change', function() {
+            const newBotId = this.value;
+            console.log('🔄 Bot ID o\'zgartirildi:', newBotId);
+            document.getElementById('debug-bot-id').textContent = newBotId;
         });
 
         // Initialize app
@@ -839,7 +848,7 @@
 
         // Global functions
         window.showErrorMessage = showErrorMessage;
-        window.showNotification = showNotification;
+        window.getBotUserId = getBotUserId;
     </script>
 </body>
 </html>

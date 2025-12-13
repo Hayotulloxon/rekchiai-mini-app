@@ -1,628 +1,707 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💎 Diamond Rewards</title>
+<!doctype html>
+<html lang="uz" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diamond Rewards</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    window.process = { env: { NODE_ENV: 'production' } };
+  </script>
+  <style>
+    body {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+    }
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#667eea',
-                        secondary: '#764ba2'
-                    }
-                }
-            }
-        }
-    </script>
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
     
-    <!-- Telegram Web App SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    @keyframes pulse-glow {
+      0%, 100% { 
+        box-shadow: 0 0 30px rgba(139, 92, 246, 0.4),
+                    0 0 60px rgba(139, 92, 246, 0.2); 
+      }
+      50% { 
+        box-shadow: 0 0 50px rgba(139, 92, 246, 0.6),
+                    0 0 100px rgba(139, 92, 246, 0.3); 
+      }
+    }
     
-    <!-- ADSGRAM SDK (Muhim!) -->
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    @keyframes slideUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
     
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: all 0.3s;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-        }
-        .adsgram-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-        }
-    </style>
-</head>
-<body class="text-white p-4">
-    <!-- Loading -->
-    <div id="loading" class="flex flex-col items-center justify-center min-h-screen">
-        <div class="text-6xl mb-4 animate-bounce">💎</div>
-        <div class="text-xl font-bold">Diamond Rewards</div>
-        <div class="text-white/60 mt-2">Yuklanmoqda...</div>
+    @keyframes celebrate {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.2) rotate(-5deg); }
+      75% { transform: scale(1.2) rotate(5deg); }
+    }
+    
+    .float-animation {
+      animation: float 4s ease-in-out infinite;
+    }
+    
+    .pulse-glow {
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+    
+    .slide-up {
+      animation: slideUp 0.5s ease-out;
+    }
+    
+    .app-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    }
+    
+    .diamond-icon {
+      filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.8));
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+    }
+    
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0px);
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full gradient-bg text-white overflow-auto">
+  <div id="app" class="min-h-full w-full"><!-- Loading State -->
+   <div id="loading" class="flex items-center justify-center min-h-screen p-4">
+    <div class="text-center slide-up">
+     <div class="text-7xl mb-6 float-animation diamond-icon">
+      💎
+     </div>
+     <div class="w-20 h-20 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+     <p class="text-xl font-semibold">Diamond Rewards</p>
+     <p class="text-white/60 mt-2">Yuklanmoqda...</p>
     </div>
-    
-    <!-- Main Content -->
-    <div id="main-content" class="hidden max-w-md mx-auto">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-2xl font-bold">💎 Diamond Rewards</h1>
-                <p class="text-white/60 text-sm">Reklama ko'ring, olmos yig'ing</p>
-            </div>
-            <div class="glass-card px-4 py-2 rounded-full">
-                <span id="balance" class="text-xl font-bold">0</span> 💎
-            </div>
+   </div><!-- Main Content -->
+   <div id="content" class="hidden"><!-- Top Bar -->
+    <div class="sticky top-0 z-50 backdrop-blur-xl bg-white/5 border-b border-white/10">
+     <div class="max-w-lg mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+       <div class="flex items-center space-x-3">
+        <div class="text-3xl diamond-icon">
+         💎
         </div>
+        <div>
+         <h1 class="text-xl font-bold">Diamond Rewards</h1>
+         <p class="text-xs text-white/60">Reklama ko'ring, olmos yig'ing</p>
+        </div>
+       </div>
+       <div class="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full pulse-glow"><span id="diamond-count" class="text-2xl font-bold">0</span> <span class="text-xl diamond-icon">💎</span>
+       </div>
+      </div>
+     </div>
+    </div><!-- Main Container -->
+    <div class="max-w-lg mx-auto px-4 py-6 space-y-4"><!-- User Profile Card -->
+     <div class="app-card p-5 slide-up">
+      <div class="flex items-center space-x-4">
+       <div id="user-avatar" class="w-16 h-16 bg-gradient-to-br from-white/20 to-white/5 rounded-2xl flex items-center justify-center text-2xl font-bold border border-white/20">
+        👤
+       </div>
+       <div class="flex-1">
+        <h3 id="user-name" class="font-bold text-lg">Foydalanuvchi</h3>
+        <p id="user-id" class="text-white/50 text-sm">ID: Loading...</p>
+       </div>
+      </div>
+     </div><!-- Ad Watch Section -->
+     <div class="app-card p-6 slide-up" style="animation-delay: 0.1s;"><!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+       <div class="flex items-center space-x-3">
+        <div class="text-3xl">
+         🎬
+        </div>
+        <div>
+         <h2 class="text-xl font-bold">Reklama ko'ring</h2>
+         <p class="text-white/60 text-sm">Olmos yig'ing</p>
+        </div>
+       </div>
+       <div class="bg-green-500/20 border border-green-500/30 px-3 py-1.5 rounded-full"><span class="text-green-400 font-bold text-sm">+1 💎</span>
+       </div>
+      </div><!-- Status Display -->
+      <div id="ad-status" class="bg-white/5 border border-white/10 rounded-2xl p-6 mb-5 text-center min-h-[100px] flex items-center justify-center">
+       <p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>
+      </div><!-- Watch Button --> <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-5 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg"> <span class="text-2xl">▶️</span> <span>Reklamani boshlash</span> </button>
+     </div><!-- Stats Section -->
+     <div class="app-card p-6 slide-up" style="animation-delay: 0.2s;">
+      <div class="flex items-center space-x-2 mb-5">
+       <div class="text-2xl">
+        📊
+       </div>
+       <h3 class="text-xl font-bold">Statistika</h3>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+       <div class="stat-card rounded-2xl p-5 text-center">
+        <div class="text-3xl mb-2">
+         🎬
+        </div>
+        <p class="text-white/60 text-xs mb-2">Ko'rilgan</p>
+        <p id="ads-watched" class="text-3xl font-bold">0</p>
+        <p class="text-white/40 text-xs mt-1">reklamalar</p>
+       </div>
+       <div class="stat-card rounded-2xl p-5 text-center">
+        <div class="text-3xl mb-2 diamond-icon">
+         💎
+        </div>
+        <p class="text-white/60 text-xs mb-2">Jami</p>
+        <p id="total-diamonds" class="text-3xl font-bold">0</p>
+        <p class="text-white/40 text-xs mt-1">olmoslar</p>
+       </div>
+      </div>
+     </div><!-- Withdraw Section -->
+     <div class="app-card p-6 slide-up" style="animation-delay: 0.25s;">
+      <div class="flex items-center space-x-2 mb-5">
+       <div class="text-2xl">
+        💰
+       </div>
+       <h3 class="text-xl font-bold">Olmos yechish</h3>
+      </div><!-- Withdraw Info -->
+      <div class="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-5 mb-5">
+       <div class="flex items-center justify-between mb-3">
+        <div>
+         <p class="text-white/60 text-sm mb-1">Mavjud olmoslar</p>
+         <p class="text-3xl font-bold text-green-400" id="withdraw-diamonds">0</p>
+        </div>
+        <div class="text-5xl">
+         💎
+        </div>
+       </div>
+       <div class="h-px bg-white/10 my-3"></div>
+       <div class="flex items-center justify-between text-sm"><span class="text-white/60">Minimal yechish:</span> <span class="font-bold text-yellow-400">1 💎</span>
+       </div>
+      </div><!-- Withdraw Input -->
+      <div class="mb-5"><label for="withdraw-amount" class="block text-sm text-white/60 mb-2">Yechish miqdori</label>
+       <div class="relative"><input type="number" id="withdraw-amount" placeholder="0" min="1" step="1" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg font-bold focus:outline-none focus:border-green-500/50 focus:ring-2 focus:ring-green-500/20 transition-all">
+        <div class="absolute right-5 top-1/2 -translate-y-1/2 text-2xl">
+         💎
+        </div>
+       </div>
+       <p class="text-xs text-white/40 mt-2">Olmoslaringizni yechib oling</p>
+      </div><!-- Withdraw Status -->
+      <div id="withdraw-status" class="hidden bg-white/5 border border-white/10 rounded-2xl p-4 mb-5 text-center text-sm"></div><!-- Withdraw Button --> <button id="withdraw-btn" class="btn-primary w-full text-white font-bold py-5 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed"> <span class="text-2xl">💰</span> <span>Yechib olish</span> </button>
+     </div><!-- Admin Panel -->
+     <div id="admin-panel" class="hidden app-card p-6 border-2 border-yellow-500/30 slide-up" style="animation-delay: 0.3s;">
+      <div class="flex items-center space-x-3 mb-6">
+       <div class="text-3xl">
+        👑
+       </div>
+       <h2 class="text-xl font-bold">Admin Panel</h2>
+      </div><!-- Admin Stats -->
+      <div class="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-2xl p-5 mb-6">
+       <div class="flex items-center space-x-2 mb-4">
+        <div class="text-xl">
+         📈
+        </div>
+        <h3 class="font-bold">Umumiy statistika</h3>
+       </div>
+       <div class="grid grid-cols-3 gap-4 text-center">
+        <div>
+         <p class="text-2xl font-bold text-yellow-400" id="admin-total-users">0</p>
+         <p class="text-xs text-white/60 mt-1">Foydalanuvchi</p>
+        </div>
+        <div>
+         <p class="text-2xl font-bold text-yellow-400" id="admin-total-ads">0</p>
+         <p class="text-xs text-white/60 mt-1">Reklamalar</p>
+        </div>
+        <div>
+         <p class="text-2xl font-bold text-yellow-400" id="admin-total-diamonds">0</p>
+         <p class="text-xs text-white/60 mt-1">Olmoslar</p>
+        </div>
+       </div>
+      </div><!-- Users List -->
+      <div class="flex items-center space-x-2 mb-4">
+       <div class="text-xl">
+        👥
+       </div>
+       <h3 class="font-bold">Foydalanuvchilar</h3>
+      </div>
+      <div id="users-list" class="space-y-3 max-h-96 overflow-y-auto">
+      </div>
+     </div>
+    </div><!-- Footer -->
+    <div class="text-center py-8 pb-12">
+     <div class="flex items-center justify-center space-x-2 text-white/40 text-sm mb-2"><span>⚡️</span> <span>Telegram Mini App</span>
+     </div>
+     <p class="text-white/30 text-xs">Diamond Rewards • v1.0</p>
+    </div>
+   </div>
+  </div>
+  <script type="module">
+    // Firebase imports - REALTIME DATABASE
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFzNDoLlxHEpJOuZO8nhc-D2SmUId2dEc",
+      authDomain: "rekchi-2dc2f.firebaseapp.com",
+      databaseURL: "https://rekchi-2dc2f-default-rtdb.firebaseio.com",
+      projectId: "rekchi-2dc2f",
+      storageBucket: "rekchi-2dc2f.firebasestorage.app",
+      messagingSenderId: "352655860270",
+      appId: "1:352655860270:web:e071c82f4b911c21c0b5bf",
+      measurementId: "G-4WVC8S5V3R"
+    };
+
+    // Initialize Firebase
+    const firebaseApp = initializeApp(firebaseConfig);
+    const db = getDatabase(firebaseApp);
+
+    const ADMIN_IDS = ['7500103239', '7104718080'];
+    const AD_BLOCK_ID = '18961';
+    const REWARD_AMOUNT = 1;
+    
+    let currentUser = null;
+    let allUsers = [];
+    let isAdmin = false;
+    let AdController = null;
+
+    // Initialize Telegram Web App
+    function initTelegram() {
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+        const tg = window.Telegram.WebApp;
+        const user = tg.initDataUnsafe?.user;
         
-        <!-- User Info -->
-        <div class="glass-card rounded-2xl p-4 mb-4">
-            <div class="flex items-center">
-                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-xl font-bold mr-3">
-                    <span id="user-avatar">👤</span>
+        if (user) {
+          currentUser = {
+            user_id: user.id.toString(),
+            username: user.username || 'user',
+            first_name: user.first_name || 'User'
+          };
+          isAdmin = ADMIN_IDS.includes(currentUser.user_id);
+          console.log('✅ Telegram user loaded:', currentUser);
+        } else {
+          console.log('⚠️ No Telegram user, using test user');
+          currentUser = {
+            user_id: 'test_' + Date.now(),
+            username: 'testuser',
+            first_name: 'Test User'
+          };
+        }
+      }
+    }
+
+    // Initialize Adsgram
+    function initAdsgram() {
+      if (window.Adsgram) {
+        AdController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
+        console.log('✅ Adsgram initialized');
+      } else {
+        setTimeout(initAdsgram, 500);
+      }
+    }
+
+    // Firebase Realtime Database Functions
+    async function loadOrCreateUser() {
+      if (!currentUser) {
+        console.error('❌ No current user');
+        return null;
+      }
+
+      try {
+        console.log('📡 Loading user from Realtime Database:', currentUser.user_id);
+        const userRef = ref(db, 'users/' + currentUser.user_id);
+        const snapshot = await get(userRef);
+
+        if (!snapshot.exists()) {
+          console.log('➕ Creating new user');
+          const newUser = {
+            user_id: currentUser.user_id,
+            username: currentUser.username,
+            first_name: currentUser.first_name,
+            diamonds: 0,
+            ads_watched: 0,
+            last_ad_time: new Date().toISOString(),
+            created_at: new Date().toISOString()
+          };
+          
+          await set(userRef, newUser);
+          console.log('✅ New user created');
+          return newUser;
+        } else {
+          console.log('✅ User loaded');
+          return snapshot.val();
+        }
+      } catch (error) {
+        console.error('❌ Error loading user:', error);
+        showError('Ma\'lumotlar yuklanmadi: ' + error.message);
+        return null;
+      }
+    }
+
+    async function updateUserData(updates) {
+      if (!currentUser) return false;
+
+      try {
+        const userRef = ref(db, 'users/' + currentUser.user_id);
+        await update(userRef, updates);
+        console.log('✅ User updated:', updates);
+        return true;
+      } catch (error) {
+        console.error('❌ Error updating user:', error);
+        return false;
+      }
+    }
+
+    function subscribeToUsers() {
+      if (!isAdmin) return;
+
+      const usersRef = ref(db, 'users');
+      onValue(usersRef, (snapshot) => {
+        allUsers = [];
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          Object.keys(data).forEach(key => {
+            allUsers.push(data[key]);
+          });
+          console.log('👑 Admin: loaded', allUsers.length, 'users');
+          updateAdminPanel();
+        }
+      }, (error) => {
+        console.error('❌ Error subscribing to users:', error);
+      });
+    }
+
+    // Initialize App
+    async function initializeAppMain() {
+      console.log('🚀 Initializing app...');
+      
+      initTelegram();
+      initAdsgram();
+
+      const user = await loadOrCreateUser();
+      
+      if (user) {
+        updateUI(user);
+        
+        // Subscribe to user changes
+        const userRef = ref(db, 'users/' + currentUser.user_id);
+        onValue(userRef, (snapshot) => {
+          if (snapshot.exists()) {
+            console.log('🔄 User data updated');
+            updateUI(snapshot.val());
+          }
+        }, (error) => {
+          console.error('❌ Error subscribing to user:', error);
+        });
+
+        if (isAdmin) {
+          console.log('👑 Admin mode activated');
+          document.getElementById('admin-panel').classList.remove('hidden');
+          subscribeToUsers();
+        }
+      }
+
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('content').classList.remove('hidden');
+      console.log('✅ App initialized');
+    }
+
+    function updateUI(user) {
+      if (!user) return;
+
+      const initials = user.first_name.charAt(0).toUpperCase();
+      document.getElementById('user-avatar').textContent = initials;
+      document.getElementById('user-name').textContent = user.first_name;
+      document.getElementById('user-id').textContent = `ID: ${user.user_id}`;
+      
+      const diamonds = user.diamonds || 0;
+      document.getElementById('diamond-count').textContent = diamonds;
+      document.getElementById('total-diamonds').textContent = diamonds;
+      document.getElementById('withdraw-diamonds').textContent = diamonds;
+      document.getElementById('ads-watched').textContent = user.ads_watched || 0;
+      
+      // Update withdraw button state
+      const withdrawBtn = document.getElementById('withdraw-btn');
+      if (diamonds < 1) {
+        withdrawBtn.disabled = true;
+      } else {
+        withdrawBtn.disabled = false;
+      }
+    }
+
+    function updateAdminPanel() {
+      const totalUsers = allUsers.length;
+      const totalAds = allUsers.reduce((sum, u) => sum + (u.ads_watched || 0), 0);
+      const totalDiamonds = allUsers.reduce((sum, u) => sum + (u.diamonds || 0), 0);
+
+      document.getElementById('admin-total-users').textContent = totalUsers;
+      document.getElementById('admin-total-ads').textContent = totalAds;
+      document.getElementById('admin-total-diamonds').textContent = totalDiamonds;
+
+      const usersList = document.getElementById('users-list');
+      usersList.innerHTML = allUsers
+        .sort((a, b) => (b.diamonds || 0) - (a.diamonds || 0))
+        .map((user) => `
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-white/20 to-white/5 rounded-xl flex items-center justify-center text-sm font-bold border border-white/20">
+                  ${user.first_name.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                    <div id="user-name" class="font-bold">Foydalanuvchi</div>
-                    <div id="user-id" class="text-sm text-white/60">ID: ...</div>
+                  <p class="font-bold text-sm">${user.first_name}</p>
+                  <p class="text-xs text-white/50">@${user.username}</p>
                 </div>
+              </div>
+              <div class="text-right">
+                <p class="text-lg font-bold text-yellow-400">${user.diamonds || 0} 💎</p>
+                <p class="text-xs text-white/50">${user.ads_watched || 0} reklama</p>
+              </div>
             </div>
-        </div>
-        
-        <!-- Watch Ad Section -->
-        <div class="glass-card rounded-2xl p-5 mb-4">
-            <div class="flex justify-between items-center mb-4">
-                <div>
-                    <div class="text-xl font-bold mb-1">🎬 Reklama ko'ring</div>
-                    <div class="text-white/60 text-sm">Olmos yig'ing</div>
-                </div>
-                <div class="bg-green-500/20 px-3 py-1 rounded-full">
-                    <span class="text-green-400 font-bold">+1 💎</span>
-                </div>
-            </div>
-            
-            <!-- Ad Status -->
-            <div id="ad-status" class="bg-white/5 rounded-xl p-4 mb-4 text-center">
-                <p class="text-white/70">Reklama tayyor!</p>
-                <p class="text-xs text-white/40 mt-1">Faqat to'liq ko'rganingizda olmos qo'shiladi</p>
-            </div>
-            
-            <!-- Watch Button -->
-            <button id="watch-btn" class="btn-primary w-full py-4 rounded-xl font-bold text-lg">
-                ▶️ Reklamani boshlash (+1 💎)
-            </button>
-        </div>
-        
-        <!-- Withdraw Section -->
-        <div class="glass-card rounded-2xl p-5">
-            <div class="text-xl font-bold mb-4">💰 Olmos yechish</div>
-            
-            <div class="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl p-4 mb-4">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <div class="text-white/60 text-sm">Mavjud olmoslar</div>
-                        <div id="withdraw-balance" class="text-3xl font-bold text-green-400">0</div>
-                    </div>
-                    <div class="text-5xl">💎</div>
-                </div>
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-white/60 text-sm mb-2">Yechish miqdori</label>
-                <div class="relative">
-                    <input id="withdraw-amount" type="number" min="1" value="1" 
-                           class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-lg font-bold focus:outline-none focus:border-green-500">
-                    <div class="absolute right-4 top-3 text-2xl">💎</div>
-                </div>
-            </div>
-            
-            <div id="withdraw-status" class="hidden bg-white/5 rounded-xl p-4 mb-4 text-center"></div>
-            
-            <button id="withdraw-btn" class="btn-primary w-full py-4 rounded-xl font-bold text-lg">
-                💰 Yechib olish
-            </button>
-        </div>
-        
-        <!-- Footer -->
-        <div class="text-center mt-8 text-white/40 text-sm">
-            Diamond Rewards • Telegram Mini App
-        </div>
-    </div>
+          </div>
+        `).join('');
+    }
 
-    <!-- Adsgram Modal -->
-    <div id="adsgram-modal" class="adsgram-modal hidden">
-        <div class="text-center p-8">
-            <div class="text-6xl mb-6 animate-pulse">📺</div>
-            <div class="text-2xl font-bold mb-2">Reklama yuklanmoqda...</div>
-            <div class="text-white/60 mb-6">Iltimos kuting</div>
-            <div class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
-        </div>
-    </div>
+    async function watchAd() {
+      if (!currentUser) return;
 
-    <script>
-        // ================================================
-        // 📱 TELEGRAM VA ADSGRAM INIT
-        // ================================================
-        let tg = null;
-        let currentUser = null;
-        let AdController = null;
-        let isShowingAd = false;
+      const btn = document.getElementById('watch-ad-btn');
+      const statusDiv = document.getElementById('ad-status');
+      
+      btn.disabled = true;
+      btn.innerHTML = '<div class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
+      statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yuklanmoqda...</p>';
+
+      let attempts = 0;
+      while (!AdController && attempts < 20) {
+        await new Promise(resolve => setTimeout(resolve, 250));
+        attempts++;
+      }
+
+      if (!AdController) {
+        statusDiv.innerHTML = '<p class="text-red-400">Reklama tizimi yuklanmagan. Sahifani yangilang.</p>';
+        btn.disabled = false;
+        btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
+        return;
+      }
+
+      try {
+        statusDiv.innerHTML = '<p class="text-green-400 font-bold">🎬 Reklama ko\'rsatilmoqda...</p>';
         
-        function initTelegram() {
-            if (window.Telegram && window.Telegram.WebApp) {
-                tg = window.Telegram.WebApp;
-                tg.ready();
-                tg.expand();
-                
-                const user = tg.initDataUnsafe?.user;
-                if (user) {
-                    currentUser = {
-                        id: user.id.toString(),
-                        username: user.username || 'user',
-                        firstName: user.first_name || 'User'
-                    };
-                    console.log('✅ Telegram user:', currentUser);
-                } else {
-                    currentUser = {
-                        id: '7500103239',
-                        username: 'test_user',
-                        firstName: 'Test User'
-                    };
-                    console.log('⚠️ Test user');
-                }
-                
-                document.getElementById('user-avatar').textContent = 
-                    currentUser.firstName.charAt(0).toUpperCase();
-                document.getElementById('user-name').textContent = currentUser.firstName;
-                document.getElementById('user-id').textContent = `ID: ${currentUser.id}`;
-                
-                return true;
-            }
-            return false;
+        await AdController.show();
+        
+        const userRef = ref(db, 'users/' + currentUser.user_id);
+        const snapshot = await get(userRef);
+        const userData = snapshot.val();
+
+        const success = await updateUserData({
+          diamonds: (userData.diamonds || 0) + REWARD_AMOUNT,
+          ads_watched: (userData.ads_watched || 0) + 1,
+          last_ad_time: new Date().toISOString()
+        });
+
+        if (success) {
+          statusDiv.innerHTML = `
+            <div class="text-center slide-up">
+              <div class="text-6xl mb-3" style="animation: celebrate 0.6s ease-out;">🎉</div>
+              <p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p>
+              <p class="text-2xl font-bold mb-2">+${REWARD_AMOUNT} 💎</p>
+              <p class="text-sm text-white/60">Reklama to'liq ko'rildi</p>
+            </div>
+          `;
+        } else {
+          throw new Error('Mukofot berishda xatolik');
+        }
+      } catch (error) {
+        console.error('❌ Ad error:', error);
+        
+        if (error && error.error) {
+          statusDiv.innerHTML = `<p class="text-red-400">Xatolik: ${error.description || 'Reklama yuklanmadi'}</p>`;
+        } else if (error && error.done === false) {
+          statusDiv.innerHTML = '<p class="text-orange-400">Reklama to\'liq ko\'rilmadi. Mukofot berilmadi.</p>';
+        } else {
+          statusDiv.innerHTML = '<p class="text-orange-400">Reklama yopildi yoki xatolik yuz berdi.</p>';
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
+        
+        setTimeout(() => {
+          statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>';
+        }, 3000);
+      }
+    }
+
+    function showError(message) {
+      const statusDiv = document.getElementById('ad-status');
+      if (statusDiv) {
+        statusDiv.innerHTML = `<p class="text-red-400">${message}</p>`;
+      }
+    }
+
+    async function withdrawDiamonds() {
+      if (!currentUser) return;
+
+      const withdrawBtn = document.getElementById('withdraw-btn');
+      const withdrawStatus = document.getElementById('withdraw-status');
+      const amountInput = document.getElementById('withdraw-amount');
+      const amount = parseInt(amountInput.value);
+
+      // Validation
+      if (!amount || amount < 1) {
+        withdrawStatus.classList.remove('hidden');
+        withdrawStatus.innerHTML = '<p class="text-orange-400">❌ Minimal yechish 1 olmos</p>';
+        setTimeout(() => withdrawStatus.classList.add('hidden'), 3000);
+        return;
+      }
+
+      // Check user balance
+      const userRef = ref(db, 'users/' + currentUser.user_id);
+      const snapshot = await get(userRef);
+      const userData = snapshot.val();
+      const currentDiamonds = userData.diamonds || 0;
+
+      if (amount > currentDiamonds) {
+        withdrawStatus.classList.remove('hidden');
+        withdrawStatus.innerHTML = '<p class="text-orange-400">❌ Olmoslar yetarli emas</p>';
+        setTimeout(() => withdrawStatus.classList.add('hidden'), 3000);
+        return;
+      }
+
+      // Start withdrawal
+      withdrawBtn.disabled = true;
+      withdrawBtn.innerHTML = '<div class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
+      withdrawStatus.classList.remove('hidden');
+      withdrawStatus.innerHTML = '<p class="text-yellow-400">⏳ Yechilmoqda...</p>';
+
+      try {
+        // Call external API with CORS Proxy
+        const apiUrl = 'https://68ed1ab05ca4e.myxvest1.ru/Test/add_balance.php';
+        const apiKey = '4564123:hkjhfadfhieapkdnga';
+        
+        // ✅ CORS Proxy qo'shildi
+        const corsProxy = 'https://corsproxy.io/?';
+        const fullUrl = corsProxy + encodeURIComponent(apiUrl);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+        const response = await fetch(fullUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            key: apiKey,
+            user_id: currentUser.user_id,
+            amount: amount,
+            type: 'diamonds',
+            description: "Reklama ko'rib topgan"
+          }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          // Update Firebase - deduct diamonds
+          await updateUserData({
+            diamonds: currentDiamonds - amount,
+            last_withdraw_time: new Date().toISOString(),
+            total_withdrawn: (userData.total_withdrawn || 0) + amount
+          });
+
+          withdrawStatus.innerHTML = `
+            <div class="text-center">
+              <div class="text-4xl mb-2">🎉</div>
+              <p class="text-green-400 font-bold">Muvaffaqiyatli!</p>
+              <p class="text-white/80 mt-1">${amount} olmos yechib olindi</p>
+              <p class="text-xs text-white/50 mt-2">Yangi balans: ${result.new_balance || 'N/A'}</p>
+            </div>
+          `;
+          
+          amountInput.value = '';
+          
+          console.log('✅ Withdrawal successful:', result);
+        } else {
+          throw new Error(result.error || 'API xatosi');
+        }
+      } catch (error) {
+        console.error('❌ Withdrawal error:', error);
+        
+        let errorMessage = 'Noma\'lum xatolik';
+        if (error.name === 'AbortError') {
+          errorMessage = 'So\'rov vaqti tugadi (10 soniya)';
+        } else if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Internet aloqasi yo\'q';
+        } else {
+          errorMessage = error.message;
         }
         
-        function initAdsgram() {
-            try {
-                if (window.Adsgram) {
-                    // BLOCK ID 18961 - REWARDED FORMAT
-                    AdController = window.Adsgram.init({ 
-                        blockId: "18961"
-                    });
-                    
-                    console.log('✅ Adsgram initialized with blockId: 18961');
-                    console.log('AdController:', AdController);
-                    
-                    // Adsgram mavjudligini tekshirish
-                    if (AdController && typeof AdController.show === 'function') {
-                        console.log('✅ AdController.show() mavjud');
-                        return true;
-                    } else {
-                        console.error('❌ AdController.show() topilmadi');
-                        return false;
-                    }
-                } else {
-                    console.error('❌ Adsgram SDK yuklanmadi');
-                    return false;
-                }
-            } catch (error) {
-                console.error('❌ Adsgram init xatosi:', error);
-                return false;
-            }
-        }
+        withdrawStatus.innerHTML = `<p class="text-red-400">❌ Xatolik: ${errorMessage}</p>`;
+      } finally {
+        withdrawBtn.disabled = false;
+        withdrawBtn.innerHTML = '<span class="text-2xl">💰</span><span>Yechib olish</span>';
         
-        // ================================================
-        // 🎮 BUTTON HANDLERS
-        // ================================================
-        document.getElementById('watch-btn').addEventListener('click', showAd);
-        document.getElementById('withdraw-btn').addEventListener('click', withdrawDiamonds);
-        
-        // ================================================
-        // 🎬 SHOW ADSGRAM AD (REWARDED FORMAT)
-        // ================================================
-        async function showAd() {
-            console.log('🎬 showAd() boshlandi');
-            
-            if (isShowingAd) {
-                console.log('⚠️ Reklama allaqachon ko\'rsatilmoqda');
-                return;
-            }
-            
-            if (!AdController) {
-                console.error('❌ AdController mavjud emas');
-                showError('Reklama xizmati ishlamayapti');
-                return;
-            }
-            
-            const btn = document.getElementById('watch-btn');
-            const status = document.getElementById('ad-status');
-            const modal = document.getElementById('adsgram-modal');
-            
-            // Tugmani disable qilish
-            btn.disabled = true;
-            btn.innerHTML = '<div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
-            status.innerHTML = '<p class="text-yellow-400">Reklama tayyorlanmoqda...</p>';
-            isShowingAd = true;
-            
-            try {
-                // Loading modalni ko'rsatish
-                modal.classList.remove('hidden');
-                
-                console.log('📺 AdController.show() chaqirilmoqda...');
-                
-                // ADSGRAM REKLAMANI KO'RSATISH
-                // Faqat to'liq ko'rilganda .then() ishlaydi
-                // Oldindan yopilsa .catch() ishlaydi
-                AdController.show()
-                    .then((result) => {
-                        console.log('✅ Reklama to\'liq ko\'rildi:', result);
-                        
-                        // 1. MUKOFOT BERISH (faqat to'liq ko'rilganda)
-                        rewardUser();
-                        
-                        // 2. Modalni yopish
-                        modal.classList.add('hidden');
-                        
-                        // 3. Muvaffaqiyat xabarini ko'rsatish
-                        status.innerHTML = `
-                            <div class="text-center">
-                                <div class="text-4xl mb-2">🎉</div>
-                                <p class="text-green-400 font-bold">Rahmat!</p>
-                                <p class="text-white/80">Reklama to'liq ko'rildi</p>
-                                <p class="text-green-300 font-bold mt-1">+1 💎 olmos qo'shildi</p>
-                            </div>
-                        `;
-                        
-                        // 4. Holatlarni qayta tiklash
-                        isShowingAd = false;
-                        btn.disabled = false;
-                        btn.innerHTML = '▶️ Reklamani boshlash (+1 💎)';
-                        
-                        // 5. 5 soniyadan keyin statusni tiklash
-                        setTimeout(() => {
-                            status.innerHTML = `
-                                <p class="text-white/70">Reklama tayyor!</p>
-                                <p class="text-xs text-white/40 mt-1">Faqat to'liq ko'rganingizda olmos qo'shiladi</p>
-                            `;
-                        }, 5000);
-                    })
-                    .catch((error) => {
-                        console.error('❌ Reklama xatosi:', error);
-                        
-                        // Modalni yopish
-                        modal.classList.add('hidden');
-                        
-                        // Xato turiga qarab xabar ko'rsatish
-                        let errorMessage = "Reklama ko'rsatilmadi";
-                        
-                        if (error && error.state === 'skip') {
-                            // Foydalanuvchi reklamani oldindan yopdi
-                            status.innerHTML = `
-                                <div class="text-center">
-                                    <div class="text-3xl mb-2">⏭️</div>
-                                    <p class="text-orange-400 font-bold">Reklama yakunlanmadi</p>
-                                    <p class="text-white/80">Siz reklamani oldindan yopdingiz</p>
-                                    <p class="text-xs text-orange-400 mt-1">To'liq ko'rishingiz kerak edi</p>
-                                </div>
-                            `;
-                        } else if (error && error.state === 'load') {
-                            // Reklama yuklanmadi
-                            status.innerHTML = `
-                                <div class="text-center">
-                                    <div class="text-3xl mb-2">❌</div>
-                                    <p class="text-red-400 font-bold">Yuklash xatosi</p>
-                                    <p class="text-white/80">Reklama yuklanmadi</p>
-                                </div>
-                            `;
-                        } else if (error && error.state === 'no_ad') {
-                            // Reklama mavjud emas
-                            status.innerHTML = `
-                                <div class="text-center">
-                                    <div class="text-3xl mb-2">📭</div>
-                                    <p class="text-orange-400 font-bold">Reklama mavjud emas</p>
-                                    <p class="text-white/80">Hozircha reklama yo'q</p>
-                                </div>
-                            `;
-                        } else {
-                            // Boshqa xatoliklar
-                            status.innerHTML = `
-                                <div class="text-center">
-                                    <div class="text-3xl mb-2">⚠️</div>
-                                    <p class="text-red-400 font-bold">Xatolik</p>
-                                    <p class="text-white/80">${error?.description || 'Noma\'lum xatolik'}</p>
-                                </div>
-                            `;
-                        }
-                        
-                        // Holatlarni qayta tiklash
-                        isShowingAd = false;
-                        btn.disabled = false;
-                        btn.innerHTML = '▶️ Reklamani boshlash (+1 💎)';
-                        
-                        // 3 soniyadan keyin statusni tiklash
-                        setTimeout(() => {
-                            status.innerHTML = `
-                                <p class="text-white/70">Reklama tayyor!</p>
-                                <p class="text-xs text-white/40 mt-1">Faqat to'liq ko'rganingizda olmos qo'shiladi</p>
-                            `;
-                        }, 3000);
-                    });
-                    
-            } catch (error) {
-                console.error('❌ Kutilmagan xatolik:', error);
-                modal.classList.add('hidden');
-                showError('Kutilmagan xatolik yuz berdi');
-                isShowingAd = false;
-                btn.disabled = false;
-                btn.innerHTML = '▶️ Reklamani boshlash (+1 💎)';
-            }
-        }
-        
-        // ================================================
-        // 🎉 MUKOFOT BERISH FUNKSIYASI
-        // ================================================
-        function rewardUser() {
-            console.log('🎉 Foydalanuvchiga mukofot berilmoqda');
-            
-            // Balansni oshirish
-            const currentBalance = parseInt(document.getElementById('balance').textContent) || 0;
-            const newBalance = currentBalance + 1;
-            
-            // UI ni yangilash
-            document.getElementById('balance').textContent = newBalance;
-            document.getElementById('withdraw-balance').textContent = newBalance;
-            
-            // Serverga yuborish (optional)
-            sendRewardToServer();
-        }
-        
-        // ================================================
-        // 📤 SERVERGA MUKOFOT YUBORISH
-        // ================================================
-        async function sendRewardToServer() {
-            if (!currentUser) return;
-            
-            try {
-                const API_URL = 'https://68ed1ab05ca4e.myxvest1.ru/Test/add_balance.php';
-                const API_KEY = '4564123:hkjhfadfhieapkdnga';
-                
-                const requestData = {
-                    key: API_KEY,
-                    user_id: currentUser.id,
-                    amount: 1,
-                    type: 'ad_reward',
-                    description: "Reklama ko'rish mukofoti"
-                };
-                
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(requestData)
-                });
-                
-                console.log('✅ Serverga mukofot yuborildi');
-            } catch (error) {
-                console.error('❌ Serverga yuborish xatosi:', error);
-            }
-        }
-        
-        // ================================================
-        // ❌ XATO KO'RSATISH
-        // ================================================
-        function showError(message) {
-            const status = document.getElementById('ad-status');
-            status.innerHTML = `
-                <div class="text-center">
-                    <div class="text-3xl mb-2">❌</div>
-                    <p class="text-red-400 font-bold">Xatolik!</p>
-                    <p class="text-white/80">${message}</p>
-                </div>
-            `;
-            
-            setTimeout(() => {
-                status.innerHTML = `
-                    <p class="text-white/70">Reklama tayyor!</p>
-                    <p class="text-xs text-white/40 mt-1">Faqat to'liq ko'rganingizda olmos qo'shiladi</p>
-                `;
-            }, 3000);
-        }
-        
-        // ================================================
-        // 💰 OLMOS YECHISH FUNKSIYASI
-        // ================================================
-        async function withdrawDiamonds() {
-            console.log('🚀 withdrawDiamonds() boshlandi');
-            
-            if (!currentUser) {
-                alert('❌ Foydalanuvchi topilmadi');
-                return;
-            }
-            
-            const btn = document.getElementById('withdraw-btn');
-            const status = document.getElementById('withdraw-status');
-            const amountInput = document.getElementById('withdraw-amount');
-            const amount = parseInt(amountInput.value);
-            
-            console.log('💰 Miqdor:', amount, 'Foydalanuvchi:', currentUser.id);
-            
-            // Validatsiya
-            if (!amount || amount < 1) {
-                status.classList.remove('hidden');
-                status.innerHTML = '<p class="text-orange-400">❌ Minimal yechish 1 olmos</p>';
-                setTimeout(() => status.classList.add('hidden'), 3000);
-                return;
-            }
-            
-            // Balansni tekshirish
-            const currentBalance = parseInt(document.getElementById('balance').textContent) || 0;
-            if (amount > currentBalance) {
-                status.classList.remove('hidden');
-                status.innerHTML = '<p class="text-orange-400">❌ Olmoslar yetarli emas</p>';
-                setTimeout(() => status.classList.add('hidden'), 3000);
-                return;
-            }
-            
-            // Yechishni boshlash
-            btn.disabled = true;
-            btn.innerHTML = '<div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
-            status.classList.remove('hidden');
-            status.innerHTML = '<p class="text-yellow-400">⏳ Yechilmoqda...</p>';
-            
-            try {
-                const API_URL = 'https://68ed1ab05ca4e.myxvest1.ru/Test/add_balance.php';
-                const API_KEY = '4564123:hkjhfadfhieapkdnga';
-                
-                const requestData = {
-                    key: API_KEY,
-                    user_id: currentUser.id,
-                    amount: amount,
-                    type: 'diamonds',
-                    description: "Web App orqali yechish"
-                };
-                
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(requestData)
-                });
-                
-                const text = await response.text();
-                let result;
-                try {
-                    result = JSON.parse(text);
-                } catch (e) {
-                    throw new Error('Invalid JSON response');
-                }
-                
-                if (result.success) {
-                    // Muvaffaqiyat
-                    const newBalance = currentBalance - amount;
-                    
-                    // UI ni yangilash
-                    document.getElementById('balance').textContent = newBalance;
-                    document.getElementById('withdraw-balance').textContent = newBalance;
-                    amountInput.value = '1';
-                    
-                    status.innerHTML = `
-                        <div class="text-center">
-                            <div class="text-4xl mb-2">🎉</div>
-                            <p class="text-green-400 font-bold">Muvaffaqiyatli!</p>
-                            <p class="text-white/80">${amount} olmos yechib olindi</p>
-                        </div>
-                    `;
-                    
-                } else {
-                    throw new Error(result.error || 'API xatosi');
-                }
-                
-            } catch (error) {
-                console.error('❌ Yechish xatosi:', error);
-                
-                let errorMessage = 'Noma\'lum xatolik';
-                if (error.message.includes('Failed to fetch')) {
-                    errorMessage = 'Internet aloqasi yo\'q';
-                } else if (error.message.includes('Invalid key')) {
-                    errorMessage = 'API kaliti noto\'g\'ri';
-                } else {
-                    errorMessage = error.message;
-                }
-                
-                status.innerHTML = `
-                    <div class="text-center">
-                        <div class="text-3xl mb-2">❌</div>
-                        <p class="text-red-400 font-bold">Xatolik!</p>
-                        <p class="text-white/80">${errorMessage}</p>
-                    </div>
-                `;
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '💰 Yechib olish';
-                
-                // 5 soniyadan keyin statusni yashirish
-                setTimeout(() => {
-                    status.classList.add('hidden');
-                }, 5000);
-            }
-        }
-        
-        // ================================================
-        // 🚀 APP INITIALIZATION
-        // ================================================
-        function initApp() {
-            console.log('🚀 App ishga tushmoqda...');
-            
-            // Telegram ni ishga tushirish
-            if (initTelegram()) {
-                console.log('✅ Telegram ishga tushdi');
-            } else {
-                console.log('⚠️ Telegram topilmadi, web rejimida');
-                currentUser = {
-                    id: 'web_user_' + Date.now(),
-                    username: 'web_user',
-                    firstName: 'Web User'
-                };
-            }
-            
-            // Adsgram ni ishga tushirish
-            if (initAdsgram()) {
-                console.log('✅ Adsgram muvaffaqiyatli ishga tushdi');
-            } else {
-                console.error('❌ Adsgram ishga tushmadi');
-                document.getElementById('ad-status').innerHTML = `
-                    <div class="text-center">
-                        <p class="text-orange-400">⚠️ Reklama xizmati ishlamayapti</p>
-                        <p class="text-xs text-white/40 mt-1">Test rejimi</p>
-                    </div>
-                `;
-            }
-            
-            // Dastlabki balans
-            document.getElementById('balance').textContent = '10';
-            document.getElementById('withdraw-balance').textContent = '10';
-            
-            // Loading ni yashirish, main content ni ko'rsatish
-            setTimeout(() => {
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('main-content').classList.remove('hidden');
-                console.log('✅ App muvaffaqiyatli yuklandi');
-            }, 1000);
-        }
-        
-        // DOM yuklanganda app ni ishga tushirish
-        document.addEventListener('DOMContentLoaded', initApp);
-        
-        // Agar DOM allaqachon yuklangan bo'lsa
-        if (document.readyState === 'complete' || document.readyState === 'interactive') {
-            setTimeout(initApp, 100);
-        }
-    </script>
-</body>
+        setTimeout(() => {
+          withdrawStatus.classList.add('hidden');
+        }, 5000);
+      }
+    }
+
+    document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
+    document.getElementById('withdraw-btn')?.addEventListener('click', withdrawDiamonds);
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeAppMain);
+    } else {
+      initializeAppMain();
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ad4663127aadbcb',t:'MTc2NTYxNzc2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

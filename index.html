@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>💎 Diamond Rewards</title>
     
-    <!-- Tailwind CSS (production uchun) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -23,61 +23,51 @@
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <!-- Adsgram SDK -->
+    <!-- ADSGRAM SDK (Muhim!) -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     
     <style>
-        /* Custom styles */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
-        
         .glass-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             transition: all 0.3s;
         }
-        
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
         }
-        
-        .diamond-glow {
-            text-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
-        }
-        
-        /* Adsgram Modal uchun qo'shimcha style */
         .adsgram-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 10000;
         }
     </style>
 </head>
 <body class="text-white p-4">
-    <!-- Loading Screen -->
+    <!-- Loading -->
     <div id="loading" class="flex flex-col items-center justify-center min-h-screen">
         <div class="text-6xl mb-4 animate-bounce">💎</div>
         <div class="text-xl font-bold">Diamond Rewards</div>
         <div class="text-white/60 mt-2">Yuklanmoqda...</div>
     </div>
     
-    <!-- Main Content (hidden initially) -->
+    <!-- Main Content -->
     <div id="main-content" class="hidden max-w-md mx-auto">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
@@ -118,25 +108,13 @@
             <!-- Ad Status -->
             <div id="ad-status" class="bg-white/5 rounded-xl p-4 mb-4 text-center">
                 <p class="text-white/70">Reklama tayyor!</p>
-                <p class="text-xs text-white/40 mt-1">Rewarded format: faqat to'liq ko'rganingizda olmos qo'shiladi</p>
+                <p class="text-xs text-white/40 mt-1">Faqat to'liq ko'rganingizda olmos qo'shiladi</p>
             </div>
-            
-            <!-- Adsgram Container -->
-            <div id="adsgram-container" style="display: none;"></div>
             
             <!-- Watch Button -->
             <button id="watch-btn" class="btn-primary w-full py-4 rounded-xl font-bold text-lg">
                 ▶️ Reklamani boshlash (+1 💎)
             </button>
-            
-            <!-- Ad Stats -->
-            <div class="mt-4 text-center text-sm text-white/50">
-                <div>Reklamani oxirigacha ko'ring</div>
-                <div class="flex justify-center items-center gap-2 mt-1">
-                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span>Rewarded format</span>
-                </div>
-            </div>
         </div>
         
         <!-- Withdraw Section -->
@@ -171,22 +149,23 @@
         
         <!-- Footer -->
         <div class="text-center mt-8 text-white/40 text-sm">
-            Diamond Rewards • Telegram Mini App • Adsgram
+            Diamond Rewards • Telegram Mini App
         </div>
     </div>
 
-    <!-- Adsgram Modal Overlay -->
+    <!-- Adsgram Modal -->
     <div id="adsgram-modal" class="adsgram-modal hidden">
-        <div class="text-center">
-            <div class="text-4xl mb-4 animate-pulse">🎬</div>
-            <div class="text-xl font-bold mb-2">Reklama yuklanmoqda...</div>
-            <div class="text-white/60">Iltimos kuting</div>
+        <div class="text-center p-8">
+            <div class="text-6xl mb-6 animate-pulse">📺</div>
+            <div class="text-2xl font-bold mb-2">Reklama yuklanmoqda...</div>
+            <div class="text-white/60 mb-6">Iltimos kuting</div>
+            <div class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
     </div>
 
     <script>
         // ================================================
-        // 📱 TELEGRAM WEB APP INIT
+        // 📱 TELEGRAM VA ADSGRAM INIT
         // ================================================
         let tg = null;
         let currentUser = null;
@@ -206,18 +185,16 @@
                         username: user.username || 'user',
                         firstName: user.first_name || 'User'
                     };
-                    console.log('✅ Telegram user loaded:', currentUser);
+                    console.log('✅ Telegram user:', currentUser);
                 } else {
-                    // Test mode
                     currentUser = {
                         id: '7500103239',
                         username: 'test_user',
                         firstName: 'Test User'
                     };
-                    console.log('⚠️ Using test user');
+                    console.log('⚠️ Test user');
                 }
                 
-                // Update UI
                 document.getElementById('user-avatar').textContent = 
                     currentUser.firstName.charAt(0).toUpperCase();
                 document.getElementById('user-name').textContent = currentUser.firstName;
@@ -228,34 +205,31 @@
             return false;
         }
         
-        // ================================================
-        // 📺 ADSGRAM INITIALIZATION
-        // ================================================
         function initAdsgram() {
             try {
                 if (window.Adsgram) {
-                    // Sizning block ID: 18961 (Rewarded format)
+                    // BLOCK ID 18961 - REWARDED FORMAT
                     AdController = window.Adsgram.init({ 
-                        blockId: "18961",
-                        container: document.getElementById('adsgram-container')
+                        blockId: "18961"
                     });
                     
-                    console.log('✅ Adsgram initialized successfully');
+                    console.log('✅ Adsgram initialized with blockId: 18961');
+                    console.log('AdController:', AdController);
                     
-                    // Test qilish uchun Adsgram mavjudligini tekshirish
+                    // Adsgram mavjudligini tekshirish
                     if (AdController && typeof AdController.show === 'function') {
-                        console.log('✅ AdController.show() function is available');
+                        console.log('✅ AdController.show() mavjud');
                         return true;
                     } else {
-                        console.error('❌ AdController.show() function not found');
+                        console.error('❌ AdController.show() topilmadi');
                         return false;
                     }
                 } else {
-                    console.error('❌ Adsgram SDK not loaded');
+                    console.error('❌ Adsgram SDK yuklanmadi');
                     return false;
                 }
             } catch (error) {
-                console.error('❌ Error initializing Adsgram:', error);
+                console.error('❌ Adsgram init xatosi:', error);
                 return false;
             }
         }
@@ -263,23 +237,23 @@
         // ================================================
         // 🎮 BUTTON HANDLERS
         // ================================================
-        document.getElementById('watch-btn').addEventListener('click', showAdsgramAd);
+        document.getElementById('watch-btn').addEventListener('click', showAd);
         document.getElementById('withdraw-btn').addEventListener('click', withdrawDiamonds);
         
         // ================================================
-        // 🎬 ADSGRAM AD FUNCTION (REWARDED FORMAT)
+        // 🎬 SHOW ADSGRAM AD (REWARDED FORMAT)
         // ================================================
-        async function showAdsgramAd() {
-            console.log('🎬 showAdsgramAd() started');
+        async function showAd() {
+            console.log('🎬 showAd() boshlandi');
             
             if (isShowingAd) {
-                console.log('⚠️ Ad already showing');
+                console.log('⚠️ Reklama allaqachon ko\'rsatilmoqda');
                 return;
             }
             
             if (!AdController) {
-                console.error('❌ AdController not initialized');
-                showError('Reklama xizmati mavjud emas');
+                console.error('❌ AdController mavjud emas');
+                showError('Reklama xizmati ishlamayapti');
                 return;
             }
             
@@ -287,31 +261,32 @@
             const status = document.getElementById('ad-status');
             const modal = document.getElementById('adsgram-modal');
             
-            // Disable button
+            // Tugmani disable qilish
             btn.disabled = true;
             btn.innerHTML = '<div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
-            status.innerHTML = '<p class="text-yellow-400">Reklama yuklanmoqda...</p>';
+            status.innerHTML = '<p class="text-yellow-400">Reklama tayyorlanmoqda...</p>';
             isShowingAd = true;
             
             try {
-                // Show loading modal
+                // Loading modalni ko'rsatish
                 modal.classList.remove('hidden');
                 
-                console.log('📺 Calling AdController.show()...');
+                console.log('📺 AdController.show() chaqirilmoqda...');
                 
-                // Show Adsgram ad (Rewarded format)
-                // Promise faqat reklama to'liq ko'rilganda resolve bo'ladi
+                // ADSGRAM REKLAMANI KO'RSATISH
+                // Faqat to'liq ko'rilganda .then() ishlaydi
+                // Oldindan yopilsa .catch() ishlaydi
                 AdController.show()
                     .then((result) => {
-                        console.log('✅ Ad completed successfully:', result);
+                        console.log('✅ Reklama to\'liq ko\'rildi:', result);
                         
-                        // REKLAMA TO'LIQ KO'RILDI - MUKOFOT BERISH
-                        rewardUserForAd();
+                        // 1. MUKOFOT BERISH (faqat to'liq ko'rilganda)
+                        rewardUser();
                         
-                        // Hide modal
+                        // 2. Modalni yopish
                         modal.classList.add('hidden');
                         
-                        // Show success message
+                        // 3. Muvaffaqiyat xabarini ko'rsatish
                         status.innerHTML = `
                             <div class="text-center">
                                 <div class="text-4xl mb-2">🎉</div>
@@ -321,82 +296,83 @@
                             </div>
                         `;
                         
+                        // 4. Holatlarni qayta tiklash
                         isShowingAd = false;
                         btn.disabled = false;
                         btn.innerHTML = '▶️ Reklamani boshlash (+1 💎)';
                         
-                        // Reset status after 5 seconds
+                        // 5. 5 soniyadan keyin statusni tiklash
                         setTimeout(() => {
                             status.innerHTML = `
                                 <p class="text-white/70">Reklama tayyor!</p>
-                                <p class="text-xs text-white/40 mt-1">Rewarded format: faqat to'liq ko'rganingizda olmos qo'shiladi</p>
+                                <p class="text-xs text-white/40 mt-1">Faqat to'liq ko'rganingizda olmos qo'shiladi</p>
                             `;
                         }, 5000);
                     })
                     .catch((error) => {
-                        console.error('❌ Ad error:', error);
+                        console.error('❌ Reklama xatosi:', error);
                         
-                        // Hide modal
+                        // Modalni yopish
                         modal.classList.add('hidden');
                         
-                        // Handle different error cases
+                        // Xato turiga qarab xabar ko'rsatish
                         let errorMessage = "Reklama ko'rsatilmadi";
                         
-                        if (error && error.state) {
-                            switch(error.state) {
-                                case 'load':
-                                    errorMessage = "Reklama yuklanmadi";
-                                    break;
-                                case 'show':
-                                    errorMessage = "Reklama ko'rsatilmadi";
-                                    break;
-                                case 'no_ad':
-                                    errorMessage = "Hozircha reklama mavjud emas";
-                                    break;
-                                case 'skip':
-                                    errorMessage = "Reklama yakunlanmadi (Interstitial)";
-                                    break;
-                                default:
-                                    errorMessage = error.description || "Xatolik yuz berdi";
-                            }
-                        }
-                        
-                        // Agar interstitial format bo'lsa va skip bo'lsa
-                        if (error && error.skipped) {
+                        if (error && error.state === 'skip') {
+                            // Foydalanuvchi reklamani oldindan yopdi
                             status.innerHTML = `
                                 <div class="text-center">
                                     <div class="text-3xl mb-2">⏭️</div>
                                     <p class="text-orange-400 font-bold">Reklama yakunlanmadi</p>
                                     <p class="text-white/80">Siz reklamani oldindan yopdingiz</p>
-                                    <p class="text-xs text-orange-400 mt-1">Rewarded format uchun to'liq ko'rish kerak</p>
+                                    <p class="text-xs text-orange-400 mt-1">To'liq ko'rishingiz kerak edi</p>
+                                </div>
+                            `;
+                        } else if (error && error.state === 'load') {
+                            // Reklama yuklanmadi
+                            status.innerHTML = `
+                                <div class="text-center">
+                                    <div class="text-3xl mb-2">❌</div>
+                                    <p class="text-red-400 font-bold">Yuklash xatosi</p>
+                                    <p class="text-white/80">Reklama yuklanmadi</p>
+                                </div>
+                            `;
+                        } else if (error && error.state === 'no_ad') {
+                            // Reklama mavjud emas
+                            status.innerHTML = `
+                                <div class="text-center">
+                                    <div class="text-3xl mb-2">📭</div>
+                                    <p class="text-orange-400 font-bold">Reklama mavjud emas</p>
+                                    <p class="text-white/80">Hozircha reklama yo'q</p>
                                 </div>
                             `;
                         } else {
                             // Boshqa xatoliklar
                             status.innerHTML = `
                                 <div class="text-center">
-                                    <div class="text-3xl mb-2">❌</div>
-                                    <p class="text-red-400 font-bold">Xatolik!</p>
-                                    <p class="text-white/80">${errorMessage}</p>
+                                    <div class="text-3xl mb-2">⚠️</div>
+                                    <p class="text-red-400 font-bold">Xatolik</p>
+                                    <p class="text-white/80">${error?.description || 'Noma\'lum xatolik'}</p>
                                 </div>
                             `;
                         }
                         
+                        // Holatlarni qayta tiklash
                         isShowingAd = false;
                         btn.disabled = false;
                         btn.innerHTML = '▶️ Reklamani boshlash (+1 💎)';
                         
-                        // Reset after 3 seconds
+                        // 3 soniyadan keyin statusni tiklash
                         setTimeout(() => {
                             status.innerHTML = `
                                 <p class="text-white/70">Reklama tayyor!</p>
-                                <p class="text-xs text-white/40 mt-1">Rewarded format: faqat to'liq ko'rganingizda olmos qo'shiladi</p>
+                                <p class="text-xs text-white/40 mt-1">Faqat to'liq ko'rganingizda olmos qo'shiladi</p>
                             `;
                         }, 3000);
                     });
                     
             } catch (error) {
-                console.error('❌ Unexpected error:', error);
+                console.error('❌ Kutilmagan xatolik:', error);
                 modal.classList.add('hidden');
                 showError('Kutilmagan xatolik yuz berdi');
                 isShowingAd = false;
@@ -406,25 +382,25 @@
         }
         
         // ================================================
-        // 🎉 REWARD USER FOR WATCHING AD
+        // 🎉 MUKOFOT BERISH FUNKSIYASI
         // ================================================
-        function rewardUserForAd() {
-            console.log('🎉 Rewarding user for watching ad');
+        function rewardUser() {
+            console.log('🎉 Foydalanuvchiga mukofot berilmoqda');
             
-            // Faqat reklama to'liq ko'rilganda mukofot beriladi
+            // Balansni oshirish
             const currentBalance = parseInt(document.getElementById('balance').textContent) || 0;
             const newBalance = currentBalance + 1;
             
-            // Update balance
+            // UI ni yangilash
             document.getElementById('balance').textContent = newBalance;
             document.getElementById('withdraw-balance').textContent = newBalance;
             
-            // Optional: Send reward to server
+            // Serverga yuborish (optional)
             sendRewardToServer();
         }
         
         // ================================================
-        // 📤 SEND REWARD TO SERVER (optional)
+        // 📤 SERVERGA MUKOFOT YUBORISH
         // ================================================
         async function sendRewardToServer() {
             if (!currentUser) return;
@@ -441,7 +417,7 @@
                     description: "Reklama ko'rish mukofoti"
                 };
                 
-                await fetch(API_URL, {
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -449,14 +425,14 @@
                     body: JSON.stringify(requestData)
                 });
                 
-                console.log('✅ Reward sent to server');
+                console.log('✅ Serverga mukofot yuborildi');
             } catch (error) {
-                console.error('❌ Error sending reward to server:', error);
+                console.error('❌ Serverga yuborish xatosi:', error);
             }
         }
         
         // ================================================
-        // ❌ ERROR HANDLER
+        // ❌ XATO KO'RSATISH
         // ================================================
         function showError(message) {
             const status = document.getElementById('ad-status');
@@ -471,16 +447,16 @@
             setTimeout(() => {
                 status.innerHTML = `
                     <p class="text-white/70">Reklama tayyor!</p>
-                    <p class="text-xs text-white/40 mt-1">Rewarded format: faqat to'liq ko'rganingizda olmos qo'shiladi</p>
+                    <p class="text-xs text-white/40 mt-1">Faqat to'liq ko'rganingizda olmos qo'shiladi</p>
                 `;
             }, 3000);
         }
         
         // ================================================
-        // 💰 WITHDRAW DIAMONDS FUNCTION
+        // 💰 OLMOS YECHISH FUNKSIYASI
         // ================================================
         async function withdrawDiamonds() {
-            console.log('🚀 withdrawDiamonds() started');
+            console.log('🚀 withdrawDiamonds() boshlandi');
             
             if (!currentUser) {
                 alert('❌ Foydalanuvchi topilmadi');
@@ -492,9 +468,9 @@
             const amountInput = document.getElementById('withdraw-amount');
             const amount = parseInt(amountInput.value);
             
-            console.log('💰 Amount:', amount, 'User:', currentUser.id);
+            console.log('💰 Miqdor:', amount, 'Foydalanuvchi:', currentUser.id);
             
-            // Validation
+            // Validatsiya
             if (!amount || amount < 1) {
                 status.classList.remove('hidden');
                 status.innerHTML = '<p class="text-orange-400">❌ Minimal yechish 1 olmos</p>';
@@ -502,7 +478,7 @@
                 return;
             }
             
-            // Check balance
+            // Balansni tekshirish
             const currentBalance = parseInt(document.getElementById('balance').textContent) || 0;
             if (amount > currentBalance) {
                 status.classList.remove('hidden');
@@ -511,20 +487,16 @@
                 return;
             }
             
-            // Start withdrawal
+            // Yechishni boshlash
             btn.disabled = true;
             btn.innerHTML = '<div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
             status.classList.remove('hidden');
             status.innerHTML = '<p class="text-yellow-400">⏳ Yechilmoqda...</p>';
             
             try {
-                // API URL
                 const API_URL = 'https://68ed1ab05ca4e.myxvest1.ru/Test/add_balance.php';
                 const API_KEY = '4564123:hkjhfadfhieapkdnga';
                 
-                console.log('📤 Sending to API:', API_URL);
-                
-                // Request data
                 const requestData = {
                     key: API_KEY,
                     user_id: currentUser.id,
@@ -533,20 +505,7 @@
                     description: "Web App orqali yechish"
                 };
                 
-                console.log('📦 Request data:', requestData);
-                
-                // Use CORS proxy if needed
-                const useProxy = true;
-                let fetchUrl = API_URL;
-                
-                if (useProxy) {
-                    // CORS proxy
-                    fetchUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(API_URL);
-                    console.log('🔄 Using CORS proxy');
-                }
-                
-                // Send request
-                const response = await fetch(fetchUrl, {
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -555,25 +514,19 @@
                     body: JSON.stringify(requestData)
                 });
                 
-                console.log('📥 Response status:', response.status);
-                
                 const text = await response.text();
-                console.log('📄 Raw response:', text);
-                
                 let result;
                 try {
                     result = JSON.parse(text);
-                    console.log('✅ Parsed result:', result);
                 } catch (e) {
-                    console.error('❌ JSON parse error:', e);
                     throw new Error('Invalid JSON response');
                 }
                 
                 if (result.success) {
-                    // Success
+                    // Muvaffaqiyat
                     const newBalance = currentBalance - amount;
                     
-                    // Update UI
+                    // UI ni yangilash
                     document.getElementById('balance').textContent = newBalance;
                     document.getElementById('withdraw-balance').textContent = newBalance;
                     amountInput.value = '1';
@@ -583,21 +536,15 @@
                             <div class="text-4xl mb-2">🎉</div>
                             <p class="text-green-400 font-bold">Muvaffaqiyatli!</p>
                             <p class="text-white/80">${amount} olmos yechib olindi</p>
-                            <p class="text-xs text-white/50 mt-2">
-                                Yangi bot balans: ${result.data?.new_balance || 'N/A'} 💎
-                            </p>
                         </div>
                     `;
                     
-                    console.log('✅ Withdrawal successful');
-                    
                 } else {
-                    // API error
                     throw new Error(result.error || 'API xatosi');
                 }
                 
             } catch (error) {
-                console.error('❌ Withdrawal error:', error);
+                console.error('❌ Yechish xatosi:', error);
                 
                 let errorMessage = 'Noma\'lum xatolik';
                 if (error.message.includes('Failed to fetch')) {
@@ -619,7 +566,7 @@
                 btn.disabled = false;
                 btn.innerHTML = '💰 Yechib olish';
                 
-                // Hide status after 5 seconds
+                // 5 soniyadan keyin statusni yashirish
                 setTimeout(() => {
                     status.classList.add('hidden');
                 }, 5000);
@@ -630,13 +577,13 @@
         // 🚀 APP INITIALIZATION
         // ================================================
         function initApp() {
-            console.log('🚀 Initializing app...');
+            console.log('🚀 App ishga tushmoqda...');
             
-            // Initialize Telegram
+            // Telegram ni ishga tushirish
             if (initTelegram()) {
-                console.log('✅ Telegram initialized');
+                console.log('✅ Telegram ishga tushdi');
             } else {
-                console.log('⚠️ Telegram not detected, using web mode');
+                console.log('⚠️ Telegram topilmadi, web rejimida');
                 currentUser = {
                     id: 'web_user_' + Date.now(),
                     username: 'web_user',
@@ -644,36 +591,35 @@
                 };
             }
             
-            // Initialize Adsgram
-            const adsgramInitialized = initAdsgram();
-            if (adsgramInitialized) {
-                console.log('✅ Adsgram initialized successfully');
+            // Adsgram ni ishga tushirish
+            if (initAdsgram()) {
+                console.log('✅ Adsgram muvaffaqiyatli ishga tushdi');
             } else {
-                console.error('❌ Failed to initialize Adsgram');
+                console.error('❌ Adsgram ishga tushmadi');
                 document.getElementById('ad-status').innerHTML = `
                     <div class="text-center">
-                        <p class="text-orange-400">⚠️ Reklama xizmati mavjud emas</p>
-                        <p class="text-xs text-white/40 mt-1">Test rejimida ishlaydi</p>
+                        <p class="text-orange-400">⚠️ Reklama xizmati ishlamayapti</p>
+                        <p class="text-xs text-white/40 mt-1">Test rejimi</p>
                     </div>
                 `;
             }
             
-            // Set initial balance
+            // Dastlabki balans
             document.getElementById('balance').textContent = '10';
             document.getElementById('withdraw-balance').textContent = '10';
             
-            // Hide loading, show main content
+            // Loading ni yashirish, main content ni ko'rsatish
             setTimeout(() => {
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('main-content').classList.remove('hidden');
-                console.log('✅ App loaded successfully');
+                console.log('✅ App muvaffaqiyatli yuklandi');
             }, 1000);
         }
         
-        // Start app when page loads
+        // DOM yuklanganda app ni ishga tushirish
         document.addEventListener('DOMContentLoaded', initApp);
         
-        // Also try initialization if DOM already loaded
+        // Agar DOM allaqachon yuklangan bo'lsa
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             setTimeout(initApp, 100);
         }

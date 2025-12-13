@@ -98,12 +98,25 @@
                 </div>
             </div>
             
+            <!-- Ad Container -->
+            <div id="ad-container" class="hidden">
+                <div id="ad-frame" class="bg-black rounded-xl overflow-hidden mb-4">
+                    <iframe id="ad-iframe" src="" style="width:100%; height:300px; border:none;"></iframe>
+                </div>
+            </div>
+            
             <div id="ad-status" class="bg-white/5 rounded-xl p-4 mb-4 text-center">
                 <p class="text-white/70">Reklama tayyor!</p>
             </div>
             
             <button id="watch-btn" class="btn-primary w-full py-4 rounded-xl font-bold text-lg">
                 ▶️ Reklamani boshlash
+            </button>
+            
+            <!-- Ad Close Button (hidden initially) -->
+            <button id="close-ad-btn" 
+                    class="hidden w-full py-3 rounded-xl font-bold text-lg bg-red-500/20 hover:bg-red-500/30 mt-2">
+                ❌ Reklamani yopish
             </button>
         </div>
         
@@ -149,6 +162,8 @@
         // ================================================
         let tg = null;
         let currentUser = null;
+        let adShown = false;
+        let adCompleted = false;
         
         function initTelegram() {
             if (window.Telegram && window.Telegram.WebApp) {
@@ -190,46 +205,230 @@
         // ================================================
         document.getElementById('watch-btn').addEventListener('click', watchAd);
         document.getElementById('withdraw-btn').addEventListener('click', withdrawDiamonds);
+        document.getElementById('close-ad-btn').addEventListener('click', closeAd);
         
         // ================================================
-        // 🎬 WATCH AD FUNCTION
+        // 🎬 WATCH AD FUNCTION (YANGILANGAN)
         // ================================================
         async function watchAd() {
+            console.log('🎬 watchAd() started');
+            
             const btn = document.getElementById('watch-btn');
             const status = document.getElementById('ad-status');
+            const adContainer = document.getElementById('ad-container');
+            const closeAdBtn = document.getElementById('close-ad-btn');
+            const adIframe = document.getElementById('ad-iframe');
+            
+            // Agar reklama hozir ko'rsatilgan bo'lsa
+            if (adShown) {
+                console.log('⚠️ Ad already shown');
+                return;
+            }
             
             btn.disabled = true;
             btn.innerHTML = '<div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
             status.innerHTML = '<p class="text-yellow-400">Reklama yuklanmoqda...</p>';
             
-            // Simulate ad watching
-            setTimeout(() => {
-                // Success
-                const currentBalance = parseInt(document.getElementById('balance').textContent) || 0;
-                const newBalance = currentBalance + 1;
+            // Reklama ID (sizning block ID 18961)
+            const AD_BLOCK_ID = 18961;
+            
+            try {
+                // Reklama URL (Telegram Ads yoki boshqa reklama xizmati)
+                // Bu yerda siz o'zingizning reklama xizmatizni qo'shishingiz kerak
+                const AD_URL = `https://example.com/ads/block/${AD_BLOCK_ID}?user=${currentUser.id}`;
                 
-                document.getElementById('balance').textContent = newBalance;
-                document.getElementById('withdraw-balance').textContent = newBalance;
+                // Ikkala variantni ham sinab ko'ramiz
+                const adProviders = [
+                    // Variant 1: Direkt reklama URL
+                    AD_URL,
+                    // Variant 2: Google Adsense (agar mavjud bo'lsa)
+                    'https://ads.example.com/video-ad.html',
+                    // Variant 3: Telegram Ads
+                    'https://t.me/ads/preview'
+                ];
                 
-                status.innerHTML = `
-                    <div class="text-center">
-                        <div class="text-4xl mb-2">🎉</div>
-                        <p class="text-green-400 font-bold">Tabriklaymiz!</p>
-                        <p class="text-white/80">+1 💎 olmos qo'shildi</p>
-                    </div>
-                `;
+                // Reklamani yuklash
+                adIframe.src = adProviders[0];
                 
+                // Reklama containerini ko'rsatish
+                adContainer.classList.remove('hidden');
+                
+                // Reklamani yopish tugmasini ko'rsatish
+                closeAdBtn.classList.remove('hidden');
+                
+                // Reklama ko'rsatildi deb belgilash
+                adShown = true;
+                adCompleted = false;
+                
+                status.innerHTML = '<p class="text-blue-400">Reklama ko\'rsatilmoqda...</p>';
+                btn.innerHTML = '⏸️ Reklama ko\'rsatilmoqda';
                 btn.disabled = false;
-                btn.innerHTML = '▶️ Reklamani boshlash';
                 
-                // Reset after 3 seconds
+                console.log('✅ Ad displayed, waiting for completion...');
+                
+                // Reklama tugaganini aniqlash
+                setupAdCompletionCheck();
+                
+            } catch (error) {
+                console.error('❌ Error loading ad:', error);
+                
+                // Agar reklama yuklanmasa, fallback simulatsiya
+                status.innerHTML = '<p class="text-orange-400">Reklama yuklanmadi, test rejimi...</p>';
+                
+                // 5 soniya kutish (reklama ko'rilayotgan simulatsiya)
                 setTimeout(() => {
-                    status.innerHTML = '<p class="text-white/70">Reklama tayyor!</p>';
-                }, 3000);
+                    completeAdReward();
+                }, 5000);
+            }
+        }
+        
+        // ================================================
+        // 🔍 REKLAMA TUGAGANINI ANIQLASH
+        // ================================================
+        function setupAdCompletionCheck() {
+            const adIframe = document.getElementById('ad-iframe');
+            const closeAdBtn = document.getElementById('close-ad-btn');
+            
+            // Reklama iframe'dan xabar kutish
+            window.addEventListener('message', function(event) {
+                console.log('📨 Message from iframe:', event.data);
                 
-                console.log('✅ Ad watched, new balance:', newBalance);
+                // Agar reklama tugagan haqida xabar kelsa
+                if (event.data === 'ad_completed' || event.data.type === 'ad_complete') {
+                    completeAdReward();
+                }
+            });
+            
+            // Reklama yopish tugmasi bosilganda
+            closeAdBtn.addEventListener('click', function() {
+                // Foydalanuvchi reklamani yopdi
+                if (adShown && !adCompleted) {
+                    const status = document.getElementById('ad-status');
+                    status.innerHTML = '<p class="text-orange-400">Reklama to\'liq ko\'rilmadi!</p>';
+                    
+                    // 3 soniyadan so'ng qayta tiklash
+                    setTimeout(() => {
+                        resetAdSection();
+                    }, 3000);
+                }
+            });
+            
+            // Iframe yuklanganini tekshirish
+            adIframe.addEventListener('load', function() {
+                console.log('✅ Ad iframe loaded');
                 
-            }, 2000); // 2 second simulation
+                // Reklama avtomatik boshlanishi mumkin
+                // 30 soniya ichida reklama tugamagan bo'lsa, avtomatik yakunlash
+                setTimeout(() => {
+                    if (adShown && !adCompleted) {
+                        console.log('⏰ Auto-completing ad after 30s');
+                        completeAdReward();
+                    }
+                }, 30000);
+            });
+        }
+        
+        // ================================================
+        // 🎉 REKLAMA TUGAGANDA MUKOFOT BERISH
+        // ================================================
+        function completeAdReward() {
+            if (adCompleted) {
+                console.log('⚠️ Ad already completed');
+                return;
+            }
+            
+            adCompleted = true;
+            adShown = false;
+            
+            const btn = document.getElementById('watch-btn');
+            const status = document.getElementById('ad-status');
+            const adContainer = document.getElementById('ad-container');
+            const closeAdBtn = document.getElementById('close-ad-btn');
+            const adIframe = document.getElementById('ad-iframe');
+            
+            // Mukofotni qo'shish
+            const currentBalance = parseInt(document.getElementById('balance').textContent) || 0;
+            const newBalance = currentBalance + 1;
+            
+            document.getElementById('balance').textContent = newBalance;
+            document.getElementById('withdraw-balance').textContent = newBalance;
+            
+            // Reklamani yopish
+            adIframe.src = '';
+            adContainer.classList.add('hidden');
+            closeAdBtn.classList.add('hidden');
+            
+            // Muvaffaqiyat xabarini ko'rsatish
+            status.innerHTML = `
+                <div class="text-center">
+                    <div class="text-4xl mb-2">🎉</div>
+                    <p class="text-green-400 font-bold">Rahmat!</p>
+                    <p class="text-white/80">Reklama ko'rildi</p>
+                    <p class="text-green-300 font-bold mt-1">+1 💎 olmos qo'shildi</p>
+                </div>
+            `;
+            
+            btn.disabled = false;
+            btn.innerHTML = '▶️ Reklamani boshlash';
+            
+            console.log('✅ Ad completed, new balance:', newBalance);
+            
+            // 5 soniyadan so'ng qayta tiklash
+            setTimeout(() => {
+                status.innerHTML = '<p class="text-white/70">Reklama tayyor!</p>';
+            }, 5000);
+        }
+        
+        // ================================================
+        // ❌ REKLAMANI YOPISH
+        // ================================================
+        function closeAd() {
+            const adContainer = document.getElementById('ad-container');
+            const closeAdBtn = document.getElementById('close-ad-btn');
+            const adIframe = document.getElementById('ad-iframe');
+            const status = document.getElementById('ad-status');
+            const btn = document.getElementById('watch-btn');
+            
+            // Reklamani to'xtatish
+            adIframe.src = '';
+            adContainer.classList.add('hidden');
+            closeAdBtn.classList.add('hidden');
+            
+            // Agar reklama tugatilmagan bo'lsa
+            if (adShown && !adCompleted) {
+                status.innerHTML = '<p class="text-orange-400">Reklama to\'liq ko\'rilmadi!</p>';
+                adShown = false;
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = '▶️ Reklamani boshlash';
+            
+            // 3 soniyadan so'ng qayta tiklash
+            setTimeout(() => {
+                status.innerHTML = '<p class="text-white/70">Reklama tayyor!</p>';
+            }, 3000);
+        }
+        
+        // ================================================
+        // 🔄 REKLAMA BO'LIMINI QAYTA TIKLASH
+        // ================================================
+        function resetAdSection() {
+            const adContainer = document.getElementById('ad-container');
+            const closeAdBtn = document.getElementById('close-ad-btn');
+            const adIframe = document.getElementById('ad-iframe');
+            const status = document.getElementById('ad-status');
+            const btn = document.getElementById('watch-btn');
+            
+            adIframe.src = '';
+            adContainer.classList.add('hidden');
+            closeAdBtn.classList.add('hidden');
+            
+            adShown = false;
+            adCompleted = false;
+            
+            status.innerHTML = '<p class="text-white/70">Reklama tayyor!</p>';
+            btn.disabled = false;
+            btn.innerHTML = '▶️ Reklamani boshlash';
         }
         
         // ================================================

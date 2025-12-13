@@ -112,6 +112,19 @@
             left: 100%;
         }
         
+        .withdraw-btn {
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            box-shadow: 0 6px 20px rgba(52, 211, 153, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .withdraw-btn:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(52, 211, 153, 0.4);
+        }
+        
         .withdraw-success {
             background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(21, 128, 61, 0.1));
             border-color: rgba(34, 197, 94, 0.2);
@@ -202,9 +215,9 @@
             border: 1px solid rgba(0, 150, 255, 0.2);
         }
         
-        .withdraw-info {
+        .withdraw-section {
             background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(21, 128, 61, 0.05));
-            border: 1px solid rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
         }
         
         .admin-card {
@@ -250,20 +263,95 @@
             100% { background-position: -200% 0; }
         }
         
-        /* Shine effect for avatar */
-        .avatar-shine::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
+        /* Menu Navigation */
+        .menu-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
-        .avatar-shine:hover::after {
-            left: 100%;
+        .menu-nav {
+            display: flex;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 12px 16px;
+            gap: 8px;
+        }
+        
+        .menu-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 8px;
+            border-radius: 16px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .menu-item:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .menu-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .menu-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .menu-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #0096ff;
+            display: none;
+        }
+        
+        .menu-item.active .menu-indicator {
+            display: block;
+        }
+        
+        .content-container {
+            padding-bottom: 100px; /* Menu uchun joy */
+        }
+        
+        /* Content sections */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -305,11 +393,11 @@
             </div>
 
             <!-- Main Container -->
-            <div class="max-w-lg mx-auto px-4 py-6 space-y-4">
+            <div class="max-w-lg mx-auto px-4 py-6 space-y-4 content-container">
                 <!-- User Profile Card -->
                 <div class="app-card p-5 slide-up">
                     <div class="flex items-center space-x-4">
-                        <div id="user-avatar" class="avatar-container user-avatar avatar-shine">
+                        <div id="user-avatar" class="avatar-container user-avatar">
                             <!-- Avatar image will be loaded from Telegram -->
                         </div>
                         <div class="flex-1">
@@ -320,83 +408,145 @@
                     </div>
                 </div>
 
-                <!-- Ad Watch Section -->
-                <div class="app-card p-6 slide-up" style="animation-delay: 0.1s;">
-                    <!-- Header -->
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="flex items-center space-x-3">
-                            <div class="text-3xl">
-                                🎬
+                <!-- Earn Diamonds Section (Menu 1) -->
+                <div id="earn-section" class="content-section active">
+                    <!-- Ad Watch Section -->
+                    <div class="app-card p-6 slide-up" style="animation-delay: 0.1s;">
+                        <!-- Header -->
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center space-x-3">
+                                <div class="text-3xl">
+                                    🎬
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-bold text-white/90">Reklama ko'ring</h2>
+                                    <p class="text-white/60 text-sm">Olmos yig'ing</p>
+                                </div>
                             </div>
-                            <div>
-                                <h2 class="text-xl font-bold text-white/90">Reklama ko'ring</h2>
-                                <p class="text-white/60 text-sm">Olmos yig'ing</p>
+                            <div class="reward-badge px-3 py-1.5 rounded-full">
+                                <span class="text-green-400 font-bold text-sm">+1 💎</span>
                             </div>
                         </div>
-                        <div class="reward-badge px-3 py-1.5 rounded-full">
-                            <span class="text-green-400 font-bold text-sm">+1 💎</span>
+
+                        <!-- Status Display -->
+                        <div id="ad-status" class="status-card rounded-2xl p-6 mb-5 text-center min-h-[100px] flex items-center justify-center">
+                            <p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>
+                        </div>
+
+                        <!-- Watch Button -->
+                        <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg transition-all duration-300">
+                            <span class="text-2xl">▶️</span>
+                            <span>Reklamani boshlash</span>
+                        </button>
+                    </div>
+
+                    <!-- Stats Info -->
+                    <div class="app-card p-6 slide-up" style="animation-delay: 0.2s;">
+                        <div class="flex items-center space-x-2 mb-5">
+                            <div class="text-2xl">
+                                📊
+                            </div>
+                            <h3 class="text-xl font-bold text-white/90">Statistika</h3>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
+                                <div class="flex items-center space-x-3">
+                                    <div class="text-2xl">
+                                        💎
+                                    </div>
+                                    <div>
+                                        <p class="text-white/60 text-sm">Umumiy olmoslar</p>
+                                        <p class="text-2xl font-bold text-blue-400" id="total-earned-diamonds">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
+                                <div class="flex items-center space-x-3">
+                                    <div class="text-2xl">
+                                        🎬
+                                    </div>
+                                    <div>
+                                        <p class="text-white/60 text-sm">Ko'rilgan reklamalar</p>
+                                        <p class="text-2xl font-bold text-green-400" id="ads-watched">0</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Status Display -->
-                    <div id="ad-status" class="status-card rounded-2xl p-6 mb-5 text-center min-h-[100px] flex items-center justify-center">
-                        <p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>
-                    </div>
-
-                    <!-- Watch Button -->
-                    <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg transition-all duration-300">
-                        <span class="text-2xl">▶️</span>
-                        <span>Reklamani boshlash</span>
-                    </button>
                 </div>
 
-                <!-- Withdraw Section -->
-                <div class="app-card p-6 slide-up" style="animation-delay: 0.25s;">
-                    <div class="flex items-center space-x-2 mb-5">
-                        <div class="text-2xl">
-                            💰
-                        </div>
-                        <h3 class="text-xl font-bold text-white/90">Olmos yechish</h3>
-                    </div>
-
-                    <!-- Withdraw Info -->
-                    <div class="withdraw-info rounded-2xl p-5 mb-5">
-                        <div class="flex items-center justify-between mb-3">
+                <!-- Withdraw Diamonds Section (Menu 2) -->
+                <div id="withdraw-section" class="content-section">
+                    <div class="app-card p-6 slide-up" style="animation-delay: 0.1s;">
+                        <div class="flex items-center space-x-2 mb-6">
+                            <div class="text-3xl text-green-400">
+                                💰
+                            </div>
                             <div>
-                                <p class="text-white/60 text-sm mb-1">Mavjud olmoslar</p>
-                                <p class="text-3xl font-bold text-green-400" id="withdraw-diamonds">0</p>
-                            </div>
-                            <div class="text-5xl">
-                                💎
+                                <h2 class="text-xl font-bold text-white/90">Olmos yechish</h2>
+                                <p class="text-white/60 text-sm">Balansingizdan olmoslarni yechib oling</p>
                             </div>
                         </div>
-                        <div class="h-px bg-white/10 my-3"></div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-white/60">Minimal yechish:</span>
-                            <span class="font-bold text-yellow-400">1 💎</span>
+
+                        <!-- Current Balance -->
+                        <div class="mb-6 p-5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl border border-green-500/20">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-white/60 text-sm mb-1">Mavjud balans</p>
+                                    <p id="withdraw-balance" class="text-3xl font-bold text-green-400">0 💎</p>
+                                </div>
+                                <div class="text-5xl">
+                                    💎
+                                </div>
+                            </div>
+                            <div class="h-px bg-white/10 my-3"></div>
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-white/60">Minimal yechish:</span>
+                                <span class="font-bold text-yellow-400">1 💎</span>
+                            </div>
                         </div>
+
+                        <!-- Withdraw Input -->
+                        <div class="mb-5">
+                            <label for="withdraw-amount" class="block text-sm text-white/60 mb-2">Yechish miqdori</label>
+                            <div class="relative">
+                                <input type="number" id="withdraw-amount" placeholder="0" min="1" step="1" class="w-full input-field rounded-2xl px-5 py-4 text-white text-lg font-bold focus:outline-none focus:ring-2 focus:ring-green-500/20 transition-all">
+                                <div class="absolute right-5 top-1/2 -translate-y-1/2 text-2xl">
+                                    💎
+                                </div>
+                            </div>
+                            <p class="text-xs text-white/40 mt-2">Nechta olmos yechmoqchisiz?</p>
+                        </div>
+
+                        <!-- Withdraw Status -->
+                        <div id="withdraw-status" class="hidden status-card rounded-2xl p-4 mb-5 text-center text-sm"></div>
+
+                        <!-- Withdraw Button -->
+                        <button id="withdraw-btn" class="withdraw-btn w-full text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span class="text-2xl">💰</span>
+                            <span>Yechib olish</span>
+                        </button>
                     </div>
 
-                    <!-- Withdraw Input -->
-                    <div class="mb-5">
-                        <label for="withdraw-amount" class="block text-sm text-white/60 mb-2">Yechish miqdori</label>
-                        <div class="relative">
-                            <input type="number" id="withdraw-amount" placeholder="0" min="1" step="1" class="w-full input-field rounded-2xl px-5 py-4 text-white text-lg font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
-                            <div class="absolute right-5 top-1/2 -translate-y-1/2 text-2xl">
-                                💎
+                    <!-- Previous Withdrawals -->
+                    <div class="app-card p-6 slide-up" style="animation-delay: 0.2s;">
+                        <div class="flex items-center space-x-2 mb-5">
+                            <div class="text-2xl">
+                                📝
+                            </div>
+                            <h3 class="text-xl font-bold text-white/90">Yechish tarixi</h3>
+                        </div>
+                        
+                        <div id="withdraw-history" class="space-y-3">
+                            <div class="text-center py-8">
+                                <div class="text-4xl mb-3">📭</div>
+                                <p class="text-white/60">Hali olmos yechilmagan</p>
+                                <p class="text-white/40 text-xs mt-1">Birinchi yechishni amalga oshiring</p>
                             </div>
                         </div>
-                        <p class="text-xs text-white/40 mt-2">Olmoslaringizni yechib oling</p>
                     </div>
-
-                    <!-- Withdraw Status -->
-                    <div id="withdraw-status" class="hidden status-card rounded-2xl p-4 mb-5 text-center text-sm"></div>
-
-                    <!-- Withdraw Button -->
-                    <button id="withdraw-btn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <span class="text-2xl">💰</span>
-                        <span>Yechib olish</span>
-                    </button>
                 </div>
 
                 <!-- Admin Panel -->
@@ -445,13 +595,20 @@
                 </div>
             </div>
 
-            <!-- Footer -->
-            <div class="text-center py-8 pb-12">
-                <div class="flex items-center justify-center space-x-2 text-white/40 text-sm mb-2">
-                    <span>⚡️</span>
-                    <span>Telegram Mini App</span>
-                </div>
-                <p class="text-white/30 text-xs">RekchiAi olmoslari • v1.0</p>
+            <!-- Bottom Menu Navigation -->
+            <div class="menu-container">
+                <nav class="menu-nav">
+                    <button class="menu-item active" data-section="earn-section">
+                        <span class="menu-icon">💎</span>
+                        <span class="menu-label">Olmos ishlash</span>
+                        <span class="menu-indicator"></span>
+                    </button>
+                    <button class="menu-item" data-section="withdraw-section">
+                        <span class="menu-icon">💰</span>
+                        <span class="menu-label">Olmos yechish</span>
+                        <span class="menu-indicator"></span>
+                    </button>
+                </nav>
             </div>
         </div>
     </div>
@@ -485,6 +642,8 @@
         let allUsers = [];
         let isAdmin = false;
         let AdController = null;
+        let currentBalance = 0;
+        let currentSection = 'earn-section';
 
         // Telegramdan foydalanuvchi profil rasmini olish funksiyasi
         async function getTelegramProfilePhoto(userId, username, firstName) {
@@ -649,6 +808,7 @@
                         language_code: currentUser.language_code || 'uz',
                         diamonds: 0,
                         ads_watched: 0,
+                        withdraw_history: [],
                         last_ad_time: new Date().toISOString(),
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString()
@@ -789,8 +949,15 @@
             
             // Update diamond count
             const diamonds = user.diamonds || 0;
+            currentBalance = diamonds;
+            
             document.getElementById('diamond-count').textContent = diamonds;
-            document.getElementById('withdraw-diamonds').textContent = diamonds;
+            document.getElementById('total-earned-diamonds').textContent = diamonds;
+            document.getElementById('withdraw-balance').textContent = `${diamonds} 💎`;
+            
+            // Update stats
+            const adsWatched = user.ads_watched || 0;
+            document.getElementById('ads-watched').textContent = adsWatched;
             
             // Update withdraw button state
             const withdrawBtn = document.getElementById('withdraw-btn');
@@ -806,6 +973,58 @@
                 withdrawAmountInput.disabled = false;
                 withdrawAmountInput.max = diamonds;
             }
+            
+            // Update withdraw history
+            updateWithdrawHistory(user.withdraw_history || []);
+        }
+
+        function updateWithdrawHistory(history) {
+            const historyDiv = document.getElementById('withdraw-history');
+            
+            if (history.length === 0) {
+                historyDiv.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-4xl mb-3">📭</div>
+                        <p class="text-white/60">Hali olmos yechilmagan</p>
+                        <p class="text-white/40 text-xs mt-1">Birinchi yechishni amalga oshiring</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Show only last 5 withdrawals
+            const recentHistory = history.slice(-5).reverse();
+            
+            historyDiv.innerHTML = recentHistory.map((withdrawal, index) => {
+                const date = new Date(withdrawal.timestamp);
+                const formattedDate = date.toLocaleDateString('uz-UZ', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                const formattedTime = date.toLocaleTimeString('uz-UZ', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                return `
+                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-all">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-green-500/20">
+                                <span class="text-lg">💰</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-white/90">${withdrawal.amount} 💎</p>
+                                <p class="text-xs text-white/50">${formattedDate} ${formattedTime}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-green-400 font-bold">Muvaffaqiyatli</p>
+                            <p class="text-xs text-white/50">ID: ${withdrawal.id?.slice(-4) || ''}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function updateAdminPanel() {
@@ -919,12 +1138,10 @@
         }
 
         async function withdrawDiamonds() {
-            if (!currentUser) return;
-
-            const withdrawBtn = document.getElementById('withdraw-btn');
-            const withdrawStatus = document.getElementById('withdraw-status');
             const amountInput = document.getElementById('withdraw-amount');
             const amount = parseInt(amountInput.value);
+            const withdrawStatus = document.getElementById('withdraw-status');
+            const withdrawBtn = document.getElementById('withdraw-btn');
 
             // Validation
             if (!amount || amount < 1) {
@@ -938,13 +1155,7 @@
                 return;
             }
 
-            // Check user balance from Firebase
-            const userRef = ref(db, 'users/' + currentUser.user_id);
-            const snapshot = await get(userRef);
-            const userData = snapshot.val();
-            const currentDiamonds = userData.diamonds || 0;
-
-            if (amount > currentDiamonds) {
+            if (amount > currentBalance) {
                 withdrawStatus.classList.remove('hidden');
                 withdrawStatus.classList.add('withdraw-error');
                 withdrawStatus.innerHTML = '<p class="text-orange-400">❌ Olmoslar yetarli emas</p>';
@@ -957,17 +1168,33 @@
 
             // Start withdrawal
             withdrawBtn.disabled = true;
-            withdrawBtn.innerHTML = '<div class="w-6 h-6 border-3 border-white/30 border-t-blue-500 rounded-full animate-spin mx-auto"></div>';
+            withdrawBtn.innerHTML = '<div class="w-6 h-6 border-3 border-white/30 border-t-green-500 rounded-full animate-spin mx-auto"></div>';
             withdrawStatus.classList.remove('hidden');
             withdrawStatus.innerHTML = '<p class="text-yellow-400">⏳ Yechilmoqda...</p>';
 
             try {
-                // 1. First update Firebase (deduct diamonds)
-                const newDiamonds = currentDiamonds - amount;
+                // 1. First update Firebase (deduct diamonds and add to history)
+                const userRef = ref(db, 'users/' + currentUser.user_id);
+                const snapshot = await get(userRef);
+                const userData = snapshot.val();
+                
+                const newDiamonds = currentBalance - amount;
+                const withdrawId = Date.now().toString();
+                const withdrawalRecord = {
+                    id: withdrawId,
+                    amount: amount,
+                    timestamp: new Date().toISOString(),
+                    status: 'completed'
+                };
+                
+                const currentHistory = userData.withdraw_history || [];
+                const updatedHistory = [...currentHistory, withdrawalRecord];
+                
                 const withdrawResult = await updateUserData({
                     diamonds: newDiamonds,
                     last_withdraw_time: new Date().toISOString(),
-                    total_withdrawn: (userData.total_withdrawn || 0) + amount
+                    total_withdrawn: (userData.total_withdrawn || 0) + amount,
+                    withdraw_history: updatedHistory
                 });
 
                 if (!withdrawResult) {
@@ -1056,6 +1283,27 @@
             }
         }
 
+        // Menu Navigation Functions
+        function switchSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-section') === sectionId) {
+                    item.classList.add('active');
+                }
+            });
+            
+            currentSection = sectionId;
+        }
+
         function showError(message) {
             const statusDiv = document.getElementById('ad-status');
             if (statusDiv) {
@@ -1067,22 +1315,11 @@
         document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
         document.getElementById('withdraw-btn')?.addEventListener('click', withdrawDiamonds);
 
-        document.getElementById('withdraw-amount')?.addEventListener('input', function() {
-            const btn = document.getElementById('withdraw-btn');
-            const userRef = ref(db, 'users/' + currentUser.user_id);
-            
-            get(userRef).then(snapshot => {
-                if (snapshot.exists()) {
-                    const userData = snapshot.val();
-                    const currentDiamonds = userData.diamonds || 0;
-                    const amount = parseInt(this.value) || 0;
-                    
-                    if (amount > 0 && amount <= currentDiamonds) {
-                        btn.disabled = false;
-                    } else {
-                        btn.disabled = true;
-                    }
-                }
+        // Menu navigation
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const sectionId = item.getAttribute('data-section');
+                switchSection(sectionId);
             });
         });
 

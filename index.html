@@ -1,700 +1,748 @@
 <!doctype html>
 <html lang="uz" class="h-full">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diamond Rewards</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    window.process = { env: { NODE_ENV: 'production' } };
-  </script>
-  <style>
-    body {
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
-    }
-    
-    @keyframes pulse-glow {
-      0%, 100% { 
-        box-shadow: 0 0 30px rgba(139, 92, 246, 0.4),
-                    0 0 60px rgba(139, 92, 246, 0.2); 
-      }
-      50% { 
-        box-shadow: 0 0 50px rgba(139, 92, 246, 0.6),
-                    0 0 100px rgba(139, 92, 246, 0.3); 
-      }
-    }
-    
-    @keyframes slideUp {
-      from { 
-        opacity: 0; 
-        transform: translateY(20px); 
-      }
-      to { 
-        opacity: 1; 
-        transform: translateY(0); 
-      }
-    }
-    
-    @keyframes celebrate {
-      0%, 100% { transform: scale(1) rotate(0deg); }
-      25% { transform: scale(1.2) rotate(-5deg); }
-      75% { transform: scale(1.2) rotate(5deg); }
-    }
-    
-    .float-animation {
-      animation: float 4s ease-in-out infinite;
-    }
-    
-    .pulse-glow {
-      animation: pulse-glow 3s ease-in-out infinite;
-    }
-    
-    .slide-up {
-      animation: slideUp 0.5s ease-out;
-    }
-    
-    .app-card {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(30px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
-      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
-    }
-    
-    .gradient-bg {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    }
-    
-    .diamond-icon {
-      filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.8));
-    }
-    
-    .stat-card {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
-    }
-    
-    .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-    }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
-    }
-    
-    .btn-primary:active:not(:disabled) {
-      transform: translateY(0px);
-    }
-  </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
- </head>
- <body class="h-full gradient-bg text-white overflow-auto">
-  <div id="app" class="min-h-full w-full"><!-- Loading State -->
-   <div id="loading" class="flex items-center justify-center min-h-screen p-4">
-    <div class="text-center slide-up">
-     <div class="text-7xl mb-6 float-animation diamond-icon">
-      💎
-     </div>
-     <div class="w-20 h-20 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-     <p class="text-xl font-semibold">Diamond Rewards</p>
-     <p class="text-white/60 mt-2">Yuklanmoqda...</p>
-    </div>
-   </div><!-- Main Content -->
-   <div id="content" class="hidden"><!-- Top Bar -->
-    <div class="sticky top-0 z-50 backdrop-blur-xl bg-white/5 border-b border-white/10">
-     <div class="max-w-lg mx-auto px-4 py-4">
-      <div class="flex items-center justify-between">
-       <div class="flex items-center space-x-3">
-        <div class="text-3xl diamond-icon">
-         💎
-        </div>
-        <div>
-         <h1 class="text-xl font-bold">Diamond Rewards</h1>
-         <p class="text-xs text-white/60">Reklama ko'ring, olmos yig'ing</p>
-        </div>
-       </div>
-       <div class="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full pulse-glow"><span id="diamond-count" class="text-2xl font-bold">0</span> <span class="text-xl diamond-icon">💎</span>
-       </div>
-      </div>
-     </div>
-    </div><!-- Main Container -->
-    <div class="max-w-lg mx-auto px-4 py-6 space-y-4"><!-- User Profile Card -->
-     <div class="app-card p-5 slide-up">
-      <div class="flex items-center space-x-4">
-       <div id="user-avatar" class="w-16 h-16 bg-gradient-to-br from-white/20 to-white/5 rounded-2xl flex items-center justify-center text-2xl font-bold border border-white/20">
-        👤
-       </div>
-       <div class="flex-1">
-        <h3 id="user-name" class="font-bold text-lg">Foydalanuvchi</h3>
-        <p id="user-id" class="text-white/50 text-sm">ID: Loading...</p>
-       </div>
-      </div>
-     </div><!-- Ad Watch Section -->
-     <div class="app-card p-6 slide-up" style="animation-delay: 0.1s;"><!-- Header -->
-      <div class="flex items-center justify-between mb-6">
-       <div class="flex items-center space-x-3">
-        <div class="text-3xl">
-         🎬
-        </div>
-        <div>
-         <h2 class="text-xl font-bold">Reklama ko'ring</h2>
-         <p class="text-white/60 text-sm">Olmos yig'ing</p>
-        </div>
-       </div>
-       <div class="bg-green-500/20 border border-green-500/30 px-3 py-1.5 rounded-full"><span class="text-green-400 font-bold text-sm">+1 💎</span>
-       </div>
-      </div><!-- Status Display -->
-      <div id="ad-status" class="bg-white/5 border border-white/10 rounded-2xl p-6 mb-5 text-center min-h-[100px] flex items-center justify-center">
-       <p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>
-      </div><!-- Watch Button --> <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-5 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg"> <span class="text-2xl">▶️</span> <span>Reklamani boshlash</span> </button>
-     </div><!-- Stats Section -->
-     <div class="app-card p-6 slide-up" style="animation-delay: 0.2s;">
-      <div class="flex items-center space-x-2 mb-5">
-       <div class="text-2xl">
-        📊
-       </div>
-       <h3 class="text-xl font-bold">Statistika</h3>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-       <div class="stat-card rounded-2xl p-5 text-center">
-        <div class="text-3xl mb-2">
-         🎬
-        </div>
-        <p class="text-white/60 text-xs mb-2">Ko'rilgan</p>
-        <p id="ads-watched" class="text-3xl font-bold">0</p>
-        <p class="text-white/40 text-xs mt-1">reklamalar</p>
-       </div>
-       <div class="stat-card rounded-2xl p-5 text-center">
-        <div class="text-3xl mb-2 diamond-icon">
-         💎
-        </div>
-        <p class="text-white/60 text-xs mb-2">Jami</p>
-        <p id="total-diamonds" class="text-3xl font-bold">0</p>
-        <p class="text-white/40 text-xs mt-1">olmoslar</p>
-       </div>
-      </div>
-     </div><!-- Withdraw Section -->
-     <div class="app-card p-6 slide-up" style="animation-delay: 0.25s;">
-      <div class="flex items-center space-x-2 mb-5">
-       <div class="text-2xl">
-        💰
-       </div>
-       <h3 class="text-xl font-bold">Olmos yechish</h3>
-      </div><!-- Withdraw Info -->
-      <div class="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-5 mb-5">
-       <div class="flex items-center justify-between mb-3">
-        <div>
-         <p class="text-white/60 text-sm mb-1">Mavjud olmoslar</p>
-         <p class="text-3xl font-bold text-green-400" id="withdraw-diamonds">0</p>
-        </div>
-        <div class="text-5xl">
-         💎
-        </div>
-       </div>
-       <div class="h-px bg-white/10 my-3"></div>
-       <div class="flex items-center justify-between text-sm"><span class="text-white/60">Minimal yechish:</span> <span class="font-bold text-yellow-400">1 💎</span>
-       </div>
-      </div><!-- Withdraw Input -->
-      <div class="mb-5"><label for="withdraw-amount" class="block text-sm text-white/60 mb-2">Yechish miqdori</label>
-       <div class="relative"><input type="number" id="withdraw-amount" placeholder="0" min="1" step="1" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg font-bold focus:outline-none focus:border-green-500/50 focus:ring-2 focus:ring-green-500/20 transition-all">
-        <div class="absolute right-5 top-1/2 -translate-y-1/2 text-2xl">
-         💎
-        </div>
-       </div>
-       <p class="text-xs text-white/40 mt-2">Olmoslaringizni yechib oling</p>
-      </div><!-- Withdraw Status -->
-      <div id="withdraw-status" class="hidden bg-white/5 border border-white/10 rounded-2xl p-4 mb-5 text-center text-sm"></div><!-- Withdraw Button --> <button id="withdraw-btn" class="btn-primary w-full text-white font-bold py-5 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed"> <span class="text-2xl">💰</span> <span>Yechib olish</span> </button>
-     </div><!-- Admin Panel -->
-     <div id="admin-panel" class="hidden app-card p-6 border-2 border-yellow-500/30 slide-up" style="animation-delay: 0.3s;">
-      <div class="flex items-center space-x-3 mb-6">
-       <div class="text-3xl">
-        👑
-       </div>
-       <h2 class="text-xl font-bold">Admin Panel</h2>
-      </div><!-- Admin Stats -->
-      <div class="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-2xl p-5 mb-6">
-       <div class="flex items-center space-x-2 mb-4">
-        <div class="text-xl">
-         📈
-        </div>
-        <h3 class="font-bold">Umumiy statistika</h3>
-       </div>
-       <div class="grid grid-cols-3 gap-4 text-center">
-        <div>
-         <p class="text-2xl font-bold text-yellow-400" id="admin-total-users">0</p>
-         <p class="text-xs text-white/60 mt-1">Foydalanuvchi</p>
-        </div>
-        <div>
-         <p class="text-2xl font-bold text-yellow-400" id="admin-total-ads">0</p>
-         <p class="text-xs text-white/60 mt-1">Reklamalar</p>
-        </div>
-        <div>
-         <p class="text-2xl font-bold text-yellow-400" id="admin-total-diamonds">0</p>
-         <p class="text-xs text-white/60 mt-1">Olmoslar</p>
-        </div>
-       </div>
-      </div><!-- Users List -->
-      <div class="flex items-center space-x-2 mb-4">
-       <div class="text-xl">
-        👥
-       </div>
-       <h3 class="font-bold">Foydalanuvchilar</h3>
-      </div>
-      <div id="users-list" class="space-y-3 max-h-96 overflow-y-auto">
-      </div>
-     </div>
-    </div><!-- Footer -->
-    <div class="text-center py-8 pb-12">
-     <div class="flex items-center justify-center space-x-2 text-white/40 text-sm mb-2"><span>⚡️</span> <span>Telegram Mini App</span>
-     </div>
-     <p class="text-white/30 text-xs">Diamond Rewards • v1.0</p>
-    </div>
-   </div>
-  </div>
-  <script type="module">
-    // Firebase imports - REALTIME DATABASE
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
-
-    // Firebase Configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyAFzNDoLlxHEpJOuZO8nhc-D2SmUId2dEc",
-      authDomain: "rekchi-2dc2f.firebaseapp.com",
-      databaseURL: "https://rekchi-2dc2f-default-rtdb.firebaseio.com",
-      projectId: "rekchi-2dc2f",
-      storageBucket: "rekchi-2dc2f.firebasestorage.app",
-      messagingSenderId: "352655860270",
-      appId: "1:352655860270:web:e071c82f4b911c21c0b5bf",
-      measurementId: "G-4WVC8S5V3R"
-    };
-
-    // Initialize Firebase
-    const firebaseApp = initializeApp(firebaseConfig);
-    const db = getDatabase(firebaseApp);
-
-    const ADMIN_IDS = ['7500103239', '7104718080'];
-    const AD_BLOCK_ID = '18961';
-    const REWARD_AMOUNT = 1;
-    
-    let currentUser = null;
-    let allUsers = [];
-    let isAdmin = false;
-    let AdController = null;
-
-    // Initialize Telegram Web App
-    function initTelegram() {
-      if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
-        const tg = window.Telegram.WebApp;
-        const user = tg.initDataUnsafe?.user;
-        
-        if (user) {
-          currentUser = {
-            user_id: user.id.toString(),
-            username: user.username || 'user',
-            first_name: user.first_name || 'User'
-          };
-          isAdmin = ADMIN_IDS.includes(currentUser.user_id);
-          console.log('✅ Telegram user loaded:', currentUser);
-        } else {
-          console.log('⚠️ No Telegram user, using test user');
-          currentUser = {
-            user_id: 'test_' + Date.now(),
-            username: 'testuser',
-            first_name: 'Test User'
-          };
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Rewards</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.process = { env: { NODE_ENV: 'production' } };
+    </script>
+    <style>
+        /* Sizning CSS kodingiz o'zgartirilmagan */
+        body {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
         }
-      }
-    }
-
-    // Initialize Adsgram
-    function initAdsgram() {
-      if (window.Adsgram) {
-        AdController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
-        console.log('✅ Adsgram initialized');
-      } else {
-        setTimeout(initAdsgram, 500);
-      }
-    }
-
-    // Firebase Realtime Database Functions
-    async function loadOrCreateUser() {
-      if (!currentUser) {
-        console.error('❌ No current user');
-        return null;
-      }
-
-      try {
-        console.log('📡 Loading user from Realtime Database:', currentUser.user_id);
-        const userRef = ref(db, 'users/' + currentUser.user_id);
-        const snapshot = await get(userRef);
-
-        if (!snapshot.exists()) {
-          console.log('➕ Creating new user');
-          const newUser = {
-            user_id: currentUser.user_id,
-            username: currentUser.username,
-            first_name: currentUser.first_name,
-            diamonds: 0,
-            ads_watched: 0,
-            last_ad_time: new Date().toISOString(),
-            created_at: new Date().toISOString()
-          };
-          
-          await set(userRef, newUser);
-          console.log('✅ New user created');
-          return newUser;
-        } else {
-          console.log('✅ User loaded');
-          return snapshot.val();
-        }
-      } catch (error) {
-        console.error('❌ Error loading user:', error);
-        showError('Ma\'lumotlar yuklanmadi: ' + error.message);
-        return null;
-      }
-    }
-
-    async function updateUserData(updates) {
-      if (!currentUser) return false;
-
-      try {
-        const userRef = ref(db, 'users/' + currentUser.user_id);
-        await update(userRef, updates);
-        console.log('✅ User updated:', updates);
-        return true;
-      } catch (error) {
-        console.error('❌ Error updating user:', error);
-        return false;
-      }
-    }
-
-    function subscribeToUsers() {
-      if (!isAdmin) return;
-
-      const usersRef = ref(db, 'users');
-      onValue(usersRef, (snapshot) => {
-        allUsers = [];
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          Object.keys(data).forEach(key => {
-            allUsers.push(data[key]);
-          });
-          console.log('👑 Admin: loaded', allUsers.length, 'users');
-          updateAdminPanel();
-        }
-      }, (error) => {
-        console.error('❌ Error subscribing to users:', error);
-      });
-    }
-
-    // Initialize App
-    async function initializeAppMain() {
-      console.log('🚀 Initializing app...');
-      
-      initTelegram();
-      initAdsgram();
-
-      const user = await loadOrCreateUser();
-      
-      if (user) {
-        updateUI(user);
         
-        // Subscribe to user changes
-        const userRef = ref(db, 'users/' + currentUser.user_id);
-        onValue(userRef, (snapshot) => {
-          if (snapshot.exists()) {
-            console.log('🔄 User data updated');
-            updateUI(snapshot.val());
-          }
-        }, (error) => {
-          console.error('❌ Error subscribing to user:', error);
-        });
-
-        if (isAdmin) {
-          console.log('👑 Admin mode activated');
-          document.getElementById('admin-panel').classList.remove('hidden');
-          subscribeToUsers();
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
         }
-      }
-
-      document.getElementById('loading').classList.add('hidden');
-      document.getElementById('content').classList.remove('hidden');
-      console.log('✅ App initialized');
-    }
-
-    function updateUI(user) {
-      if (!user) return;
-
-      const initials = user.first_name.charAt(0).toUpperCase();
-      document.getElementById('user-avatar').textContent = initials;
-      document.getElementById('user-name').textContent = user.first_name;
-      document.getElementById('user-id').textContent = `ID: ${user.user_id}`;
-      
-      const diamonds = user.diamonds || 0;
-      document.getElementById('diamond-count').textContent = diamonds;
-      document.getElementById('total-diamonds').textContent = diamonds;
-      document.getElementById('withdraw-diamonds').textContent = diamonds;
-      document.getElementById('ads-watched').textContent = user.ads_watched || 0;
-      
-      // Update withdraw button state
-      const withdrawBtn = document.getElementById('withdraw-btn');
-      if (diamonds < 1) {
-        withdrawBtn.disabled = true;
-      } else {
-        withdrawBtn.disabled = false;
-      }
-    }
-
-    function updateAdminPanel() {
-      const totalUsers = allUsers.length;
-      const totalAds = allUsers.reduce((sum, u) => sum + (u.ads_watched || 0), 0);
-      const totalDiamonds = allUsers.reduce((sum, u) => sum + (u.diamonds || 0), 0);
-
-      document.getElementById('admin-total-users').textContent = totalUsers;
-      document.getElementById('admin-total-ads').textContent = totalAds;
-      document.getElementById('admin-total-diamonds').textContent = totalDiamonds;
-
-      const usersList = document.getElementById('users-list');
-      usersList.innerHTML = allUsers
-        .sort((a, b) => (b.diamonds || 0) - (a.diamonds || 0))
-        .map((user) => `
-          <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-white/20 to-white/5 rounded-xl flex items-center justify-center text-sm font-bold border border-white/20">
-                  ${user.first_name.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <p class="font-bold text-sm">${user.first_name}</p>
-                  <p class="text-xs text-white/50">@${user.username}</p>
-                </div>
-              </div>
-              <div class="text-right">
-                <p class="text-lg font-bold text-yellow-400">${user.diamonds || 0} 💎</p>
-                <p class="text-xs text-white/50">${user.ads_watched || 0} reklama</p>
-              </div>
-            </div>
-          </div>
-        `).join('');
-    }
-
-    async function watchAd() {
-      if (!currentUser) return;
-
-      const btn = document.getElementById('watch-ad-btn');
-      const statusDiv = document.getElementById('ad-status');
-      
-      btn.disabled = true;
-      btn.innerHTML = '<div class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
-      statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yuklanmoqda...</p>';
-
-      let attempts = 0;
-      while (!AdController && attempts < 20) {
-        await new Promise(resolve => setTimeout(resolve, 250));
-        attempts++;
-      }
-
-      if (!AdController) {
-        statusDiv.innerHTML = '<p class="text-red-400">Reklama tizimi yuklanmagan. Sahifani yangilang.</p>';
-        btn.disabled = false;
-        btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
-        return;
-      }
-
-      try {
-        statusDiv.innerHTML = '<p class="text-green-400 font-bold">🎬 Reklama ko\'rsatilmoqda...</p>';
         
-        await AdController.show();
+        @keyframes pulse-glow {
+            0%, 100% { 
+                box-shadow: 0 0 30px rgba(139, 92, 246, 0.4),
+                            0 0 60px rgba(139, 92, 246, 0.2); 
+            }
+            50% { 
+                box-shadow: 0 0 50px rgba(139, 92, 246, 0.6),
+                            0 0 100px rgba(139, 92, 246, 0.3); 
+            }
+        }
         
-        const userRef = ref(db, 'users/' + currentUser.user_id);
-        const snapshot = await get(userRef);
-        const userData = snapshot.val();
-
-        const success = await updateUserData({
-          diamonds: (userData.diamonds || 0) + REWARD_AMOUNT,
-          ads_watched: (userData.ads_watched || 0) + 1,
-          last_ad_time: new Date().toISOString()
-        });
-
-        if (success) {
-          statusDiv.innerHTML = `
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-5deg); }
+            75% { transform: scale(1.2) rotate(5deg); }
+        }
+        
+        .float-animation {
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        .app-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+        
+        .diamond-icon {
+            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.8));
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0px);
+        }
+    </style>
+</head>
+<body class="h-full gradient-bg text-white overflow-auto">
+    <div id="app" class="min-h-full w-full">
+        <!-- Loading State -->
+        <div id="loading" class="flex items-center justify-center min-h-screen p-4">
             <div class="text-center slide-up">
-              <div class="text-6xl mb-3" style="animation: celebrate 0.6s ease-out;">🎉</div>
-              <p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p>
-              <p class="text-2xl font-bold mb-2">+${REWARD_AMOUNT} 💎</p>
-              <p class="text-sm text-white/60">Reklama to'liq ko'rildi</p>
+                <div class="text-7xl mb-6 float-animation diamond-icon">💎</div>
+                <div class="w-20 h-20 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                <p class="text-xl font-semibold">Diamond Rewards</p>
+                <p class="text-white/60 mt-2">Yuklanmoqda...</p>
             </div>
-          `;
-        } else {
-          throw new Error('Mukofot berishda xatolik');
-        }
-      } catch (error) {
-        console.error('❌ Ad error:', error);
+        </div>
         
-        if (error && error.error) {
-          statusDiv.innerHTML = `<p class="text-red-400">Xatolik: ${error.description || 'Reklama yuklanmadi'}</p>`;
-        } else if (error && error.done === false) {
-          statusDiv.innerHTML = '<p class="text-orange-400">Reklama to\'liq ko\'rilmadi. Mukofot berilmadi.</p>';
-        } else {
-          statusDiv.innerHTML = '<p class="text-orange-400">Reklama yopildi yoki xatolik yuz berdi.</p>';
-        }
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
-        
-        setTimeout(() => {
-          statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>';
-        }, 3000);
-      }
-    }
+        <!-- Main Content -->
+        <div id="content" class="hidden">
+            <!-- Top Bar -->
+            <div class="sticky top-0 z-50 backdrop-blur-xl bg-white/5 border-b border-white/10">
+                <div class="max-w-lg mx-auto px-4 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-3xl diamond-icon">💎</div>
+                            <div>
+                                <h1 class="text-xl font-bold">Diamond Rewards</h1>
+                                <p class="text-xs text-white/60">Reklama ko'ring, olmos yig'ing</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full pulse-glow">
+                            <span id="diamond-count" class="text-2xl font-bold">0</span>
+                            <span class="text-xl diamond-icon">💎</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Container -->
+            <div class="max-w-lg mx-auto px-4 py-6 space-y-4">
+                <!-- User Profile Card -->
+                <div class="app-card p-5 slide-up">
+                    <div class="flex items-center space-x-4">
+                        <div id="user-avatar" class="w-16 h-16 bg-gradient-to-br from-white/20 to-white/5 rounded-2xl flex items-center justify-center text-2xl font-bold border border-white/20">
+                            👤
+                        </div>
+                        <div class="flex-1">
+                            <h3 id="user-name" class="font-bold text-lg">Foydalanuvchi</h3>
+                            <p id="user-id" class="text-white/50 text-sm">ID: Loading...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ad Watch Section -->
+                <div class="app-card p-6 slide-up" style="animation-delay: 0.1s;">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-3xl">🎬</div>
+                            <div>
+                                <h2 class="text-xl font-bold">Reklama ko'ring</h2>
+                                <p class="text-white/60 text-sm">Olmos yig'ing</p>
+                            </div>
+                        </div>
+                        <div class="bg-green-500/20 border border-green-500/30 px-3 py-1.5 rounded-full">
+                            <span class="text-green-400 font-bold text-sm">+1 💎</span>
+                        </div>
+                    </div>
+                    
+                    <div id="ad-status" class="bg-white/5 border border-white/10 rounded-2xl p-6 mb-5 text-center min-h-[100px] flex items-center justify-center">
+                        <p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>
+                    </div>
+                    
+                    <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-5 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg">
+                        <span class="text-2xl">▶️</span>
+                        <span>Reklamani boshlash</span>
+                    </button>
+                </div>
+                
+                <!-- Stats Section -->
+                <div class="app-card p-6 slide-up" style="animation-delay: 0.2s;">
+                    <div class="flex items-center space-x-2 mb-5">
+                        <div class="text-2xl">📊</div>
+                        <h3 class="text-xl font-bold">Statistika</h3>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="stat-card rounded-2xl p-5 text-center">
+                            <div class="text-3xl mb-2">🎬</div>
+                            <p class="text-white/60 text-xs mb-2">Ko'rilgan</p>
+                            <p id="ads-watched" class="text-3xl font-bold">0</p>
+                            <p class="text-white/40 text-xs mt-1">reklamalar</p>
+                        </div>
+                        <div class="stat-card rounded-2xl p-5 text-center">
+                            <div class="text-3xl mb-2 diamond-icon">💎</div>
+                            <p class="text-white/60 text-xs mb-2">Jami</p>
+                            <p id="total-diamonds" class="text-3xl font-bold">0</p>
+                            <p class="text-white/40 text-xs mt-1">olmoslar</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Withdraw Section -->
+                <div class="app-card p-6 slide-up" style="animation-delay: 0.25s;">
+                    <div class="flex items-center space-x-2 mb-5">
+                        <div class="text-2xl">💰</div>
+                        <h3 class="text-xl font-bold">Olmos yechish</h3>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-5 mb-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <p class="text-white/60 text-sm mb-1">Mavjud olmoslar</p>
+                                <p class="text-3xl font-bold text-green-400" id="withdraw-diamonds">0</p>
+                            </div>
+                            <div class="text-5xl">💎</div>
+                        </div>
+                        <div class="h-px bg-white/10 my-3"></div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-white/60">Minimal yechish:</span>
+                            <span class="font-bold text-yellow-400">1 💎</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-5">
+                        <label for="withdraw-amount" class="block text-sm text-white/60 mb-2">Yechish miqdori</label>
+                        <div class="relative">
+                            <input type="number" id="withdraw-amount" placeholder="0" min="1" step="1" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg font-bold focus:outline-none focus:border-green-500/50 focus:ring-2 focus:ring-green-500/20 transition-all">
+                            <div class="absolute right-5 top-1/2 -translate-y-1/2 text-2xl">💎</div>
+                        </div>
+                        <p class="text-xs text-white/40 mt-2">Olmoslaringizni yechib oling</p>
+                    </div>
+                    
+                    <div id="withdraw-status" class="hidden bg-white/5 border border-white/10 rounded-2xl p-4 mb-5 text-center text-sm"></div>
+                    
+                    <button id="withdraw-btn" class="btn-primary w-full text-white font-bold py-5 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="text-2xl">💰</span>
+                        <span>Yechib olish</span>
+                    </button>
+                </div>
+                
+                <!-- Admin Panel -->
+                <div id="admin-panel" class="hidden app-card p-6 border-2 border-yellow-500/30 slide-up" style="animation-delay: 0.3s;">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="text-3xl">👑</div>
+                        <h2 class="text-xl font-bold">Admin Panel</h2>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-2xl p-5 mb-6">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="text-xl">📈</div>
+                            <h3 class="font-bold">Umumiy statistika</h3>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div>
+                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-users">0</p>
+                                <p class="text-xs text-white/60 mt-1">Foydalanuvchi</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-ads">0</p>
+                                <p class="text-xs text-white/60 mt-1">Reklamalar</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-diamonds">0</p>
+                                <p class="text-xs text-white/60 mt-1">Olmoslar</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="text-xl">👥</div>
+                        <h3 class="font-bold">Foydalanuvchilar</h3>
+                    </div>
+                    
+                    <div id="users-list" class="space-y-3 max-h-96 overflow-y-auto"></div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="text-center py-8 pb-12">
+                <div class="flex items-center justify-center space-x-2 text-white/40 text-sm mb-2">
+                    <span>⚡️</span>
+                    <span>Telegram Mini App</span>
+                </div>
+                <p class="text-white/30 text-xs">Diamond Rewards • v1.0</p>
+            </div>
+        </div>
+    </div>
 
-    function showError(message) {
-      const statusDiv = document.getElementById('ad-status');
-      if (statusDiv) {
-        statusDiv.innerHTML = `<p class="text-red-400">${message}</p>`;
-      }
-    }
+    <script type="module">
+        // Firebase imports - REALTIME DATABASE
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-    // WebApp da yechib olish funksiyasi
-async function withdrawDiamonds(userId, amount) {
-    try {
-        // ✅ CORS proxy ishlatamiz
-        const corsProxy = 'https://corsproxy.io/?';
-        const apiUrl = 'https://68ed1ab05ca4e.myxvest1.ru/withdraw.php';
-        const fullUrl = corsProxy + encodeURIComponent(apiUrl);
-        
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-        
-        const response = await fetch(fullUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                key: '4564123:hkjhfadfhieapkdnga',
-                user_id: userId,
-                amount: amount
-            }),
-            signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        return result;
-        
-    } catch (error) {
-        console.error('Withdrawal error:', error);
-        
-        // Xato turiga qarab xabar
-        if (error.name === 'AbortError') {
-            return {
-                success: false,
-                message: '⏳ So\'rov vaqti tugadi. Qayta urinib ko\'ring.'
-            };
-        } else if (error.message.includes('Failed to fetch')) {
-            return {
-                success: false,
-                message: '📡 Internet aloqasi yo\'q. Qayta urinib ko\'ring.'
-            };
-        }
-        
-        return {
-            success: false,
-            message: '❌ Noma\'lum xatolik: ' + error.message
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFzNDoLlxHEpJOuZO8nhc-D2SmUId2dEc",
+            authDomain: "rekchi-2dc2f.firebaseapp.com",
+            databaseURL: "https://rekchi-2dc2f-default-rtdb.firebaseio.com",
+            projectId: "rekchi-2dc2f",
+            storageBucket: "rekchi-2dc2f.firebasestorage.app",
+            messagingSenderId: "352655860270",
+            appId: "1:352655860270:web:e071c82f4b911c21c0b5bf",
+            measurementId: "G-4WVC8S5V3R"
         };
-    }
-}
 
-// Tugma bosilganda
-document.getElementById('withdraw-btn').addEventListener('click', async function() {
-    const userId = currentUser?.user_id;
-    const amount = parseInt(document.getElementById('withdraw-amount').value);
-    
-    if (!userId || !amount || amount < 1) {
-        alert('❌ Iltimos, to\'g\'ri miqdor kiriting');
-        return;
-    }
-    
-    // Tugmani disable qilish
-    const btn = this;
-    btn.disabled = true;
-    btn.innerHTML = '<div class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
-    
-    // Statusni ko'rsatish
-    const statusDiv = document.getElementById('withdraw-status');
-    statusDiv.classList.remove('hidden');
-    statusDiv.innerHTML = '<p class="text-yellow-400">⏳ Yechib olinmoqda...</p>';
-    
-    // API ga so'rov yuborish
-    const result = await withdrawDiamonds(userId, amount);
-    
-    // Statusni yangilash
-    if (result.success) {
-        statusDiv.innerHTML = `
-            <div class="text-center">
-                <div class="text-4xl mb-2">🎉</div>
-                <p class="text-green-400 font-bold">Muvaffaqiyatli!</p>
-                <p class="text-white/80 mt-1">${amount} olmos yechib olindi</p>
-                <p class="text-xs text-white/50 mt-2">${result.message}</p>
-            </div>
-        `;
+        // Initialize Firebase
+        const firebaseApp = initializeApp(firebaseConfig);
+        const db = getDatabase(firebaseApp);
+
+        const ADMIN_IDS = ['7500103239', '7104718080'];
+        const AD_BLOCK_ID = '18961';
+        const REWARD_AMOUNT = 1;
         
-        // Balansni yangilash
-        updateUI({ diamonds: result.new_balance });
-        
-        // Inputni tozalash
-        document.getElementById('withdraw-amount').value = '';
-    } else {
-        statusDiv.innerHTML = `<p class="text-red-400">❌ ${result.message || result.error}</p>`;
-    }
-    
-    // Tugmani qayta yoqish
-    btn.disabled = false;
-    btn.innerHTML = '<span class="text-2xl">💰</span><span>Yechib olish</span>';
-    
-    // 5 soniyadan keyin statusni yashirish
-    setTimeout(() => {
-        statusDiv.classList.add('hidden');
-    }, 5000);
-});
+        let currentUser = null;
+        let allUsers = [];
+        let isAdmin = false;
+        let AdController = null;
 
-    document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
-    document.getElementById('withdraw-btn')?.addEventListener('click', withdrawDiamonds);
+        // Initialize Telegram Web App
+        function initTelegram() {
+            if (window.Telegram?.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+                const tg = window.Telegram.WebApp;
+                const user = tg.initDataUnsafe?.user;
+                
+                if (user) {
+                    currentUser = {
+                        user_id: user.id.toString(),
+                        username: user.username || 'user',
+                        first_name: user.first_name || 'User'
+                    };
+                    isAdmin = ADMIN_IDS.includes(currentUser.user_id);
+                    console.log('✅ Telegram user loaded:', currentUser);
+                } else {
+                    console.log('⚠️ No Telegram user, using test user');
+                    currentUser = {
+                        user_id: 'test_' + Date.now(),
+                        username: 'testuser',
+                        first_name: 'Test User'
+                    };
+                }
+            }
+        }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initializeAppMain);
-    } else {
-      initializeAppMain();
-    }
-  </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ad4663127aadbcb',t:'MTc2NTYxNzc2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+        // Initialize Adsgram
+        function initAdsgram() {
+            if (window.Adsgram) {
+                AdController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
+                console.log('✅ Adsgram initialized');
+            } else {
+                setTimeout(initAdsgram, 500);
+            }
+        }
+
+        // Firebase Realtime Database Functions
+        async function loadOrCreateUser() {
+            if (!currentUser) {
+                console.error('❌ No current user');
+                return null;
+            }
+
+            try {
+                console.log('📡 Loading user from Realtime Database:', currentUser.user_id);
+                const userRef = ref(db, 'users/' + currentUser.user_id);
+                const snapshot = await get(userRef);
+
+                if (!snapshot.exists()) {
+                    console.log('➕ Creating new user');
+                    const newUser = {
+                        user_id: currentUser.user_id,
+                        username: currentUser.username,
+                        first_name: currentUser.first_name,
+                        diamonds: 0,
+                        ads_watched: 0,
+                        last_ad_time: new Date().toISOString(),
+                        created_at: new Date().toISOString()
+                    };
+                    
+                    await set(userRef, newUser);
+                    console.log('✅ New user created');
+                    return newUser;
+                } else {
+                    console.log('✅ User loaded');
+                    return snapshot.val();
+                }
+            } catch (error) {
+                console.error('❌ Error loading user:', error);
+                showError('Ma\'lumotlar yuklanmadi: ' + error.message);
+                return null;
+            }
+        }
+
+        async function updateUserData(updates) {
+            if (!currentUser) return false;
+
+            try {
+                const userRef = ref(db, 'users/' + currentUser.user_id);
+                await update(userRef, updates);
+                console.log('✅ User updated:', updates);
+                return true;
+            } catch (error) {
+                console.error('❌ Error updating user:', error);
+                return false;
+            }
+        }
+
+        function subscribeToUsers() {
+            if (!isAdmin) return;
+
+            const usersRef = ref(db, 'users');
+            onValue(usersRef, (snapshot) => {
+                allUsers = [];
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    Object.keys(data).forEach(key => {
+                        allUsers.push(data[key]);
+                    });
+                    console.log('👑 Admin: loaded', allUsers.length, 'users');
+                    updateAdminPanel();
+                }
+            }, (error) => {
+                console.error('❌ Error subscribing to users:', error);
+            });
+        }
+
+        // Initialize App
+        async function initializeAppMain() {
+            console.log('🚀 Initializing app...');
+            
+            initTelegram();
+            initAdsgram();
+
+            const user = await loadOrCreateUser();
+            
+            if (user) {
+                updateUI(user);
+                
+                // Subscribe to user changes
+                const userRef = ref(db, 'users/' + currentUser.user_id);
+                onValue(userRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        console.log('🔄 User data updated');
+                        updateUI(snapshot.val());
+                    }
+                }, (error) => {
+                    console.error('❌ Error subscribing to user:', error);
+                });
+
+                if (isAdmin) {
+                    console.log('👑 Admin mode activated');
+                    document.getElementById('admin-panel').classList.remove('hidden');
+                    subscribeToUsers();
+                }
+            }
+
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('content').classList.remove('hidden');
+            console.log('✅ App initialized');
+        }
+
+        function updateUI(user) {
+            if (!user) return;
+
+            const initials = user.first_name.charAt(0).toUpperCase();
+            document.getElementById('user-avatar').textContent = initials;
+            document.getElementById('user-name').textContent = user.first_name;
+            document.getElementById('user-id').textContent = `ID: ${user.user_id}`;
+            
+            const diamonds = user.diamonds || 0;
+            document.getElementById('diamond-count').textContent = diamonds;
+            document.getElementById('total-diamonds').textContent = diamonds;
+            document.getElementById('withdraw-diamonds').textContent = diamonds;
+            document.getElementById('ads-watched').textContent = user.ads_watched || 0;
+            
+            // Update withdraw button state
+            const withdrawBtn = document.getElementById('withdraw-btn');
+            if (diamonds < 1) {
+                withdrawBtn.disabled = true;
+            } else {
+                withdrawBtn.disabled = false;
+            }
+        }
+
+        function updateAdminPanel() {
+            const totalUsers = allUsers.length;
+            const totalAds = allUsers.reduce((sum, u) => sum + (u.ads_watched || 0), 0);
+            const totalDiamonds = allUsers.reduce((sum, u) => sum + (u.diamonds || 0), 0);
+
+            document.getElementById('admin-total-users').textContent = totalUsers;
+            document.getElementById('admin-total-ads').textContent = totalAds;
+            document.getElementById('admin-total-diamonds').textContent = totalDiamonds;
+
+            const usersList = document.getElementById('users-list');
+            usersList.innerHTML = allUsers
+                .sort((a, b) => (b.diamonds || 0) - (a.diamonds || 0))
+                .map((user) => `
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-white/20 to-white/5 rounded-xl flex items-center justify-center text-sm font-bold border border-white/20">
+                                    ${user.first_name.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-sm">${user.first_name}</p>
+                                    <p class="text-xs text-white/50">@${user.username}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-yellow-400">${user.diamonds || 0} 💎</p>
+                                <p class="text-xs text-white/50">${user.ads_watched || 0} reklama</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        async function watchAd() {
+            if (!currentUser) return;
+
+            const btn = document.getElementById('watch-ad-btn');
+            const statusDiv = document.getElementById('ad-status');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<div class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
+            statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yuklanmoqda...</p>';
+
+            let attempts = 0;
+            while (!AdController && attempts < 20) {
+                await new Promise(resolve => setTimeout(resolve, 250));
+                attempts++;
+            }
+
+            if (!AdController) {
+                statusDiv.innerHTML = '<p class="text-red-400">Reklama tizimi yuklanmagan. Sahifani yangilang.</p>';
+                btn.disabled = false;
+                btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
+                return;
+            }
+
+            try {
+                statusDiv.innerHTML = '<p class="text-green-400 font-bold">🎬 Reklama ko\'rsatilmoqda...</p>';
+                
+                await AdController.show();
+                
+                const userRef = ref(db, 'users/' + currentUser.user_id);
+                const snapshot = await get(userRef);
+                const userData = snapshot.val();
+
+                const success = await updateUserData({
+                    diamonds: (userData.diamonds || 0) + REWARD_AMOUNT,
+                    ads_watched: (userData.ads_watched || 0) + 1,
+                    last_ad_time: new Date().toISOString()
+                });
+
+                if (success) {
+                    statusDiv.innerHTML = `
+                        <div class="text-center slide-up">
+                            <div class="text-6xl mb-3" style="animation: celebrate 0.6s ease-out;">🎉</div>
+                            <p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p>
+                            <p class="text-2xl font-bold mb-2">+${REWARD_AMOUNT} 💎</p>
+                            <p class="text-sm text-white/60">Reklama to'liq ko'rildi</p>
+                        </div>
+                    `;
+                } else {
+                    throw new Error('Mukofot berishda xatolik');
+                }
+            } catch (error) {
+                console.error('❌ Ad error:', error);
+                
+                if (error && error.error) {
+                    statusDiv.innerHTML = `<p class="text-red-400">Xatolik: ${error.description || 'Reklama yuklanmadi'}</p>`;
+                } else if (error && error.done === false) {
+                    statusDiv.innerHTML = '<p class="text-orange-400">Reklama to\'liq ko\'rilmadi. Mukofot berilmadi.</p>';
+                } else {
+                    statusDiv.innerHTML = '<p class="text-orange-400">Reklama yopildi yoki xatolik yuz berdi.</p>';
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
+                
+                setTimeout(() => {
+                    statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>';
+                }, 3000);
+            }
+        }
+
+        function showError(message) {
+            const statusDiv = document.getElementById('ad-status');
+            if (statusDiv) {
+                statusDiv.innerHTML = `<p class="text-red-400">${message}</p>`;
+            }
+        }
+
+        // ✅ YANGILANGAN: Yechib olish funksiyasi
+        async function withdrawDiamonds(userId, amount) {
+            console.log('🔄 Withdraw started:', { userId, amount });
+            
+            try {
+                // 1. To'g'ri API endpoint ga so'rov yuboramiz
+                // withdraw.php FAKAT PHP kodidan iborat bo'lishi kerak
+                const apiUrl = 'https://68ed1ab05ca4e.myxvest1.ru/withdraw.php';
+                
+                // 2. CORS proxy ishlatamiz
+                const corsProxy = 'https://corsproxy.io/?';
+                const fullUrl = corsProxy + encodeURIComponent(apiUrl);
+                
+                console.log('📡 Sending to:', apiUrl);
+                console.log('🔑 API Key being sent:', '4564123:hkjhfadfhieapkdnga');
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+                
+                // 3. So'rovni tayyorlash
+                const formData = new URLSearchParams();
+                formData.append('key', '4564123:hkjhfadfhieapkdnga');
+                formData.append('user_id', userId);
+                formData.append('amount', amount);
+                formData.append('debug', 'true');
+                
+                const response = await fetch(fullUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData,
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                console.log('📥 Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ HTTP error response:', errorText);
+                    throw new Error(`Server xatosi: ${response.status}`);
+                }
+                
+                const resultText = await response.text();
+                console.log('📄 Raw response:', resultText);
+                
+                // 4. JSON javobni parse qilish
+                let result;
+                try {
+                    result = JSON.parse(resultText);
+                } catch (parseError) {
+                    console.error('❌ JSON parse error:', parseError);
+                    console.error('❌ Response was:', resultText);
+                    throw new Error('Server noto\'g\'ri formatda javob qaytarmoqda (HTML chiqarmoqda)');
+                }
+                
+                console.log('✅ Parsed result:', result);
+                return result;
+                
+            } catch (error) {
+                console.error('❌ Withdrawal error:', error);
+                
+                let errorMessage = 'Noma\'lum xatolik';
+                
+                if (error.name === 'AbortError') {
+                    errorMessage = '⏳ So\'rov vaqti tugadi. Qayta urinib ko\'ring.';
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage = '📡 Internet aloqasi yo\'q. Qayta urinib ko\'ring.';
+                } else if (error.message.includes('noto\'g\'ri format')) {
+                    errorMessage = '🔄 Server noto\'g\'ri javob qaytarmoqda. Admin bilan bog\'laning.';
+                } else {
+                    errorMessage = '❌ Xatolik: ' + error.message;
+                }
+                
+                return {
+                    success: false,
+                    message: errorMessage,
+                    error: error.message
+                };
+            }
+        }
+
+        // Tugma bosilganda
+        document.getElementById('withdraw-btn').addEventListener('click', async function() {
+            const userId = currentUser?.user_id;
+            const amount = parseInt(document.getElementById('withdraw-amount').value);
+            
+            if (!userId || !amount || amount < 1) {
+                alert('❌ Iltimos, to\'g\'ri miqdor kiriting');
+                return;
+            }
+            
+            // Tugmani disable qilish
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<div class="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
+            
+            // Statusni ko'rsatish
+            const statusDiv = document.getElementById('withdraw-status');
+            statusDiv.classList.remove('hidden');
+            statusDiv.innerHTML = '<p class="text-yellow-400">⏳ Yechib olinmoqda...</p>';
+            
+            // API ga so'rov yuborish
+            const result = await withdrawDiamonds(userId, amount);
+            
+            // Statusni yangilash
+            if (result.success) {
+                statusDiv.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-4xl mb-2">🎉</div>
+                        <p class="text-green-400 font-bold">Muvaffaqiyatli!</p>
+                        <p class="text-white/80 mt-1">${amount} olmos yechib olindi</p>
+                        <p class="text-xs text-white/50 mt-2">Yangi balans: ${result.new_balance || 'N/A'}</p>
+                    </div>
+                `;
+                
+                // Balansni yangilash (agar yangi balans kelgan bo'lsa)
+                if (result.new_balance !== undefined) {
+                    updateUI({ diamonds: result.new_balance });
+                }
+                
+                // Inputni tozalash
+                document.getElementById('withdraw-amount').value = '';
+            } else {
+                statusDiv.innerHTML = `<p class="text-red-400">❌ ${result.message || result.error}</p>`;
+            }
+            
+            // Tugmani qayta yoqish
+            btn.disabled = false;
+            btn.innerHTML = '<span class="text-2xl">💰</span><span>Yechib olish</span>';
+            
+            // 5 soniyadan keyin statusni yashirish
+            setTimeout(() => {
+                statusDiv.classList.add('hidden');
+            }, 5000);
+        });
+
+        // Event listeners
+        document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
+
+        // Initialize app
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeAppMain);
+        } else {
+            initializeAppMain();
+        }
+    </script>
+</body>
 </html>

@@ -1,165 +1,631 @@
 <!doctype html>
-<html lang="uz">
+<html lang="uz" class="h-full dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Diamond Bonus</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>RekchiAi olmoslari</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.process = { env: { NODE_ENV: 'production' } }; </script>
+    <style>
+        /* Base styles */
+        body { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif; background: #0f0f0f; color: #fff; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes pulse-glow { 0%,100%{box-shadow:0 0 20px rgba(0,150,255,.3),0 0 40px rgba(0,150,255,.1)} 50%{box-shadow:0 0 30px rgba(0,150,255,.5),0 0 60px rgba(0,150,255,.2)} }
+        @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1; transform:translateY(0)} }
+        @keyframes celebrate { 0%,100%{transform:scale(1) rotate(0)} 25%{transform:scale(1.15) rotate(-3deg)} 75%{transform:scale(1.15) rotate(3deg)} }
+        .float-animation{animation:float 3s ease-in-out infinite} .pulse-glow{animation:pulse-glow 2s ease-in-out infinite} .slide-up{animation:slideUp .4s ease-out}
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+        .app-card{background:linear-gradient(135deg, rgba(20,20,20,.95), rgba(30,30,30,.95)); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,.08); border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.5);}
+        .gradient-bg{background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#2d2d2d 100%)}
+        .diamond-icon{filter:drop-shadow(0 0 8px rgba(0,150,255,.6)); color:#0096ff}
 
-<style>
-body{
-margin:0;
-font-family:system-ui;
-background:#f2f4ff;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh
-}
-.app{
-width:100%;
-max-width:380px;
-background:#fff;
-border-radius:20px;
-padding:20px;
-box-shadow:0 10px 30px rgba(0,0,0,.1)
-}
-h1{
-margin:0 0 10px;
-font-size:20px;
-text-align:center
-}
-.balance{
-font-size:32px;
-text-align:center;
-margin:15px 0
-}
-button{
-width:100%;
-padding:14px;
-border:none;
-border-radius:14px;
-font-size:16px;
-font-weight:600;
-cursor:pointer
-}
-.free{
-background:#4caf50;
-color:#fff;
-margin-bottom:12px
-}
-.ad{
-background:#667eea;
-color:#fff
-}
-.info{
-margin-top:10px;
-font-size:12px;
-color:#666;
-text-align:center
-}
-</style>
+        .btn-primary{background:linear-gradient(135deg,#0096ff 0%,#0066cc 100%); box-shadow:0 6px 20px rgba(0,150,255,.3); transition:all .3s; position:relative; overflow:hidden;}
+        .btn-primary:hover:not(:disabled){ transform:translateY(-2px) scale(1.02); box-shadow:0 10px 25px rgba(0,150,255,.4); }
+        .btn-primary::after{ content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent); transition:left .5s; }
+        .btn-primary:hover::after{ left:100%; }
+
+        .avatar-container{ width:64px; height:64px; border-radius:50%; overflow:hidden; position:relative; background:linear-gradient(135deg,#0096ff,#0066cc); flex:0 0 auto; }
+        .avatar-image{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); min-width:100%; min-height:100%; object-fit:cover; display:block; }
+        .gradient-avatar{ width:100%; height:100%; background:linear-gradient(135deg,#0096ff,#0066cc); border-radius:50%; display:flex; align-items:center; justify-content:center; }
+
+        .status-card{ background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); }
+        .reward-badge{ background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.2); }
+        .diamond-count{ background:rgba(0,150,255,.1); border:1px solid rgba(0,150,255,.2); }
+
+        .menu-container{ position:fixed; bottom:0; left:0; right:0; background:rgba(15,15,15,.95); backdrop-filter:blur(20px); border-top:1px solid rgba(255,255,255,.1); z-index:100; padding-bottom:env(safe-area-inset-bottom); }
+        .menu-nav{ display:flex; max-width:600px; margin:0 auto; padding:12px 16px; gap:8px; }
+        .menu-item{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px 8px; border-radius:16px; background:transparent; border:none; color:rgba(255,255,255,.5); transition:all .3s; cursor:pointer; position:relative; }
+        .menu-item.active{ background:rgba(255,255,255,.1); color:white; }
+        .content-container{ padding-bottom:100px; }
+
+        ::-webkit-scrollbar{ width:6px } ::-webkit-scrollbar-track{ background:rgba(255,255,255,.05); border-radius:10px } ::-webkit-scrollbar-thumb{ background:#0096ff; border-radius:10px } ::-webkit-scrollbar-thumb:hover{ background:#0066cc }
+        ::selection{ background:rgba(0,150,255,.3); color:white }
+
+        .content-section{ display:none; animation:fadeIn .3s ease-out; } .content-section.active{ display:block; }
+        @keyframes fadeIn{ from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
+
+        /* Leaderboard styles for standalone menu */
+        .leaderboard-wrapper { max-width:640px; margin:10px auto; padding:12px; }
+        .leaderboard-card { background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:12px; }
+        .leaderboard-tabs { display:flex; gap:8px; margin-bottom:12px; }
+        .leaderboard-tab { padding:8px 12px; border-radius:10px; cursor:pointer; color:rgba(255,255,255,.75); background:transparent; font-weight:600; border:1px solid transparent; }
+        .leaderboard-tab.active { background:linear-gradient(90deg,#0096ff,#0066cc); color:white; box-shadow:0 6px 18px rgba(0,150,255,0.12); }
+        .leaderboard-list { display:flex; flex-direction:column; gap:8px; max-height:420px; overflow:auto; }
+        .leaderboard-item { display:flex; align-items:center; gap:12px; padding:10px; border-radius:10px; transition:background .12s; }
+        .leader-rank { width:36px; text-align:center; font-weight:800; color:#ffd54a; }
+        .leader-avatar { width:48px; height:48px; border-radius:50%; overflow:hidden; flex:0 0 auto; }
+        .leader-meta { flex:1; }
+        .leader-name { font-weight:700; color:#fff; }
+        .leader-username { font-size:12px; color:rgba(255,255,255,.6) }
+        .leader-count { font-weight:800; color:#ffd54a; margin-left:auto; white-space:nowrap; }
+
+        @media (max-width:420px) { .leaderboard-list{ max-height:300px } .leader-avatar{ width:40px; height:40px } }
+    </style>
 </head>
+<body class="h-full gradient-bg text-white overflow-auto">
+    <div id="app" class="min-h-full w-full">
+        <!-- Loading -->
+        <div id="loading" class="flex items-center justify-center min-h-screen p-4">
+            <div class="text-center slide-up">
+                <div class="text-7xl mb-6 float-animation diamond-icon">💎</div>
+                <div class="w-20 h-20 border-4 border-white/20 border-t-blue-500 rounded-full animate-spin mx-auto mb-6"></div>
+                <p class="text-xl font-semibold text-white/90">RekchiAi olmoslari</p>
+                <p class="text-white/60 mt-2">Yuklanmoqda...</p>
+            </div>
+        </div>
 
-<body>
-<div class="app">
-<h1>💎 Diamond Bonus</h1>
+        <!-- Content -->
+        <div id="content" class="hidden">
+            <!-- Top bar -->
+            <div class="sticky top-0 z-50 top-bar border-b border-white/5">
+                <div class="max-w-lg mx-auto px-4 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-3xl diamond-icon">💎</div>
+                            <div>
+                                <h1 class="text-xl font-bold text-white/90">RekchiAi olmoslari</h1>
+                                <p class="text-xs text-white/60">Reklama ko'ring, olmos bot balansiga qo'shiladi</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 diamond-count px-4 py-2 rounded-full pulse-glow">
+                            <span id="diamond-count" class="text-2xl font-bold text-yellow-400">0</span>
+                            <span class="text-xl diamond-icon">💎</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-<div class="balance">
-💎 <span id="bal">0</span>
-</div>
+            <div class="max-w-lg mx-auto px-4 py-6 space-y-4 content-container">
+                <!-- Earn Section -->
+                <div id="earn-section" class="content-section active">
+                    <!-- User card -->
+                    <div class="app-card p-5 slide-up">
+                        <div class="flex items-center space-x-4">
+                            <div id="user-avatar" class="avatar-container user-avatar"></div>
+                            <div class="flex-1">
+                                <h3 id="user-name" class="font-bold text-lg text-white/90">Foydalanuvchi</h3>
+                                <p id="user-id" class="text-white/50 text-sm">ID: Loading...</p>
+                                <p id="user-username" class="text-white/60 text-xs mt-1">@username</p>
+                            </div>
+                        </div>
+                    </div>
 
-<button class="free" id="freeBtn">
-🎁 Kunlik bepul bonus
-</button>
+                    <!-- Ad watch card -->
+                    <div class="app-card p-6 slide-up" style="animation-delay:0.1s;">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center space-x-3">
+                                <!-- Icon changed to diamond as requested -->
+                                <div class="text-3xl">💎</div>
+                                <div>
+                                    <h2 class="text-xl font-bold text-white/90">Reklama ko'ring</h2>
+                                    <p class="text-white/60 text-sm">Olmos bot balansiga avtomatik qo'shiladi</p>
+                                </div>
+                            </div>
+                            <div class="reward-badge px-3 py-1.5 rounded-full">
+                                <span class="text-green-400 font-bold text-sm">+1 💎</span>
+                            </div>
+                        </div>
 
-<button class="ad" id="adBtn">
-▶️ Bonus olish (ixtiyoriy)
-</button>
+                        <div id="ad-status" class="status-card rounded-2xl p-6 mb-5 text-center min-h-[100px] flex items-center justify-center">
+                            <p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>
+                        </div>
 
-<div class="info">
-Reklama ko‘rish majburiy emas. <br>
-Reklama — faqat qo‘shimcha bonus uchun.
-</div>
-</div>
+                        <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg transition-all duration-300">
+                            <span class="text-2xl">▶️</span>
+                            <span>Reklamani boshlash</span>
+                        </button>
+                    </div>
 
-<script>
-var ADSGRAM_BLOCK_ID = "18961"
-var balance = 0
-var todayAds = 0
-var adCtrl = null
-var userId = null
+                    <!-- Note: statistics card removed as requested -->
+                </div>
 
-function todayKey(k){
-var d=new Date().toISOString().slice(0,10)
-return k+"_"+d+"_"+userId
-}
+                <!-- Leaderboard Section (standalone menu) -->
+                <div id="leaderboard-section" class="content-section">
+                    <div class="leaderboard-wrapper slide-up">
+                        <div class="leaderboard-card">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-lg font-bold">Reytinglar</h3>
+                                    <p class="text-xs text-white/60">Kunlik va umumiy top 10</p>
+                                </div>
+                                <div class="leaderboard-tabs" role="tablist" aria-label="Reyting turlari">
+                                    <button id="lb-tab-daily-main" class="leaderboard-tab active" type="button">Kunlik</button>
+                                    <button id="lb-tab-overall-main" class="leaderboard-tab" type="button">Umumiy</button>
+                                </div>
+                            </div>
 
-function load(){
-balance=parseInt(localStorage.getItem("bal_"+userId)||"0")
-todayAds=parseInt(localStorage.getItem(todayKey("ads"))||"0")
-document.getElementById("bal").textContent=balance
-}
+                            <div id="leaderboard-list" class="leaderboard-list" aria-live="polite">
+                                <div class="text-white/60 text-sm">Yuklanmoqda...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-function save(){
-localStorage.setItem("bal_"+userId,balance)
-localStorage.setItem(todayKey("ads"),todayAds)
-}
+                <!-- Admin panel (kept) -->
+                <div id="admin-panel" class="hidden app-card p-6 border-2 border-yellow-500/20 slide-up" style="animation-delay:0.3s;">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="text-3xl">👑</div>
+                        <h2 class="text-xl font-bold text-white/90">Admin Panel</h2>
+                    </div>
 
-function toast(t){
-Telegram.WebApp.showAlert(t)
-}
+                    <div class="admin-card rounded-2xl p-5 mb-6">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="text-xl">📈</div>
+                            <h3 class="font-bold text-white/90">Umumiy statistika</h3>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div>
+                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-users">0</p>
+                                <p class="text-xs text-white/60 mt-1">Foydalanuvchi</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-ads">0</p>
+                                <p class="text-xs text-white/60 mt-1">Reklamalar</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-diamonds">0</p>
+                                <p class="text-xs text-white/60 mt-1">Olmoslar</p>
+                            </div>
+                        </div>
+                    </div>
 
-function initAds(){
-if(!window.Adsgram)return
-adCtrl=Adsgram.init({blockId:ADSGRAM_BLOCK_ID})
-adCtrl.addEventListener("onReward",function(){
-balance+=1
-todayAds+=1
-save()
-load()
-toast("🎉 Bonus qo‘shildi!")
-})
-}
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="text-xl">👥</div>
+                        <h3 class="font-bold text-white/90">Foydalanuvchilar</h3>
+                    </div>
+                    <div id="users-list" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
+                </div>
+            </div>
 
-document.getElementById("freeBtn").onclick=function(){
-var k=todayKey("free")
-if(localStorage.getItem(k)){
-toast("Bugun bepul bonus olgansiz")
-return
-}
-balance+=1
-localStorage.setItem(k,"1")
-save()
-load()
-toast("🎁 Bepul bonus berildi")
-}
+            <!-- Bottom menu: Olmos ishlash + Reytinglar -->
+            <div class="menu-container">
+                <nav class="menu-nav">
+                    <button class="menu-item active" data-section="earn-section" id="menu-earn">
+                        <span class="menu-icon">💎</span>
+                        <span class="menu-label">Olmos ishlash</span>
+                    </button>
+                    <button class="menu-item" data-section="leaderboard-section" id="menu-leaderboard">
+                        <span class="menu-icon">🏆</span>
+                        <span class="menu-label">Reytinglar</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </div>
 
-document.getElementById("adBtn").onclick=function(){
-if(todayAds>=10){
-toast("Bugungi reklama limiti tugadi")
-return
-}
-if(!adCtrl){
-toast("Reklama hozir mavjud emas")
-return
-}
-adCtrl.show()
-}
+    <!-- Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-if(window.Telegram && Telegram.WebApp){
-Telegram.WebApp.ready()
-var u=Telegram.WebApp.initDataUnsafe.user
-if(!u){
-toast("Telegram ichida oching")
-}else{
-userId=u.id
-load()
-initAds()
-}
-}
-</script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFzNDoLlxHEpJOuZO8nhc-D2SmUId2dEc",
+            authDomain: "rekchi-2dc2f.firebaseapp.com",
+            databaseURL: "https://rekchi-2dc2f-default-rtdb.firebaseio.com",
+            projectId: "rekchi-2dc2f",
+            storageBucket: "rekchi-2dc2f.firebasestorage.app",
+            messagingSenderId: "352655860270",
+            appId: "1:352655860270:web:e071c82f4b911c21c0b5bf",
+            measurementId: "G-4WVC8S5V3R"
+        };
+        const firebaseApp = initializeApp(firebaseConfig);
+        const db = getDatabase(firebaseApp);
+
+        // Constants
+        const ADMIN_IDS = ['7500103239', '7104718080'];
+        const AD_BLOCK_ID = '18961';
+        const REWARD_AMOUNT = 1;
+
+        // Server endpoints (host add_balance.php & get_balance.php)
+        const BOT_API_ADD_URL = 'https://68ed1ab05ca4e.myxvest1.ru/add_balance.php';
+        const BOT_API_GET_URL = 'https://68ed1ab05ca4e.myxvest1.ru/get_balance.php';
+        const BOT_API_KEY = '4564123:hkjhfadfhieapkdnga'; // ideally keep on server
+
+        let currentUser = null;
+        let allUsers = [];
+        let isAdmin = false;
+        let AdController = null;
+        let botBalance = 0;
+        let currentLeaderboard = 'daily'; // 'daily' | 'overall'
+
+        // Helpers
+        async function getTelegramProfilePhoto(userId, username) {
+            try {
+                const tg = window.Telegram?.WebApp;
+                if (tg?.initDataUnsafe?.user?.photo_url) return tg.initDataUnsafe.user.photo_url;
+                if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
+                return createFullGradientAvatar(userId);
+            } catch (e) {
+                return createFullGradientAvatar(userId);
+            }
+        }
+        function createFullGradientAvatar(userId) {
+            const gradients = [['#FF6B6B','#FF8E53'],['#4ECDC4','#44A08D'],['#FFD93D','#FF6B6B'],['#6BC5D2','#4A9CC2'],['#9D50BB','#6E48AA'],['#00C9FF','#92FE9D'],['#FF9A9E','#FAD0C4'],['#A18CD1','#FBC2EB'],['#667eea','#764ba2'],['#f093fb','#f5576c']];
+            const idx = (userId||'').split('').reduce((s,c)=>s+c.charCodeAt(0),0) % gradients.length;
+            const [c1,c2] = gradients[idx];
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><defs><linearGradient id="g${userId}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="100%" height="100%" rx="128" fill="url(#g${userId})"/></svg>`;
+            return 'data:image/svg+xml;base64,' + btoa(svg);
+        }
+
+        // Init Telegram & Ads
+        function initTelegram() {
+            if (window.Telegram?.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+                window.Telegram.WebApp.setBackgroundColor('#0f0f0f');
+                window.Telegram.WebApp.setHeaderColor('#0f0f0f');
+                const tg = window.Telegram.WebApp;
+                const user = tg.initDataUnsafe?.user;
+                if (user) {
+                    currentUser = {
+                        user_id: user.id.toString(),
+                        username: user.username || '',
+                        first_name: user.first_name || 'Foydalanuvchi',
+                        last_name: user.last_name || '',
+                        photo_url: user.photo_url || null,
+                        language_code: user.language_code || 'uz'
+                    };
+                    isAdmin = ADMIN_IDS.includes(currentUser.user_id);
+                } else {
+                    currentUser = { user_id: 'web_' + Date.now(), username: 'foydalanuvchi', first_name: 'Foydalanuvchi', last_name:'', photo_url:null, language_code:'uz' };
+                }
+            } else {
+                currentUser = { user_id: 'web_' + Date.now(), username: 'foydalanuvchi', first_name: 'Foydalanuvchi', last_name:'', photo_url:null, language_code:'uz' };
+            }
+        }
+        function initAdsgram() {
+            if (window.Adsgram) AdController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
+            else setTimeout(initAdsgram, 500);
+        }
+
+        // Load/create user in Firebase
+        async function loadOrCreateUser() {
+            if (!currentUser) return null;
+            try {
+                const userRef = ref(db, 'users/' + currentUser.user_id);
+                const snapshot = await get(userRef);
+                if (!snapshot.exists()) {
+                    const profilePhoto = await getTelegramProfilePhoto(currentUser.user_id, currentUser.username);
+                    const newUser = {
+                        user_id: currentUser.user_id,
+                        username: currentUser.username || '',
+                        first_name: currentUser.first_name || 'Foydalanuvchi',
+                        last_name: currentUser.last_name || '',
+                        photo_url: profilePhoto,
+                        language_code: currentUser.language_code || 'uz',
+                        ads_by_day: {}, // counts per YYYY-MM-DD
+                        diamonds: 0,
+                        ads_watched: 0,
+                        withdraw_history: [],
+                        last_ad_time: new Date().toISOString(),
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    };
+                    await set(userRef, newUser);
+                    return newUser;
+                } else {
+                    let userData = snapshot.val();
+                    if (!userData.photo_url) {
+                        const profilePhoto = await getTelegramProfilePhoto(currentUser.user_id, currentUser.username);
+                        const updates = { photo_url: profilePhoto, username: currentUser.username || userData.username, first_name: currentUser.first_name || userData.first_name, updated_at: new Date().toISOString() };
+                        await update(userRef, updates);
+                        userData = { ...userData, ...updates };
+                    }
+                    if (!userData.ads_by_day) {
+                        await update(userRef, { ads_by_day: {} });
+                        userData.ads_by_day = {};
+                    }
+                    return userData;
+                }
+            } catch (err) {
+                console.error('loadOrCreateUser error', err);
+                return null;
+            }
+        }
+        async function updateUserData(updates) {
+            if (!currentUser) return false;
+            try {
+                const userRef = ref(db, 'users/' + currentUser.user_id);
+                await update(userRef, { ...updates, updated_at: new Date().toISOString() });
+                return true;
+            } catch (err) {
+                console.error('updateUserData error', err);
+                return false;
+            }
+        }
+
+        // Subscribe to all users for leaderboard + admin
+        function subscribeToUsers() {
+            const usersRef = ref(db, 'users');
+            onValue(usersRef, (snapshot) => {
+                allUsers = [];
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    Object.keys(data).forEach(k => allUsers.push(data[k]));
+                }
+                updateAdminPanel();
+                renderLeaderboardsMain();
+            }, (err) => console.error('subscribeToUsers error', err));
+        }
+
+        // Render leaderboards into the standalone leaderboard section
+        function renderLeaderboardsMain() {
+            const listEl = document.getElementById('leaderboard-list');
+            if (!listEl) return;
+            const now = new Date();
+            const tzOffset = now.getTimezoneOffset() * 60000;
+            const localKey = new Date(now - tzOffset).toISOString().slice(0,10);
+
+            const mapped = allUsers.map(u => {
+                const ads_by_day = u.ads_by_day || {};
+                return {
+                    id: u.user_id,
+                    name: u.first_name || 'Foydalanuvchi',
+                    username: u.username || '',
+                    photo_url: u.photo_url || '',
+                    todayCount: parseInt(ads_by_day[localKey] || 0),
+                    overallCount: parseInt(u.ads_watched || 0)
+                };
+            });
+
+            let sorted;
+            if (currentLeaderboard === 'daily') {
+                sorted = mapped.sort((a,b) => b.todayCount - a.todayCount || b.overallCount - a.overallCount);
+            } else {
+                sorted = mapped.sort((a,b) => b.overallCount - a.overallCount || b.todayCount - a.todayCount);
+            }
+
+            const top = sorted.slice(0,10);
+            if (top.length === 0) {
+                listEl.innerHTML = `<div class="text-white/60 text-sm">Hozircha ma'lumot yo'q.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = top.map((u,i) => `
+                <div class="leaderboard-item">
+                    <div class="leader-rank">${i+1}</div>
+                    <div class="leader-avatar">
+                        ${u.photo_url ? `<img src="${u.photo_url}" alt="${escapeHtml(u.name)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'gradient-avatar\\' style=\\'width:100%;height:100%\\'></div>'">` : `<div class="gradient-avatar" style="width:100%;height:100%"></div>`}
+                    </div>
+                    <div class="leader-meta">
+                        <div class="leader-name">${escapeHtml(u.name)}</div>
+                        <div class="leader-username">${u.username ? '@'+escapeHtml(u.username) : ''}</div>
+                    </div>
+                    <div class="leader-count">${currentLeaderboard === 'daily' ? u.todayCount : u.overallCount} 💎</div>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
+
+        // Admin panel render (avatars same style)
+        function updateAdminPanel() {
+            const totalUsers = allUsers.length;
+            const totalAds = allUsers.reduce((s,u)=> s + (u.ads_watched||0), 0);
+            const totalDiamonds = allUsers.reduce((s,u)=> s + (u.diamonds||0), 0);
+            document.getElementById('admin-total-users').textContent = totalUsers;
+            document.getElementById('admin-total-ads').textContent = totalAds;
+            document.getElementById('admin-total-diamonds').textContent = totalDiamonds;
+
+            const usersList = document.getElementById('users-list');
+            if (!usersList) return;
+            usersList.innerHTML = allUsers
+                .sort((a,b)=>(b.diamonds||0)-(a.diamonds||0))
+                .slice(0,20)
+                .map(u => `
+                    <div class="app-card p-4 hover:bg-white/5 transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="avatar-container">
+                                    ${u.photo_url ? `<img src="${u.photo_url}" alt="${(u.first_name||'Foydalanuvchi')}" class="avatar-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'gradient-avatar\\'></div>'">` : `<div class="gradient-avatar"></div>`}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-sm text-white/90">${u.first_name || 'Foydalanuvchi'}</p>
+                                    <p class="text-xs text-white/50">${u.username ? '@'+u.username : '@nousername'}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-yellow-400">${u.diamonds || 0} 💎</p>
+                                <p class="text-xs text-white/50">${u.ads_watched || 0} videolar</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        // Watch ad flow: update Firebase (ads_by_day & ads_watched) + call server add_balance then refresh leaderboards
+        async function watchAd() {
+            if (!currentUser) return;
+            const btn = document.getElementById('watch-ad-btn');
+            const statusDiv = document.getElementById('ad-status');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="w-6 h-6 border-3 border-white/30 border-t-blue-500 rounded-full animate-spin mx-auto"></div>';
+            statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yuklanmoqda...</p>';
+
+            let attempts = 0;
+            while (!AdController && attempts < 20) { await new Promise(r=>setTimeout(r,250)); attempts++; }
+
+            if (!AdController) {
+                statusDiv.innerHTML = '<p class="text-red-400">Reklama tizimi yuklanmagan. Sahifani yangilang.</p>';
+                btn.disabled = false;
+                btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
+                return;
+            }
+
+            try {
+                statusDiv.innerHTML = '<p class="text-green-400 font-bold">💎 Reklama (video) ko\'rsatilmoqda...</p>';
+                await AdController.show();
+
+                // read user
+                const userRef = ref(db, 'users/' + currentUser.user_id);
+                const snapshot = await get(userRef);
+                const userData = snapshot.val() || {};
+
+                const now = new Date();
+                const tzOffset = now.getTimezoneOffset() * 60000;
+                const localKey = new Date(now - tzOffset).toISOString().slice(0,10);
+
+                const ads_by_day = userData.ads_by_day || {};
+                const newDayCount = (ads_by_day[localKey] || 0) + 1;
+                const newOverall = (userData.ads_watched || 0) + 1;
+
+                // update firebase
+                const updates = { ads_watched: newOverall, [`ads_by_day/${localKey}`]: newDayCount, last_ad_time: new Date().toISOString() };
+                const ok = await updateUserData(updates);
+                if (!ok) throw new Error('Firebase yangilashida xatolik');
+
+                // notify server bot to add balance
+                try { await addToBotBalance(REWARD_AMOUNT); } catch(e){ console.warn('Bot add failed', e); }
+
+                // re-sync quickly
+                renderLeaderboardsMain();
+                await fetchBotBalance();
+
+                statusDiv.innerHTML = `<div class="text-center slide-up"><div class="text-6xl mb-3" style="animation:celebrate .6s;">🎉</div><p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p><p class="text-2xl font-bold text-yellow-400 mb-2">+${REWARD_AMOUNT} 💎</p><p class="text-sm text-white/60">Olmos bot balansiga qo'shildi</p></div>`;
+            } catch (err) {
+                console.error('Ad error', err);
+                statusDiv.innerHTML = '<p class="text-orange-400">Reklama yopildi yoki xatolik yuz berdi.</p>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
+                setTimeout(()=>{ statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; }, 3000);
+            }
+        }
+
+        // Server bot API calls
+        async function addToBotBalance(amount) {
+            if (!currentUser) throw new Error('No user');
+            const body = new URLSearchParams({ key: BOT_API_KEY, user_id: currentUser.user_id, amount: amount });
+            const controller = new AbortController();
+            const timeoutId = setTimeout(()=>controller.abort(), 10000);
+            const resp = await fetch(BOT_API_ADD_URL, { method:'POST', headers:{ 'Content-Type':'application/x-www-form-urlencoded' }, body: body.toString(), signal: controller.signal });
+            clearTimeout(timeoutId);
+            if (!resp.ok) { const txt = await resp.text().catch(()=>null); console.warn('addToBotBalance non-OK', resp.status, txt); return { success:false, message:'HTTP '+resp.status }; }
+            return await resp.json();
+        }
+
+        async function fetchBotBalance() {
+            if (!currentUser) return;
+            try {
+                const url = new URL(BOT_API_GET_URL);
+                url.searchParams.set('key', BOT_API_KEY);
+                url.searchParams.set('user_id', currentUser.user_id);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(()=>controller.abort(), 8000);
+                const resp = await fetch(url.toString(), { method:'GET', headers:{ 'Accept':'application/json' }, signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (!resp.ok) { console.warn('fetchBotBalance non-OK', resp.status); return; }
+                const json = await resp.json();
+                if (json && json.success) {
+                    botBalance = parseInt(json.balance || 0) || 0;
+                    document.getElementById('diamond-count').textContent = `${botBalance}`;
+                } else {
+                    console.warn('fetchBotBalance returned error', json);
+                }
+            } catch (err) {
+                console.warn('fetchBotBalance error', err);
+            }
+        }
+
+        // UI bindings (menu + leaderboard tabs)
+        function bindUI() {
+            document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
+
+            // bottom menu
+            document.getElementById('menu-earn')?.addEventListener('click', () => switchSection('earn-section', 'menu-earn'));
+            document.getElementById('menu-leaderboard')?.addEventListener('click', () => switchSection('leaderboard-section', 'menu-leaderboard'));
+
+            // leaderboard tabs
+            document.getElementById('lb-tab-daily-main')?.addEventListener('click', () => {
+                currentLeaderboard = 'daily';
+                document.getElementById('lb-tab-daily-main').classList.add('active');
+                document.getElementById('lb-tab-overall-main').classList.remove('active');
+                renderLeaderboardsMain();
+            });
+            document.getElementById('lb-tab-overall-main')?.addEventListener('click', () => {
+                currentLeaderboard = 'overall';
+                document.getElementById('lb-tab-overall-main').classList.add('active');
+                document.getElementById('lb-tab-daily-main').classList.remove('active');
+                renderLeaderboardsMain();
+            });
+        }
+
+        function switchSection(sectionId, menuButtonId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.menu-item').forEach(mi => mi.classList.remove('active'));
+            if (menuButtonId) document.getElementById(menuButtonId).classList.add('active');
+            // if leaderboard opened, render it
+            if (sectionId === 'leaderboard-section') renderLeaderboardsMain();
+        }
+
+        // Update user UI (avatar, name)
+        function updateUI(user) {
+            if (!user) return;
+            const avatarDiv = document.getElementById('user-avatar');
+            if (user.photo_url) {
+                avatarDiv.innerHTML = `<img src="${user.photo_url}" alt="${(user.first_name||'Foydalanuvchi')}" class="avatar-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'gradient-avatar\\'></div>'">`;
+            } else {
+                avatarDiv.innerHTML = '<div class="gradient-avatar"></div>';
+            }
+            document.getElementById('user-name').textContent = user.first_name || 'Foydalanuvchi';
+            document.getElementById('user-id').textContent = `ID: ${user.user_id}`;
+            document.getElementById('user-username').textContent = user.username ? `@${user.username}` : '@nousername';
+            // update bot balance display
+            document.getElementById('diamond-count').textContent = `${botBalance}`;
+        }
+
+        // App init
+        async function initializeAppMain() {
+            initTelegram();
+            initAdsgram();
+            bindUI();
+
+            const user = await loadOrCreateUser();
+            if (user) {
+                const userRef = ref(db, 'users/' + currentUser.user_id);
+                onValue(userRef, (snap) => { if (snap.exists()) updateUI(snap.val()); });
+
+                subscribeToUsers();
+
+                if (isAdmin) document.getElementById('admin-panel').classList.remove('hidden');
+            }
+
+            if (currentUser) {
+                await fetchBotBalance();
+                setInterval(fetchBotBalance, 30000);
+            }
+
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('content').classList.remove('hidden');
+        }
+
+        // start
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeAppMain);
+        else initializeAppMain();
+    </script>
 </body>
 </html>

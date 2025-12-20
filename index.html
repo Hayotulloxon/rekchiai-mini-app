@@ -49,6 +49,34 @@
         .content-section{ display:none; animation:fadeIn .3s ease-out; } .content-section.active{ display:block; }
         @keyframes fadeIn{ from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
 
+        /* Loading Modal */
+        .loading-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .loading-modal.active {
+            display: flex;
+        }
+        .loading-content {
+            background: linear-gradient(135deg, rgba(30,30,30,.95), rgba(40,40,40,.95));
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 24px;
+            padding: 32px;
+            text-align: center;
+            max-width: 320px;
+            width: 90%;
+            animation: slideUp .3s ease-out;
+        }
+
         /* Leaderboard styles for standalone menu */
         .leaderboard-wrapper { max-width:640px; margin:10px auto; padding:12px; }
         .leaderboard-card { background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:12px; }
@@ -68,6 +96,16 @@
     </style>
 </head>
 <body class="h-full gradient-bg text-white overflow-auto">
+    <!-- Loading Modal -->
+    <div id="loading-modal" class="loading-modal">
+        <div class="loading-content">
+            <div class="text-6xl mb-6 float-animation diamond-icon">💎</div>
+            <div class="w-20 h-20 border-4 border-white/20 border-t-blue-500 rounded-full animate-spin mx-auto mb-6"></div>
+            <p class="text-xl font-semibold text-white/90">Reklama yuklanyapti...</p>
+            <p class="text-white/60 mt-2">Iltimos, kuting</p>
+        </div>
+    </div>
+
     <div id="app" class="min-h-full w-full">
         <!-- Loading -->
         <div id="loading" class="flex items-center justify-center min-h-screen p-4">
@@ -140,8 +178,6 @@
                             <span>Reklamani boshlash</span>
                         </button>
                     </div>
-
-                    <!-- Note: statistics card removed as requested -->
                 </div>
 
                 <!-- Leaderboard Section (standalone menu) -->
@@ -275,6 +311,22 @@
             return 'data:image/svg+xml;base64,' + btoa(svg);
         }
 
+        // Modalni ko'rsatish
+        function showLoadingModal() {
+            const modal = document.getElementById('loading-modal');
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+
+        // Modalni yopish
+        function hideLoadingModal() {
+            const modal = document.getElementById('loading-modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
         // Init Telegram & Ads
         function initTelegram() {
             if (window.Telegram?.WebApp) {
@@ -333,28 +385,36 @@
                 throw new Error('Taddy yuklanmagan');
             }
             
+            // Loading modalni ko'rsatish
+            showLoadingModal();
+            
             return new Promise((resolve, reject) => {
                 try {
                     taddy.ads().interstitial({
                         onClosed: () => {
                             console.log('Taddy reklama yopildi');
+                            hideLoadingModal();
                             resolve(true);
                         },
                         onViewThrough: (id) => {
                             console.log('Taddy reklama to\'liq ko\'rildi', id);
+                            hideLoadingModal();
                             resolve(true);
                         }
                     }).then((success) => {
                         if (!success) {
                             console.log('Taddy reklama ko\'rsatilmadi');
+                            hideLoadingModal();
                             reject(new Error('Reklama ko\'rsatilmadi'));
                         }
                     }).catch(err => {
                         console.error('Taddy xatosi:', err);
+                        hideLoadingModal();
                         reject(err);
                     });
                 } catch (error) {
                     console.error('Taddy interfaol xatosi:', error);
+                    hideLoadingModal();
                     reject(error);
                 }
             });
@@ -366,16 +426,22 @@
                 throw new Error('Adsgram yuklanmagan');
             }
             
+            // Loading modalni ko'rsatish
+            showLoadingModal();
+            
             return new Promise((resolve, reject) => {
                 try {
                     AdController.show().then(() => {
+                        hideLoadingModal();
                         resolve(true);
                     }).catch(err => {
                         console.error('Adsgram xatosi:', err);
+                        hideLoadingModal();
                         reject(err);
                     });
                 } catch (error) {
                     console.error('Adsgram interfaol xatosi:', error);
+                    hideLoadingModal();
                     reject(error);
                 }
             });
@@ -578,8 +644,6 @@
             statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yuklanmoqda...</p>';
 
             try {
-                statusDiv.innerHTML = '<p class="text-green-400 font-bold">💎 Reklama (video) ko\'rsatilmoqda...</p>';
-                
                 // Navbatdagi reklamani ko'rsatish (Taddy yoki Adsgram)
                 await showNextAd();
 

@@ -213,7 +213,11 @@
                             <span>Reklamani boshlash</span>
                         </button>
                         
-                        
+                        <!-- Ad platform info -->
+                        <div class="mt-4 text-center text-xs text-white/40">
+                            <p>Navbatdagi reklama: <span id="next-ad-platform" class="text-blue-400">Taddy</span></p>
+                            <p class="mt-1">3 xil reklama tizimi: Taddy, Adsgram, Monetag</p>
+                        </div>
                     </div>
                 </div>
 
@@ -477,6 +481,7 @@
             // Taddy'ni ishga tushirish
             if (window.Taddy) {
                 taddy = window.Taddy;
+                // Taddy SDK avtomatik init bo'ladi (data-pub-id atributi bor)
                 // ready event'ini yuborish
                 setTimeout(() => {
                     if (taddy && taddy.ready) {

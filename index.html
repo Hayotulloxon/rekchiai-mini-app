@@ -9,6 +9,8 @@
     <script src="https://sdk.taddy.pro/web/taddy.min.js?1317" data-pub-id="6e046780b6e21c40ba2174108ad75218"></script>
     <!-- Adsgram SDK -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    <!-- Telegram Ads SDK -->
+    <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script> window.process = { env: { NODE_ENV: 'production' } }; </script>
     <style>
@@ -324,8 +326,9 @@
         let AdController = null;
         let botBalance = 0;
         let currentLeaderboard = 'daily'; // 'daily' | 'overall'
-        let adCounter = 0; // Taddy va Adsgram reklamalarini navbatlash uchun
+        let adCounter = 0; // Taddy, Adsgram va Telegram Ads reklamalarini navbatlash uchun
         let taddy = null; // Taddy obyekti
+        let telegramAds = null; // Telegram Ads obyekti
         let onlineUsers = new Set(); // Online foydalanuvchilar
         let userActivityTimes = {}; // Har bir foydalanuvchining so'nggi faollik vaqti
 
@@ -453,7 +456,7 @@
             updateUserActivity();
         }
 
-        // Taddy va Adsgram'ni ishga tushirish
+        // Taddy, Adsgram va Telegram Ads'ni ishga tushirish
         function initAdServices() {
             // Taddy'ni ishga tushirish
             if (window.Taddy) {
@@ -475,6 +478,19 @@
                         AdController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
                     }
                 }, 500);
+            }
+
+            // Telegram Ads'ni ishga tushirish
+            if (window.TelegramAdsController) {
+                telegramAds = window.TelegramAdsController;
+                try {
+                    telegramAds.initialize({
+                        pubId: "996799",
+                        appId: "5104",
+                    });
+                } catch (err) {
+                    console.warn('Telegram Ads init error:', err);
+                }
             }
         }
 
@@ -546,36 +562,145 @@
             });
         }
 
-        // Navbatdagi reklamani ko'rsatish (Taddy yoki Adsgram)
+        // Telegram Ads reklamasini ko'rsatish
+        async function showTelegramAd() {
+            if (!telegramAds) {
+                throw new Error('Telegram Ads yuklanmagan');
+            }
+            
+            // Loading modalni ko'rsatish
+            showLoadingModal();
+            
+            return new Promise((resolve, reject) => {
+                try {
+                    // Telegram Ads API'siga murojaat qilish
+                    // Bu API turli usullarda chaqirilishi mumkin
+                    if (typeof telegramAds.showAd === 'function') {
+                        telegramAds.showAd()
+                            .then(() => {
+                                hideLoadingModal();
+                                resolve(true);
+                            })
+                            .catch(err => {
+                                console.error('Telegram Ads xatosi:', err);
+                                hideLoadingModal();
+                                reject(err);
+                            });
+                    } else if (typeof telegramAds.load === 'function') {
+                        telegramAds.load()
+                            .then(() => {
+                                hideLoadingModal();
+                                resolve(true);
+                            })
+                            .catch(err => {
+                                console.error('Telegram Ads xatosi:', err);
+                                hideLoadingModal();
+                                reject(err);
+                            });
+                    } else {
+                        // Agar aniq API usuli bo'lmasa, oddiy show() ni sinab ko'ramiz
+                        telegramAds.show()
+                            .then(() => {
+                                hideLoadingModal();
+                                resolve(true);
+                            })
+                            .catch(err => {
+                                console.error('Telegram Ads xatosi:', err);
+                                hideLoadingModal();
+                                reject(err);
+                            });
+                    }
+                } catch (error) {
+                    console.error('Telegram Ads interfaol xatosi:', error);
+                    hideLoadingModal();
+                    reject(error);
+                }
+            });
+        }
+
+        // Navbatdagi reklamani ko'rsatish (Taddy, Adsgram yoki Telegram Ads)
         async function showNextAd() {
             adCounter++;
             
-            // Juft sonli reklamalar: Taddy
-            // Toq sonli reklamalar: Adsgram
-            const isTaddyTurn = (adCounter % 2 === 0);
+            // 3 turlik reklama navbatini aniqlash
+            const adType = adCounter % 3; // 0: Taddy, 1: Adsgram, 2: Telegram Ads
             
-            if (isTaddyTurn && taddy) {
+            if (adType === 0 && taddy) {
                 console.log('Taddy reklamasi ko\'rsatilmoqda...');
                 return await showTaddyAd();
-            } else {
+            } else if (adType === 1) {
                 console.log('Adsgram reklamasi ko\'rsatilmoqda...');
                 
-                // Adsgram yuklanmagan bo'lsa, Taddy'ga o'tkazish
+                // Adsgram yuklanmagan bo'lsa, boshqa platformaga o'tkazish
                 let attempts = 0;
                 while (!AdController && attempts < 20) { 
                     await new Promise(r => setTimeout(r, 250)); 
                     attempts++; 
                 }
                 
-                if (!AdController && taddy) {
-                    console.log('Adsgram yuklanmagan, Taddy reklamasi ko\'rsatilmoqda...');
-                    return await showTaddyAd();
-                } else if (!AdController) {
-                    throw new Error('Ikkala reklama tizimi ham yuklanmagan');
+                if (!AdController) {
+                    // Adsgram yuklanmagan, navbatni boshqa platformaga o'tkazish
+                    console.log('Adsgram yuklanmagan, navbat o\'zgartiramiz...');
+                    return await showFallbackAd();
                 }
                 
                 return await showAdsgramAd();
+            } else if (adType === 2) {
+                console.log('Telegram Ads reklamasi ko\'rsatilmoqda...');
+                
+                // Telegram Ads yuklanmagan bo'lsa, boshqa platformaga o'tkazish
+                let attempts = 0;
+                while (!telegramAds && attempts < 20) { 
+                    await new Promise(r => setTimeout(r, 250)); 
+                    attempts++; 
+                }
+                
+                if (!telegramAds) {
+                    console.log('Telegram Ads yuklanmagan, navbat o\'zgartiramiz...');
+                    return await showFallbackAd();
+                }
+                
+                return await showTelegramAd();
+            } else {
+                // Agar hamma platformalar yuklanmagan bo'lsa
+                throw new Error('Hech qanday reklama tizimi yuklanmagan');
             }
+        }
+
+        // Zaxira reklama (agar bir platforma ishlamasa)
+        async function showFallbackAd() {
+            // Avval Taddy'ni sinab ko'ramiz
+            if (taddy) {
+                console.log('Zaxira: Taddy reklamasi ko\'rsatilmoqda...');
+                return await showTaddyAd();
+            }
+            
+            // Keyin Adsgram'ni sinab ko'ramiz
+            let attempts = 0;
+            while (!AdController && attempts < 20) { 
+                await new Promise(r => setTimeout(r, 250)); 
+                attempts++; 
+            }
+            
+            if (AdController) {
+                console.log('Zaxira: Adsgram reklamasi ko\'rsatilmoqda...');
+                return await showAdsgramAd();
+            }
+            
+            // Keyin Telegram Ads'ni sinab ko'ramiz
+            attempts = 0;
+            while (!telegramAds && attempts < 20) { 
+                await new Promise(r => setTimeout(r, 250)); 
+                attempts++; 
+            }
+            
+            if (telegramAds) {
+                console.log('Zaxira: Telegram Ads reklamasi ko\'rsatilmoqda...');
+                return await showTelegramAd();
+            }
+            
+            // Agar hamma platformalar yuklanmagan bo'lsa
+            throw new Error('Hech qanday reklama tizimi yuklanmagan');
         }
 
         // Load/create user in Firebase
@@ -798,7 +923,7 @@
             statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yuklanmoqda...</p>';
 
             try {
-                // Navbatdagi reklamani ko'rsatish (Taddy yoki Adsgram)
+                // Navbatdagi reklamani ko'rsatish (Taddy, Adsgram yoki Telegram Ads)
                 await showNextAd();
 
                 // read user

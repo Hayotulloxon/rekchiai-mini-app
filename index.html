@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>RekchiAi olmoslari</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- IKKALA REKLAMA SDK -->
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    <!-- Taddy SDK -->
     <script src="https://sdk.taddy.pro/web/taddy.min.js?1317" data-pub-id="6e046780b6e21c40ba2174108ad75218"></script>
+    <!-- Adsgram SDK -->
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script> window.process = { env: { NODE_ENV: 'production' } }; </script>
     <style>
@@ -118,6 +119,7 @@
                     <div class="app-card p-6 slide-up" style="animation-delay:0.1s;">
                         <div class="flex items-center justify-between mb-6">
                             <div class="flex items-center space-x-3">
+                                <!-- Icon changed to diamond as requested -->
                                 <div class="text-3xl">💎</div>
                                 <div>
                                     <h2 class="text-xl font-bold text-white/90">Reklama ko'ring</h2>
@@ -138,6 +140,8 @@
                             <span>Reklamani boshlash</span>
                         </button>
                     </div>
+
+                    <!-- Note: statistics card removed as requested -->
                 </div>
 
                 <!-- Leaderboard Section (standalone menu) -->
@@ -238,18 +242,19 @@
         const AD_BLOCK_ID = '18961';
         const REWARD_AMOUNT = 1;
 
-        // Server endpoints
+        // Server endpoints (host add_balance.php & get_balance.php)
         const BOT_API_ADD_URL = 'https://68ed1ab05ca4e.myxvest1.ru/add_balance.php';
         const BOT_API_GET_URL = 'https://68ed1ab05ca4e.myxvest1.ru/get_balance.php';
-        const BOT_API_KEY = '4564123:hkjhfadfhieapkdnga';
+        const BOT_API_KEY = '4564123:hkjhfadfhieapkdnga'; // ideally keep on server
 
         let currentUser = null;
         let allUsers = [];
         let isAdmin = false;
-        let adsgramController = null;
-        let taddyController = null;
+        let AdController = null;
         let botBalance = 0;
-        let currentLeaderboard = 'daily';
+        let currentLeaderboard = 'daily'; // 'daily' | 'overall'
+        let adCounter = 0; // Taddy va Adsgram reklamalarini navbatlash uchun
+        let taddy = null; // Taddy obyekti
 
         // Helpers
         async function getTelegramProfilePhoto(userId, username) {
@@ -262,31 +267,12 @@
                 return createFullGradientAvatar(userId);
             }
         }
-        
         function createFullGradientAvatar(userId) {
             const gradients = [['#FF6B6B','#FF8E53'],['#4ECDC4','#44A08D'],['#FFD93D','#FF6B6B'],['#6BC5D2','#4A9CC2'],['#9D50BB','#6E48AA'],['#00C9FF','#92FE9D'],['#FF9A9E','#FAD0C4'],['#A18CD1','#FBC2EB'],['#667eea','#764ba2'],['#f093fb','#f5576c']];
             const idx = (userId||'').split('').reduce((s,c)=>s+c.charCodeAt(0),0) % gradients.length;
             const [c1,c2] = gradients[idx];
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><defs><linearGradient id="g${userId}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="100%" height="100%" rx="128" fill="url(#g${userId})"/></svg>`;
             return 'data:image/svg+xml;base64,' + btoa(svg);
-        }
-
-        // Foydalanuvchi uchun qaysi reklama tizimi kerakligini aniqlash
-        function getNextAdSystem(userAdCount) {
-            // Juft son -> AdsGram, Toq son -> Taddy
-            // 0, 2, 4, 6... -> AdsGram
-            // 1, 3, 5, 7... -> Taddy
-            return (userAdCount % 2 === 0) ? 'adsgram' : 'taddy';
-        }
-
-        // Reklama statusini UI'da ko'rsatish
-        function updateAdStatusUI(system) {
-            const statusDiv = document.getElementById('ad-status');
-            if (system === 'adsgram') {
-                statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! (AdsGram) 🚀</p>';
-            } else {
-                statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! (Taddy) 🚀</p>';
-            }
         }
 
         // Init Telegram & Ads
@@ -315,27 +301,115 @@
                 currentUser = { user_id: 'web_' + Date.now(), username: 'foydalanuvchi', first_name: 'Foydalanuvchi', last_name:'', photo_url:null, language_code:'uz' };
             }
         }
-        
-        function initAdsgram() {
+
+        // Taddy va Adsgram'ni ishga tushirish
+        function initAdServices() {
+            // Taddy'ni ishga tushirish
+            if (window.Taddy) {
+                taddy = window.Taddy;
+                // ready event'ini yuborish
+                setTimeout(() => {
+                    if (taddy && taddy.ready) {
+                        taddy.ready();
+                    }
+                }, 1000);
+            }
+
+            // Adsgram'ni ishga tushirish
             if (window.Adsgram) {
-                adsgramController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
-                console.log('AdsGram initialized');
+                AdController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
             } else {
-                setTimeout(initAdsgram, 500);
+                setTimeout(() => {
+                    if (window.Adsgram) {
+                        AdController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
+                    }
+                }, 500);
             }
         }
-        
-        function initTaddy() {
-            if (window.Taddy) {
-                // Taddy avtomatik init bo'lgan bo'lishi mumkin
-                if (!window.Taddy.isReady) {
-                    window.Taddy.init('6e046780b6e21c40ba2174108ad75218');
+
+        // Taddy reklamasini ko'rsatish
+        async function showTaddyAd() {
+            if (!taddy) {
+                throw new Error('Taddy yuklanmagan');
+            }
+            
+            return new Promise((resolve, reject) => {
+                try {
+                    taddy.ads().interstitial({
+                        onClosed: () => {
+                            console.log('Taddy reklama yopildi');
+                            resolve(true);
+                        },
+                        onViewThrough: (id) => {
+                            console.log('Taddy reklama to\'liq ko\'rildi', id);
+                            resolve(true);
+                        }
+                    }).then((success) => {
+                        if (!success) {
+                            console.log('Taddy reklama ko\'rsatilmadi');
+                            reject(new Error('Reklama ko\'rsatilmadi'));
+                        }
+                    }).catch(err => {
+                        console.error('Taddy xatosi:', err);
+                        reject(err);
+                    });
+                } catch (error) {
+                    console.error('Taddy interfaol xatosi:', error);
+                    reject(error);
                 }
-                window.Taddy.ready();
-                taddyController = window.Taddy;
-                console.log('Taddy initialized');
+            });
+        }
+
+        // Adsgram reklamasini ko'rsatish
+        async function showAdsgramAd() {
+            if (!AdController) {
+                throw new Error('Adsgram yuklanmagan');
+            }
+            
+            return new Promise((resolve, reject) => {
+                try {
+                    AdController.show().then(() => {
+                        resolve(true);
+                    }).catch(err => {
+                        console.error('Adsgram xatosi:', err);
+                        reject(err);
+                    });
+                } catch (error) {
+                    console.error('Adsgram interfaol xatosi:', error);
+                    reject(error);
+                }
+            });
+        }
+
+        // Navbatdagi reklamani ko'rsatish (Taddy yoki Adsgram)
+        async function showNextAd() {
+            adCounter++;
+            
+            // Juft sonli reklamalar: Taddy
+            // Toq sonli reklamalar: Adsgram
+            const isTaddyTurn = (adCounter % 2 === 0);
+            
+            if (isTaddyTurn && taddy) {
+                console.log('Taddy reklamasi ko\'rsatilmoqda...');
+                return await showTaddyAd();
             } else {
-                setTimeout(initTaddy, 500);
+                console.log('Adsgram reklamasi ko\'rsatilmoqda...');
+                
+                // Adsgram yuklanmagan bo'lsa, Taddy'ga o'tkazish
+                let attempts = 0;
+                while (!AdController && attempts < 20) { 
+                    await new Promise(r => setTimeout(r, 250)); 
+                    attempts++; 
+                }
+                
+                if (!AdController && taddy) {
+                    console.log('Adsgram yuklanmagan, Taddy reklamasi ko\'rsatilmoqda...');
+                    return await showTaddyAd();
+                } else if (!AdController) {
+                    throw new Error('Ikkala reklama tizimi ham yuklanmagan');
+                }
+                
+                return await showAdsgramAd();
             }
         }
 
@@ -354,7 +428,7 @@
                         last_name: currentUser.last_name || '',
                         photo_url: profilePhoto,
                         language_code: currentUser.language_code || 'uz',
-                        ads_by_day: {},
+                        ads_by_day: {}, // counts per YYYY-MM-DD
                         diamonds: 0,
                         ads_watched: 0,
                         withdraw_history: [],
@@ -363,7 +437,6 @@
                         updated_at: new Date().toISOString()
                     };
                     await set(userRef, newUser);
-                    updateAdStatusUI('adsgram'); // Yangi foydalanuvchi uchun AdsGram
                     return newUser;
                 } else {
                     let userData = snapshot.val();
@@ -377,11 +450,6 @@
                         await update(userRef, { ads_by_day: {} });
                         userData.ads_by_day = {};
                     }
-                    
-                    // Foydalanuvchi uchun keyingi reklama tizimini ko'rsatish
-                    const nextSystem = getNextAdSystem(userData.ads_watched || 0);
-                    updateAdStatusUI(nextSystem);
-                    
                     return userData;
                 }
             } catch (err) {
@@ -389,7 +457,6 @@
                 return null;
             }
         }
-        
         async function updateUserData(updates) {
             if (!currentUser) return false;
             try {
@@ -501,7 +568,7 @@
                 `).join('');
         }
 
-        // Watch ad flow: juft-toq tizim bilan
+        // Watch ad flow: update Firebase (ads_by_day & ads_watched) + call server add_balance then refresh leaderboards
         async function watchAd() {
             if (!currentUser) return;
             const btn = document.getElementById('watch-ad-btn');
@@ -511,110 +578,44 @@
             statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yuklanmoqda...</p>';
 
             try {
-                // Foydalanuvchi ma'lumotlarini olish
+                statusDiv.innerHTML = '<p class="text-green-400 font-bold">💎 Reklama (video) ko\'rsatilmoqda...</p>';
+                
+                // Navbatdagi reklamani ko'rsatish (Taddy yoki Adsgram)
+                await showNextAd();
+
+                // read user
                 const userRef = ref(db, 'users/' + currentUser.user_id);
                 const snapshot = await get(userRef);
                 const userData = snapshot.val() || {};
-                const adsWatched = userData.ads_watched || 0;
-                
-                // Keyingi reklama tizimini aniqlash
-                const nextSystem = getNextAdSystem(adsWatched);
-                console.log(`User ${currentUser.user_id} has ${adsWatched} ads, next system: ${nextSystem}`);
 
-                // Reklama tizimini yuklashni kutish
-                if (nextSystem === 'adsgram') {
-                    let attempts = 0;
-                    while (!adsgramController && attempts < 20) { 
-                        await new Promise(r => setTimeout(r, 250)); 
-                        attempts++; 
-                    }
-                    if (!adsgramController) throw new Error('AdsGram yuklanmagan');
-                } else {
-                    let attempts = 0;
-                    while (!taddyController && attempts < 20) { 
-                        await new Promise(r => setTimeout(r, 250)); 
-                        attempts++; 
-                    }
-                    if (!taddyController || !taddyController.ads) throw new Error('Taddy yuklanmagan');
-                }
-
-                // Reklama ko'rsatish
-                statusDiv.innerHTML = `<p class="text-green-400 font-bold">💎 ${nextSystem === 'adsgram' ? 'AdsGram' : 'Taddy'} reklamasi ko'rsatilmoqda...</p>`;
-                
-                let adSuccess = false;
-                if (nextSystem === 'adsgram') {
-                    // AdsGram reklamasi
-                    await adsgramController.show();
-                    adSuccess = true;
-                } else {
-                    // Taddy reklamasi
-                    adSuccess = await taddyController.ads().interstitial({
-                        onClosed: () => console.log('Taddy reklamasi yopildi'),
-                        onViewThrough: (id) => console.log('Taddy reklamasi to\'liq ko\'rildi:', id)
-                    });
-                }
-
-                if (!adSuccess) {
-                    throw new Error('Reklama ko\'rsatilmadi');
-                }
-
-                // Firebase yangilash
                 const now = new Date();
                 const tzOffset = now.getTimezoneOffset() * 60000;
                 const localKey = new Date(now - tzOffset).toISOString().slice(0,10);
 
                 const ads_by_day = userData.ads_by_day || {};
                 const newDayCount = (ads_by_day[localKey] || 0) + 1;
-                const newOverall = adsWatched + 1;
+                const newOverall = (userData.ads_watched || 0) + 1;
 
-                const updates = { 
-                    ads_watched: newOverall, 
-                    [`ads_by_day/${localKey}`]: newDayCount, 
-                    last_ad_time: new Date().toISOString() 
-                };
-                
+                // update firebase
+                const updates = { ads_watched: newOverall, [`ads_by_day/${localKey}`]: newDayCount, last_ad_time: new Date().toISOString() };
                 const ok = await updateUserData(updates);
                 if (!ok) throw new Error('Firebase yangilashida xatolik');
 
-                // Bot balansiga qo'shish
-                try { 
-                    await addToBotBalance(REWARD_AMOUNT); 
-                } catch(e){ 
-                    console.warn('Bot add failed', e); 
-                }
+                // notify server bot to add balance
+                try { await addToBotBalance(REWARD_AMOUNT); } catch(e){ console.warn('Bot add failed', e); }
 
-                // Yangi reklama tizimini ko'rsatish
-                const nextSystemAfter = getNextAdSystem(newOverall);
-                updateAdStatusUI(nextSystemAfter);
-
-                // Yangilash
+                // re-sync quickly
                 renderLeaderboardsMain();
                 await fetchBotBalance();
 
-                statusDiv.innerHTML = `
-                    <div class="text-center slide-up">
-                        <div class="text-6xl mb-3" style="animation:celebrate .6s;">🎉</div>
-                        <p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p>
-                        <p class="text-2xl font-bold text-yellow-400 mb-2">+${REWARD_AMOUNT} 💎</p>
-                        <p class="text-sm text-white/60">Olmos bot balansiga qo'shildi</p>
-                        <p class="text-xs text-white/40 mt-2">Keyingi reklama: ${nextSystemAfter === 'adsgram' ? 'AdsGram' : 'Taddy'}</p>
-                    </div>
-                `;
+                statusDiv.innerHTML = `<div class="text-center slide-up"><div class="text-6xl mb-3" style="animation:celebrate .6s;">🎉</div><p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p><p class="text-2xl font-bold text-yellow-400 mb-2">+${REWARD_AMOUNT} 💎</p><p class="text-sm text-white/60">Olmos bot balansiga qo'shildi</p></div>`;
             } catch (err) {
-                console.error('Reklama xatosi:', err);
+                console.error('Ad error', err);
                 statusDiv.innerHTML = '<p class="text-orange-400">Reklama yopildi yoki xatolik yuz berdi.</p>';
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
-                setTimeout(() => { 
-                    // Statusni yangilash
-                    const userRef = ref(db, 'users/' + currentUser.user_id);
-                    get(userRef).then(snapshot => {
-                        const userData = snapshot.val() || {};
-                        const nextSystem = getNextAdSystem(userData.ads_watched || 0);
-                        updateAdStatusUI(nextSystem);
-                    });
-                }, 3000);
+                setTimeout(()=>{ statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; }, 3000);
             }
         }
 
@@ -699,32 +700,18 @@
             document.getElementById('user-username').textContent = user.username ? `@${user.username}` : '@nousername';
             // update bot balance display
             document.getElementById('diamond-count').textContent = `${botBalance}`;
-            
-            // Reklama tizimini yangilash
-            const nextSystem = getNextAdSystem(user.ads_watched || 0);
-            updateAdStatusUI(nextSystem);
         }
 
         // App init
         async function initializeAppMain() {
             initTelegram();
-            initAdsgram();
-            initTaddy(); // Ikkala reklama tizimini ham ishga tushiramiz
+            initAdServices();
             bindUI();
 
             const user = await loadOrCreateUser();
             if (user) {
                 const userRef = ref(db, 'users/' + currentUser.user_id);
-                onValue(userRef, (snap) => { 
-                    if (snap.exists()) {
-                        const userData = snap.val();
-                        updateUI(userData);
-                        
-                        // Reklama tizimini yangilash
-                        const nextSystem = getNextAdSystem(userData.ads_watched || 0);
-                        updateAdStatusUI(nextSystem);
-                    }
-                });
+                onValue(userRef, (snap) => { if (snap.exists()) updateUI(snap.val()); });
 
                 subscribeToUsers();
 

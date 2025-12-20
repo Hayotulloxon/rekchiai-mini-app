@@ -484,36 +484,28 @@
                 throw new Error('Taddy yuklanmagan');
             }
             
-            // Loading modalni ko'rsatish
-            showLoadingModal();
-            
             return new Promise((resolve, reject) => {
                 try {
                     taddy.ads().interstitial({
                         onClosed: () => {
                             console.log('Taddy reklama yopildi');
-                            hideLoadingModal();
                             resolve(true);
                         },
                         onViewThrough: (id) => {
                             console.log('Taddy reklama to\'liq ko\'rildi', id);
-                            hideLoadingModal();
                             resolve(true);
                         }
                     }).then((success) => {
                         if (!success) {
                             console.log('Taddy reklama ko\'rsatilmadi');
-                            hideLoadingModal();
                             reject(new Error('Reklama ko\'rsatilmadi'));
                         }
                     }).catch(err => {
                         console.error('Taddy xatosi:', err);
-                        hideLoadingModal();
                         reject(err);
                     });
                 } catch (error) {
                     console.error('Taddy interfaol xatosi:', error);
-                    hideLoadingModal();
                     reject(error);
                 }
             });
@@ -525,22 +517,16 @@
                 throw new Error('Adsgram yuklanmagan');
             }
             
-            // Loading modalni ko'rsatish
-            showLoadingModal();
-            
             return new Promise((resolve, reject) => {
                 try {
                     AdController.show().then(() => {
-                        hideLoadingModal();
                         resolve(true);
                     }).catch(err => {
                         console.error('Adsgram xatosi:', err);
-                        hideLoadingModal();
                         reject(err);
                     });
                 } catch (error) {
                     console.error('Adsgram interfaol xatosi:', error);
-                    hideLoadingModal();
                     reject(error);
                 }
             });
@@ -797,48 +783,77 @@
             btn.innerHTML = '<div class="w-6 h-6 border-3 border-white/30 border-t-blue-500 rounded-full animate-spin mx-auto"></div>';
             statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yuklanmoqda...</p>';
 
+            let adCompleted = false;
+            let loadingModalShown = false;
+
             try {
-                // Navbatdagi reklamani ko'rsatish (Taddy yoki Adsgram)
+                // 1. Avval loading modalni ko'rsatish
+                showLoadingModal();
+                loadingModalShown = true;
+                
+                // 2. Navbatdagi reklamani ko'rsatish
                 await showNextAd();
+                
+                // 3. Reklama tugagach, loading modalni yopish
+                hideLoadingModal();
+                loadingModalShown = false;
+                adCompleted = true;
+                
+                // 4. Faqat reklama to'liq ko'rilgandan keyin bonusni berish
+                if (adCompleted) {
+                    // read user
+                    const userRef = ref(db, 'users/' + currentUser.user_id);
+                    const snapshot = await get(userRef);
+                    const userData = snapshot.val() || {};
 
-                // read user
-                const userRef = ref(db, 'users/' + currentUser.user_id);
-                const snapshot = await get(userRef);
-                const userData = snapshot.val() || {};
+                    const now = new Date();
+                    const tzOffset = now.getTimezoneOffset() * 60000;
+                    const localKey = new Date(now - tzOffset).toISOString().slice(0,10);
 
-                const now = new Date();
-                const tzOffset = now.getTimezoneOffset() * 60000;
-                const localKey = new Date(now - tzOffset).toISOString().slice(0,10);
+                    const ads_by_day = userData.ads_by_day || {};
+                    const newDayCount = (ads_by_day[localKey] || 0) + 1;
+                    const newOverall = (userData.ads_watched || 0) + 1;
 
-                const ads_by_day = userData.ads_by_day || {};
-                const newDayCount = (ads_by_day[localKey] || 0) + 1;
-                const newOverall = (userData.ads_watched || 0) + 1;
+                    // update firebase
+                    const updates = { 
+                        ads_watched: newOverall, 
+                        [`ads_by_day/${localKey}`]: newDayCount, 
+                        last_ad_time: new Date().toISOString(),
+                        last_activity: new Date().toISOString()
+                    };
+                    const ok = await updateUserData(updates);
+                    if (!ok) throw new Error('Firebase yangilashida xatolik');
 
-                // update firebase
-                const updates = { 
-                    ads_watched: newOverall, 
-                    [`ads_by_day/${localKey}`]: newDayCount, 
-                    last_ad_time: new Date().toISOString(),
-                    last_activity: new Date().toISOString()
-                };
-                const ok = await updateUserData(updates);
-                if (!ok) throw new Error('Firebase yangilashida xatolik');
+                    // notify server bot to add balance
+                    try { 
+                        await addToBotBalance(REWARD_AMOUNT); 
+                    } catch(e){ 
+                        console.warn('Bot add failed', e); 
+                    }
 
-                // notify server bot to add balance
-                try { await addToBotBalance(REWARD_AMOUNT); } catch(e){ console.warn('Bot add failed', e); }
+                    // re-sync quickly
+                    renderLeaderboardsMain();
+                    await fetchBotBalance();
 
-                // re-sync quickly
-                renderLeaderboardsMain();
-                await fetchBotBalance();
-
-                statusDiv.innerHTML = `<div class="text-center slide-up"><div class="text-6xl mb-3" style="animation:celebrate .6s;">🎉</div><p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p><p class="text-2xl font-bold text-yellow-400 mb-2">+${REWARD_AMOUNT} 💎</p><p class="text-sm text-white/60">Olmos bot balansiga qo'shildi</p></div>`;
+                    statusDiv.innerHTML = `<div class="text-center slide-up"><div class="text-6xl mb-3" style="animation:celebrate .6s;">🎉</div><p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p><p class="text-2xl font-bold text-yellow-400 mb-2">+${REWARD_AMOUNT} 💎</p><p class="text-sm text-white/60">Olmos bot balansiga qo'shildi</p></div>`;
+                }
             } catch (err) {
                 console.error('Ad error', err);
+                // Agar loading modal ko'rsatilgan bo'lsa, uni yopish
+                if (loadingModalShown) {
+                    hideLoadingModal();
+                }
                 statusDiv.innerHTML = '<p class="text-orange-400">Reklama yopildi yoki xatolik yuz berdi.</p>';
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
-                setTimeout(()=>{ statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; }, 3000);
+                
+                // Agar reklama muvaffaqiyatli yakunlangan bo'lsa, 3 soniyadan keyin statusni tiklash
+                if (adCompleted) {
+                    setTimeout(() => { 
+                        statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
+                    }, 3000);
+                }
             }
         }
 

@@ -92,6 +92,28 @@
         .leader-username { font-size:12px; color:rgba(255,255,255,.6) }
         .leader-count { font-weight:800; color:#ffd54a; margin-left:auto; white-space:nowrap; }
 
+        /* Online indicator */
+        .online-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            margin-right: 4px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        .online-count {
+            color: #22c55e;
+            font-weight: bold;
+        }
+
         @media (max-width:420px) { .leaderboard-list{ max-height:300px } .leader-avatar{ width:40px; height:40px } }
     </style>
 </head>
@@ -214,7 +236,7 @@
                             <div class="text-xl">📈</div>
                             <h3 class="font-bold text-white/90">Umumiy statistika</h3>
                         </div>
-                        <div class="grid grid-cols-3 gap-4 text-center">
+                        <div class="grid grid-cols-4 gap-4 text-center">
                             <div>
                                 <p class="text-2xl font-bold text-yellow-400" id="admin-total-users">0</p>
                                 <p class="text-xs text-white/60 mt-1">Foydalanuvchi</p>
@@ -226,6 +248,12 @@
                             <div>
                                 <p class="text-2xl font-bold text-yellow-400" id="admin-total-diamonds">0</p>
                                 <p class="text-xs text-white/60 mt-1">Olmoslar</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold online-count" id="admin-online-users">0</p>
+                                <p class="text-xs text-white/60 mt-1 flex items-center justify-center">
+                                    <span class="online-indicator"></span> Online
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -277,6 +305,7 @@
         const ADMIN_IDS = ['7500103239', '7104718080'];
         const AD_BLOCK_ID = '18961';
         const REWARD_AMOUNT = 1;
+        const ONLINE_TIMEOUT = 5 * 60 * 1000; // 5 daqiqa (300000 ms)
 
         // Server endpoints (host add_balance.php & get_balance.php)
         const BOT_API_ADD_URL = 'https://68ed1ab05ca4e.myxvest1.ru/add_balance.php';
@@ -291,6 +320,8 @@
         let currentLeaderboard = 'daily'; // 'daily' | 'overall'
         let adCounter = 0; // Taddy va Adsgram reklamalarini navbatlash uchun
         let taddy = null; // Taddy obyekti
+        let onlineUsers = new Set(); // Online foydalanuvchilar
+        let userActivityTimes = {}; // Har bir foydalanuvchining so'nggi faollik vaqti
 
         // Helpers
         async function getTelegramProfilePhoto(userId, username) {
@@ -327,6 +358,65 @@
             }
         }
 
+        // Faollikni yangilash (har safar foydalanuvchi biror amal bajarsa)
+        function updateUserActivity() {
+            if (!currentUser) return;
+            
+            const userId = currentUser.user_id;
+            userActivityTimes[userId] = Date.now();
+            
+            // Firebase'ga yangilash (ixtiyoriy)
+            try {
+                const userRef = ref(db, 'users/' + userId);
+                update(userRef, { last_activity: new Date().toISOString() });
+            } catch (err) {
+                console.warn('Activity update failed', err);
+            }
+            
+            // Online ro'yxatga qo'shish
+            onlineUsers.add(userId);
+            
+            // Admin panelni yangilash
+            updateOnlineCount();
+        }
+
+        // Online foydalanuvchilarni hisoblash
+        function calculateOnlineUsers() {
+            const now = Date.now();
+            const activeUsers = new Set();
+            
+            // Oxirgi 5 daqiqada faol bo'lgan foydalanuvchilar
+            Object.keys(userActivityTimes).forEach(userId => {
+                const lastActive = userActivityTimes[userId];
+                if (now - lastActive <= ONLINE_TIMEOUT) {
+                    activeUsers.add(userId);
+                }
+            });
+            
+            // Har bir foydalanuvchi uchun Firebase'dan oxirgi faollikni tekshirish
+            allUsers.forEach(user => {
+                if (user.last_activity) {
+                    const lastActive = new Date(user.last_activity).getTime();
+                    if (now - lastActive <= ONLINE_TIMEOUT) {
+                        activeUsers.add(user.user_id);
+                    }
+                }
+            });
+            
+            return activeUsers;
+        }
+
+        // Online sonini yangilash
+        function updateOnlineCount() {
+            if (!isAdmin) return;
+            
+            const onlineUsersSet = calculateOnlineUsers();
+            onlineUsers = onlineUsersSet;
+            const onlineCount = onlineUsersSet.size;
+            
+            document.getElementById('admin-online-users').textContent = onlineCount;
+        }
+
         // Init Telegram & Ads
         function initTelegram() {
             if (window.Telegram?.WebApp) {
@@ -352,6 +442,9 @@
             } else {
                 currentUser = { user_id: 'web_' + Date.now(), username: 'foydalanuvchi', first_name: 'Foydalanuvchi', last_name:'', photo_url:null, language_code:'uz' };
             }
+            
+            // Dastlabki faollikni yangilash
+            updateUserActivity();
         }
 
         // Taddy va Adsgram'ni ishga tushirish
@@ -499,6 +592,7 @@
                         ads_watched: 0,
                         withdraw_history: [],
                         last_ad_time: new Date().toISOString(),
+                        last_activity: new Date().toISOString(),
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString()
                     };
@@ -508,13 +602,23 @@
                     let userData = snapshot.val();
                     if (!userData.photo_url) {
                         const profilePhoto = await getTelegramProfilePhoto(currentUser.user_id, currentUser.username);
-                        const updates = { photo_url: profilePhoto, username: currentUser.username || userData.username, first_name: currentUser.first_name || userData.first_name, updated_at: new Date().toISOString() };
+                        const updates = { 
+                            photo_url: profilePhoto, 
+                            username: currentUser.username || userData.username, 
+                            first_name: currentUser.first_name || userData.first_name, 
+                            last_activity: new Date().toISOString(),
+                            updated_at: new Date().toISOString() 
+                        };
                         await update(userRef, updates);
                         userData = { ...userData, ...updates };
                     }
                     if (!userData.ads_by_day) {
                         await update(userRef, { ads_by_day: {} });
                         userData.ads_by_day = {};
+                    }
+                    if (!userData.last_activity) {
+                        await update(userRef, { last_activity: new Date().toISOString() });
+                        userData.last_activity = new Date().toISOString();
                     }
                     return userData;
                 }
@@ -523,6 +627,7 @@
                 return null;
             }
         }
+        
         async function updateUserData(updates) {
             if (!currentUser) return false;
             try {
@@ -545,6 +650,7 @@
                     Object.keys(data).forEach(k => allUsers.push(data[k]));
                 }
                 updateAdminPanel();
+                updateOnlineCount();
                 renderLeaderboardsMain();
             }, (err) => console.error('subscribeToUsers error', err));
         }
@@ -604,25 +710,64 @@
             const totalUsers = allUsers.length;
             const totalAds = allUsers.reduce((s,u)=> s + (u.ads_watched||0), 0);
             const totalDiamonds = allUsers.reduce((s,u)=> s + (u.diamonds||0), 0);
+            
             document.getElementById('admin-total-users').textContent = totalUsers;
             document.getElementById('admin-total-ads').textContent = totalAds;
             document.getElementById('admin-total-diamonds').textContent = totalDiamonds;
+            
+            // Online sonini yangilash
+            updateOnlineCount();
 
             const usersList = document.getElementById('users-list');
             if (!usersList) return;
-            usersList.innerHTML = allUsers
-                .sort((a,b)=>(b.diamonds||0)-(a.diamonds||0))
-                .slice(0,20)
-                .map(u => `
+            
+            // Foydalanuvchilarni online holatiga qarab tartiblash
+            const sortedUsers = allUsers
+                .map(u => {
+                    const isOnline = onlineUsers.has(u.user_id);
+                    const lastActivityTime = u.last_activity ? new Date(u.last_activity).getTime() : 0;
+                    const now = Date.now();
+                    const minutesAgo = lastActivityTime ? Math.floor((now - lastActivityTime) / 60000) : 999;
+                    
+                    return {
+                        ...u,
+                        isOnline,
+                        lastActivityTime,
+                        minutesAgo
+                    };
+                })
+                .sort((a, b) => {
+                    // Avval onlinelar, keyin offlinelar
+                    if (a.isOnline && !b.isOnline) return -1;
+                    if (!a.isOnline && b.isOnline) return 1;
+                    
+                    // Online bo'lsa, oxirgi faollik bo'yicha tartiblash
+                    if (a.isOnline && b.isOnline) {
+                        return a.lastActivityTime > b.lastActivityTime ? -1 : 1;
+                    }
+                    
+                    // Offline bo'lsa, olmoslar soni bo'yicha tartiblash
+                    return (b.diamonds||0) - (a.diamonds||0);
+                })
+                .slice(0,20);
+            
+            usersList.innerHTML = sortedUsers.map(u => {
+                const isOnline = onlineUsers.has(u.user_id);
+                const statusColor = isOnline ? '#22c55e' : '#ef4444';
+                const statusText = isOnline ? 'Online' : `${u.minutesAgo < 60 ? u.minutesAgo + ' min oldin' : 'Offline'}`;
+                
+                return `
                     <div class="app-card p-4 hover:bg-white/5 transition-all duration-300">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-3">
-                                <div class="avatar-container">
+                                <div class="avatar-container relative">
                                     ${u.photo_url ? `<img src="${u.photo_url}" alt="${(u.first_name||'Foydalanuvchi')}" class="avatar-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'gradient-avatar\\'></div>'">` : `<div class="gradient-avatar"></div>`}
+                                    <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[#0f0f0f]" style="background-color: ${statusColor};"></div>
                                 </div>
                                 <div>
                                     <p class="font-bold text-sm text-white/90">${u.first_name || 'Foydalanuvchi'}</p>
                                     <p class="text-xs text-white/50">${u.username ? '@'+u.username : '@nousername'}</p>
+                                    <p class="text-xs mt-1" style="color: ${statusColor};">${statusText}</p>
                                 </div>
                             </div>
                             <div class="text-right">
@@ -631,12 +776,17 @@
                             </div>
                         </div>
                     </div>
-                `).join('');
+                `;
+            }).join('');
         }
 
         // Watch ad flow: update Firebase (ads_by_day & ads_watched) + call server add_balance then refresh leaderboards
         async function watchAd() {
             if (!currentUser) return;
+            
+            // Faollikni yangilash
+            updateUserActivity();
+            
             const btn = document.getElementById('watch-ad-btn');
             const statusDiv = document.getElementById('ad-status');
             btn.disabled = true;
@@ -661,7 +811,12 @@
                 const newOverall = (userData.ads_watched || 0) + 1;
 
                 // update firebase
-                const updates = { ads_watched: newOverall, [`ads_by_day/${localKey}`]: newDayCount, last_ad_time: new Date().toISOString() };
+                const updates = { 
+                    ads_watched: newOverall, 
+                    [`ads_by_day/${localKey}`]: newDayCount, 
+                    last_ad_time: new Date().toISOString(),
+                    last_activity: new Date().toISOString()
+                };
                 const ok = await updateUserData(updates);
                 if (!ok) throw new Error('Firebase yangilashida xatolik');
 
@@ -720,7 +875,21 @@
 
         // UI bindings (menu + leaderboard tabs)
         function bindUI() {
-            document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
+            // Reklama tugmasi - faollikni yangilash
+            document.getElementById('watch-ad-btn')?.addEventListener('click', () => {
+                updateUserActivity();
+                watchAd();
+            });
+
+            // Har bir menu bosilganda faollikni yangilash
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', updateUserActivity);
+            });
+
+            // Har bir leaderboard tab bosilganda faollikni yangilash
+            document.querySelectorAll('.leaderboard-tab').forEach(tab => {
+                tab.addEventListener('click', updateUserActivity);
+            });
 
             // bottom menu
             document.getElementById('menu-earn')?.addEventListener('click', () => switchSection('earn-section', 'menu-earn'));
@@ -786,6 +955,12 @@
                 await fetchBotBalance();
                 setInterval(fetchBotBalance, 30000);
             }
+
+            // Online sonini har 30 soniyada yangilash
+            setInterval(updateOnlineCount, 30000);
+
+            // Har 10 soniyada faollikni yangilash (sessionni saqlash uchun)
+            setInterval(updateUserActivity, 10000);
 
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('content').classList.remove('hidden');

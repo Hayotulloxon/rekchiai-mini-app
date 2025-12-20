@@ -114,6 +114,16 @@
             font-weight: bold;
         }
 
+        .user-count {
+            color: #60a5fa;
+            font-weight: bold;
+        }
+
+        .ad-count {
+            color: #fbbf24;
+            font-weight: bold;
+        }
+
         @media (max-width:420px) { .leaderboard-list{ max-height:300px } .leader-avatar{ width:40px; height:40px } }
     </style>
 </head>
@@ -236,21 +246,17 @@
                             <div class="text-xl">📈</div>
                             <h3 class="font-bold text-white/90">Umumiy statistika</h3>
                         </div>
-                        <div class="grid grid-cols-4 gap-4 text-center">
+                        <div class="grid grid-cols-3 gap-4 text-center">
                             <div>
-                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-users">0</p>
+                                <p class="text-2xl font-bold user-count" id="admin-total-users">1500</p>
                                 <p class="text-xs text-white/60 mt-1">Foydalanuvchi</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-ads">0</p>
+                                <p class="text-2xl font-bold ad-count" id="admin-total-ads">63230</p>
                                 <p class="text-xs text-white/60 mt-1">Reklamalar</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-diamonds">0</p>
-                                <p class="text-xs text-white/60 mt-1">Olmoslar</p>
-                            </div>
-                            <div>
-                                <p class="text-2xl font-bold online-count" id="admin-online-users">0</p>
+                                <p class="text-2xl font-bold online-count" id="admin-online-users">3</p>
                                 <p class="text-xs text-white/60 mt-1 flex items-center justify-center">
                                     <span class="online-indicator"></span> Online
                                 </p>
@@ -709,11 +715,9 @@
         function updateAdminPanel() {
             const totalUsers = allUsers.length;
             const totalAds = allUsers.reduce((s,u)=> s + (u.ads_watched||0), 0);
-            const totalDiamonds = allUsers.reduce((s,u)=> s + (u.diamonds||0), 0);
             
             document.getElementById('admin-total-users').textContent = totalUsers;
             document.getElementById('admin-total-ads').textContent = totalAds;
-            document.getElementById('admin-total-diamonds').textContent = totalDiamonds;
             
             // Online sonini yangilash
             updateOnlineCount();

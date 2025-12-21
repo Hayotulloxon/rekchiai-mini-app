@@ -6,7 +6,7 @@
     <title>RekchiAi olmoslari</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <!-- Taddy SDK - TO'G'RI KOD -->
+    <!-- Taddy SDK -->
     <script src="https://sdk.taddy.pro/web/taddy.min.js?1317" data-pub-id="6e046780b6e21c40ba2174108ad75218"></script>
     
     <!-- Adsgram SDK -->
@@ -14,6 +14,9 @@
     
     <!-- Monetag SDK - YANGI ZONE 10355639 -->
     <script src='//libtl.com/sdk.js' data-zone='10303593' data-sdk='show_10303593'></script>
+    
+    <!-- TelegaIn SDK -->
+    <script src="https://inapp.telega.io/sdk/v1/sdk.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script> window.process = { env: { NODE_ENV: 'production' } }; </script>
@@ -195,7 +198,6 @@
                     <div class="app-card p-6 slide-up" style="animation-delay:0.1s;">
                         <div class="flex items-center justify-between mb-6">
                             <div class="flex items-center space-x-3">
-                                <!-- Icon changed to diamond as requested -->
                                 <div class="text-3xl">💎</div>
                                 <div>
                                     <h2 class="text-xl font-bold text-white/90">Reklama ko'ring</h2>
@@ -330,9 +332,10 @@
         let AdController = null;
         let botBalance = 0;
         let currentLeaderboard = 'daily'; // 'daily' | 'overall'
-        let adCounter = 0; // Taddy, Adsgram, Monetag reklamalarini navbatlash uchun
+        let adCounter = 0; // Reklamalarni navbatlash uchun
         let taddy = null; // Taddy obyekti
         let monetagLoaded = false; // Monetag yuklandi-yuklanmaganligi
+        let telegaAds = null; // TelegaIn obyekti
         let onlineUsers = new Set(); // Online foydalanuvchilar
         let userActivityTimes = {}; // Har bir foydalanuvchining so'nggi faollik vaqti
 
@@ -347,6 +350,7 @@
                 return createFullGradientAvatar(userId);
             }
         }
+        
         function createFullGradientAvatar(userId) {
             const gradients = [['#FF6B6B','#FF8E53'],['#4ECDC4','#44A08D'],['#FFD93D','#FF6B6B'],['#6BC5D2','#4A9CC2'],['#9D50BB','#6E48AA'],['#00C9FF','#92FE9D'],['#FF9A9E','#FAD0C4'],['#A18CD1','#FBC2EB'],['#667eea','#764ba2'],['#f093fb','#f5576c']];
             const idx = (userId||'').split('').reduce((s,c)=>s+c.charCodeAt(0),0) % gradients.length;
@@ -460,6 +464,22 @@
             updateUserActivity();
         }
 
+        // TelegaIn'ni ishga tushirish
+        function initTelegaIn() {
+            if (window.TelegaIn && window.TelegaIn.AdsController) {
+                try {
+                    telegaAds = window.TelegaIn.AdsController.create_miniapp({
+                        token: '92c9a699-4bc8-44a3-af22-1b741af587f5'
+                    });
+                    console.log('TelegaIn SDK muvaffaqiyatli yuklandi');
+                } catch (error) {
+                    console.error('TelegaIn init xatosi:', error);
+                }
+            } else {
+                console.warn('TelegaIn SDK yuklanmadi');
+            }
+        }
+
         // Taddy va Adsgram'ni ishga tushirish
         function initAdServices() {
             // Taddy'ni ishga tushirish - data-pub-id bilan avtomatik init bo'ladi
@@ -488,14 +508,17 @@
             
             // Monetag yuklanganligini tekshirish (yangi zone 10355639)
             setTimeout(() => {
-                if (typeof show_10355639 !== 'undefined') {
+                if (typeof show_10303593 !== 'undefined') {
                     monetagLoaded = true;
-                    console.log('Monetag yangi zone (10355639) yuklandi');
+                    console.log('Monetag yangi zone (10303593) yuklandi');
                 }
             }, 2000);
+            
+            // TelegaIn'ni ishga tushirish
+            initTelegaIn();
         }
 
-        // Taddy reklamasini ko'rsatish (TO'G'RI FUNKSIYA)
+        // Taddy reklamasini ko'rsatish
         async function showTaddyAd() {
             return new Promise((resolve, reject) => {
                 try {
@@ -556,22 +579,20 @@
             });
         }
 
-        // Monetag reklamasini ko'rsatish (YANGI ZONE 10355639 UCHUN)
+        // Monetag reklamasini ko'rsatish (YANGI ZONE 10303593 UCHUN)
         async function showMonetagAd() {
             return new Promise((resolve, reject) => {
                 try {
-                    // show_10355639 funksiyasini tekshirish
-                    if (typeof window.show_10355639 === 'undefined') {
+                    // show_10303593 funksiyasini tekshirish
+                    if (typeof window.show_10303593 === 'undefined') {
                         throw new Error('Monetag SDK yuklanmagan (yangi zone)');
                     }
                     
-                    console.log('Monetag reklamasi ko\'rsatilmoqda (zone 10355639)...');
+                    console.log('Monetag reklamasi ko\'rsatilmoqda (zone 10303593)...');
                     
                     // Reklamani ko'rsatish (Rewarded Interstitial format)
-                    window.show_10355639().then(() => {
+                    window.show_10303593().then(() => {
                         console.log('Monetag reklama muvaffaqiyatli ko\'rildi');
-                        // Bu joyda foydalanuvchini mukofotlash funksiyasini qo'shishingiz kerak
-                        // alert('You have seen an ad!'); // Monetag'ning demo kodi
                         resolve(true);
                     }).catch((error) => {
                         console.error('Monetag xatosi:', error);
@@ -585,12 +606,41 @@
             });
         }
 
-        // Navbatdagi reklamani ko'rsatish (Taddy, Adsgram, Monetag)
+        // TelegaIn reklamasini ko'rsatish
+        async function showTelegaInAd() {
+            return new Promise((resolve, reject) => {
+                try {
+                    // TelegaIn obyektini tekshirish
+                    if (!telegaAds) {
+                        throw new Error('TelegaIn SDK yuklanmagan');
+                    }
+                    
+                    console.log('TelegaIn reklamasi ko\'rsatilmoqda...');
+                    
+                    // Reklamani ko'rsatish
+                    telegaAds.ad_show({
+                        adBlockUuid: "3bdd56f5-efb0-4634-9983-e4304e6b2aec"
+                    }).then(() => {
+                        console.log('TelegaIn reklama muvaffaqiyatli ko\'rildi');
+                        resolve(true);
+                    }).catch(error => {
+                        console.error('TelegaIn reklama xatosi:', error);
+                        reject(error);
+                    });
+                    
+                } catch (error) {
+                    console.error('TelegaIn interfaol xatosi:', error);
+                    reject(error);
+                }
+            });
+        }
+
+        // Navbatdagi reklamani ko'rsatish (Taddy, Adsgram, Monetag, TelegaIn)
         async function showNextAd() {
             adCounter++;
-            const platformIndex = adCounter % 3; // 0: Taddy, 1: Adsgram, 2: Monetag
+            const platformIndex = adCounter % 4; // 0: Taddy, 1: Adsgram, 2: Monetag, 3: TelegaIn
             
-            console.log(`Reklama navbati: ${platformIndex} (${['Taddy', 'Adsgram', 'Monetag'][platformIndex]})`);
+            console.log(`Reklama navbati: ${platformIndex} (${['Taddy', 'Adsgram', 'Monetag', 'TelegaIn'][platformIndex]})`);
             
             try {
                 switch (platformIndex) {
@@ -600,25 +650,30 @@
                         
                     case 1: // Adsgram
                         console.log('Adsgram reklamasi ko\'rsatilmoqda...');
-                        
                         // Adsgram yuklanmagan bo'lsa, Monetag'ga o'tkazish
                         if (!AdController) {
                             console.log('Adsgram yuklanmagan, Monetag reklamasiga o\'tmoqda...');
                             return await showMonetagAd();
                         }
-                        
                         return await showAdsgramAd();
                         
                     case 2: // Monetag
                         console.log('Monetag reklamasi ko\'rsatilmoqda...');
+                        // show_10303593 funksiyasini tekshirish
+                        if (typeof window.show_10303593 === 'undefined') {
+                            console.log('Monetag yuklanmagan, TelegaIn reklamasiga o\'tmoqda...');
+                            return await showTelegaInAd();
+                        }
+                        return await showMonetagAd();
                         
-                        // show_10355639 funksiyasini tekshirish
-                        if (typeof window.show_10355639 === 'undefined') {
-                            console.log('Monetag yuklanmagan, Taddy reklamasiga o\'tmoqda...');
+                    case 3: // TelegaIn
+                        console.log('TelegaIn reklamasi ko\'rsatilmoqda...');
+                        // TelegaIn yuklanmagan bo'lsa, Taddy'ga o'tkazish
+                        if (!telegaAds) {
+                            console.log('TelegaIn yuklanmagan, Taddy reklamasiga o\'tmoqda...');
                             return await showTaddyAd();
                         }
-                        
-                        return await showMonetagAd();
+                        return await showTelegaInAd();
                 }
             } catch (error) {
                 console.error('Reklama ko\'rsatishda xatolik:', error);
@@ -626,43 +681,28 @@
                 // Xatolik yuz berganda, keyingi platformaga o'tish
                 console.log(`Xatolik yuz berdi, boshqa platformaga o'tmoqda...`);
                 
-                if (platformIndex === 0) { // Taddy xatolik
+                // Bir platforma xato bo'lsa, qolgan 3 tasini sinab ko'rish
+                const platforms = [
+                    { index: 0, name: 'Taddy', func: showTaddyAd },
+                    { index: 1, name: 'Adsgram', func: showAdsgramAd },
+                    { index: 2, name: 'Monetag', func: showMonetagAd },
+                    { index: 3, name: 'TelegaIn', func: showTelegaInAd }
+                ];
+                
+                // Xato bo'lgan platformani olib tashlash
+                const otherPlatforms = platforms.filter(p => p.index !== platformIndex);
+                
+                // Qolgan platformalarni sinab ko'rish
+                for (const platform of otherPlatforms) {
                     try {
-                        console.log('Adsgram reklamasini sinab ko\'rmoqda...');
-                        return await showAdsgramAd();
-                    } catch (e1) {
-                        console.log('Adsgram ham xato, Monetag reklamasini sinab ko\'rmoqda...');
-                        try {
-                            return await showMonetagAd();
-                        } catch (e2) {
-                            throw new Error('Barcha reklama platformalari xato');
-                        }
-                    }
-                } else if (platformIndex === 1) { // Adsgram xatolik
-                    try {
-                        console.log('Monetag reklamasini sinab ko\'rmoqda...');
-                        return await showMonetagAd();
-                    } catch (e1) {
-                        console.log('Monetag ham xato, Taddy reklamasini sinab ko\'rmoqda...');
-                        try {
-                            return await showTaddyAd();
-                        } catch (e2) {
-                            throw new Error('Barcha reklama platformalari xato');
-                        }
-                    }
-                } else { // Monetag xatolik
-                    try {
-                        console.log('Taddy reklamasini sinab ko\'rmoqda...');
-                        return await showTaddyAd();
-                    } catch (e1) {
-                        console.log('Taddy ham xato, Adsgram reklamasini sinab ko\'rmoqda...');
-                        try {
-                            return await showAdsgramAd();
-                        } catch (e2) {
-                            throw new Error('Barcha reklama platformalari xato');
-                        }
+                        console.log(`${platform.name} reklamasini sinab ko'rmoqda...`);
+                        return await platform.func();
+                    } catch (e) {
+                        console.log(`${platform.name} ham xato, keyingisiga o'tmoqda...`);
                     }
                 }
+                
+                throw new Error('Barcha reklama platformalari xato');
             }
         }
 

@@ -12,11 +12,11 @@
     <!-- Adsgram SDK -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     
-    <!-- Monetag SDK - YANGI ZONE 10355639 -->
-    <script src='//libtl.com/sdk.js' data-zone='10303593' data-sdk='show_10303593'></script>
-    
     <!-- TelegaIn SDK -->
     <script src="https://inapp.telega.io/sdk/v1/sdk.js"></script>
+    
+    <!-- OnClick TMA SDK -->
+    <script src="https://js.onclckvd.com/in-stream-ad-admanager/tma.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script> window.process = { env: { NODE_ENV: 'production' } }; </script>
@@ -326,6 +326,9 @@
         const BOT_API_GET_URL = 'https://68ed1ab05ca4e.myxvest1.ru/get_balance.php';
         const BOT_API_KEY = '4564123:hkjhfadfhieapkdnga'; // ideally keep on server
 
+        // OnClick TMA Spot ID (Your Spot ID ni o'z Spot ID ingiz bilan almashtiring)
+        const ONCLICK_TMA_SPOT_ID = 'YOUR_SPOT_ID_HERE';
+
         let currentUser = null;
         let allUsers = [];
         let isAdmin = false;
@@ -334,8 +337,8 @@
         let currentLeaderboard = 'daily'; // 'daily' | 'overall'
         let adCounter = 0; // Reklamalarni navbatlash uchun
         let taddy = null; // Taddy obyekti
-        let monetagLoaded = false; // Monetag yuklandi-yuklanmaganligi
         let telegaAds = null; // TelegaIn obyekti
+        let onClickShow = null; // OnClick TMA show funksiyasi
         let onlineUsers = new Set(); // Online foydalanuvchilar
         let userActivityTimes = {}; // Har bir foydalanuvchining so'nggi faollik vaqti
 
@@ -480,6 +483,26 @@
             }
         }
 
+        // OnClick TMA ni ishga tushirish
+        function initOnClickTMA() {
+            if (window.initCdTma) {
+                try {
+                    window.initCdTma({ id: ONCLICK_TMA_SPOT_ID })
+                        .then(show => {
+                            onClickShow = show;
+                            console.log('OnClick TMA SDK muvaffaqiyatli yuklandi');
+                        })
+                        .catch(e => {
+                            console.error('OnClick TMA init xatosi:', e);
+                        });
+                } catch (error) {
+                    console.error('OnClick TMA interfaol xatosi:', error);
+                }
+            } else {
+                console.warn('OnClick TMA SDK yuklanmadi');
+            }
+        }
+
         // Taddy va Adsgram'ni ishga tushirish
         function initAdServices() {
             // Taddy'ni ishga tushirish - data-pub-id bilan avtomatik init bo'ladi
@@ -495,27 +518,28 @@
                 }, 1000);
             }
 
-            // Adsgram'ni ishga tushirish
+            // Adsgram'ni ishga tushirish - BIRTA REKLAMA UCHUN
             if (window.Adsgram) {
-                AdController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
+                AdController = window.Adsgram.init({ 
+                    blockId: AD_BLOCK_ID
+                });
+                console.log('Adsgram SDK muvaffaqiyatli yuklandi (bitta reklama)');
             } else {
                 setTimeout(() => {
                     if (window.Adsgram) {
-                        AdController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
+                        AdController = window.Adsgram.init({ 
+                            blockId: AD_BLOCK_ID
+                        });
+                        console.log('Adsgram SDK kechiktirilgan yuklandi');
                     }
                 }, 500);
             }
             
-            // Monetag yuklanganligini tekshirish (yangi zone 10355639)
-            setTimeout(() => {
-                if (typeof show_10303593 !== 'undefined') {
-                    monetagLoaded = true;
-                    console.log('Monetag yangi zone (10303593) yuklandi');
-                }
-            }, 2000);
-            
             // TelegaIn'ni ishga tushirish
             initTelegaIn();
+            
+            // OnClick TMA ni ishga tushirish
+            initOnClickTMA();
         }
 
         // Taddy reklamasini ko'rsatish
@@ -558,15 +582,19 @@
             });
         }
 
-        // Adsgram reklamasini ko'rsatish
+        // Adsgram reklamasini ko'rsatish - BIRTA REKLAMA
         async function showAdsgramAd() {
-            if (!AdController) {
-                throw new Error('Adsgram yuklanmagan');
-            }
-            
             return new Promise((resolve, reject) => {
                 try {
+                    if (!AdController) {
+                        throw new Error('Adsgram yuklanmagan');
+                    }
+                    
+                    console.log('Adsgram reklamasi ko\'rsatilmoqda (bitta reklama)...');
+                    
+                    // Faqat bitta reklama ko'rsatish
                     AdController.show().then(() => {
+                        console.log('Adsgram reklamasi muvaffaqiyatli ko\'rildi');
                         resolve(true);
                     }).catch(err => {
                         console.error('Adsgram xatosi:', err);
@@ -574,33 +602,6 @@
                     });
                 } catch (error) {
                     console.error('Adsgram interfaol xatosi:', error);
-                    reject(error);
-                }
-            });
-        }
-
-        // Monetag reklamasini ko'rsatish (YANGI ZONE 10303593 UCHUN)
-        async function showMonetagAd() {
-            return new Promise((resolve, reject) => {
-                try {
-                    // show_10303593 funksiyasini tekshirish
-                    if (typeof window.show_10303593 === 'undefined') {
-                        throw new Error('Monetag SDK yuklanmagan (yangi zone)');
-                    }
-                    
-                    console.log('Monetag reklamasi ko\'rsatilmoqda (zone 10303593)...');
-                    
-                    // Reklamani ko'rsatish (Rewarded Interstitial format)
-                    window.show_10303593().then(() => {
-                        console.log('Monetag reklama muvaffaqiyatli ko\'rildi');
-                        resolve(true);
-                    }).catch((error) => {
-                        console.error('Monetag xatosi:', error);
-                        reject(error);
-                    });
-                    
-                } catch (error) {
-                    console.error('Monetag interfaol xatosi:', error);
                     reject(error);
                 }
             });
@@ -635,12 +636,41 @@
             });
         }
 
-        // Navbatdagi reklamani ko'rsatish (Taddy, Adsgram, Monetag, TelegaIn)
+        // OnClick TMA reklamasini ko'rsatish
+        async function showOnClickTMA() {
+            return new Promise((resolve, reject) => {
+                try {
+                    // OnClick TMA show funksiyasini tekshirish
+                    if (!onClickShow) {
+                        throw new Error('OnClick TMA SDK yuklanmagan');
+                    }
+                    
+                    console.log('OnClick TMA reklamasi ko\'rsatilmoqda...');
+                    
+                    // Reklamani ko'rsatish
+                    onClickShow()
+                        .then(() => {
+                            console.log('OnClick TMA reklama muvaffaqiyatli ko\'rildi');
+                            resolve(true);
+                        })
+                        .catch(error => {
+                            console.error('OnClick TMA reklama xatosi:', error);
+                            reject(error);
+                        });
+                    
+                } catch (error) {
+                    console.error('OnClick TMA interfaol xatosi:', error);
+                    reject(error);
+                }
+            });
+        }
+
+        // Navbatdagi reklamani ko'rsatish (Taddy, Adsgram, TelegaIn, OnClick TMA)
         async function showNextAd() {
             adCounter++;
-            const platformIndex = adCounter % 4; // 0: Taddy, 1: Adsgram, 2: Monetag, 3: TelegaIn
+            const platformIndex = adCounter % 4; // 0: Taddy, 1: Adsgram, 2: TelegaIn, 3: OnClick TMA
             
-            console.log(`Reklama navbati: ${platformIndex} (${['Taddy', 'Adsgram', 'Monetag', 'TelegaIn'][platformIndex]})`);
+            console.log(`Reklama navbati: ${platformIndex} (${['Taddy', 'Adsgram', 'TelegaIn', 'OnClick TMA'][platformIndex]})`);
             
             try {
                 switch (platformIndex) {
@@ -650,30 +680,23 @@
                         
                     case 1: // Adsgram
                         console.log('Adsgram reklamasi ko\'rsatilmoqda...');
-                        // Adsgram yuklanmagan bo'lsa, Monetag'ga o'tkazish
-                        if (!AdController) {
-                            console.log('Adsgram yuklanmagan, Monetag reklamasiga o\'tmoqda...');
-                            return await showMonetagAd();
-                        }
                         return await showAdsgramAd();
                         
-                    case 2: // Monetag
-                        console.log('Monetag reklamasi ko\'rsatilmoqda...');
-                        // show_10303593 funksiyasini tekshirish
-                        if (typeof window.show_10303593 === 'undefined') {
-                            console.log('Monetag yuklanmagan, TelegaIn reklamasiga o\'tmoqda...');
-                            return await showTelegaInAd();
-                        }
-                        return await showMonetagAd();
-                        
-                    case 3: // TelegaIn
+                    case 2: // TelegaIn
                         console.log('TelegaIn reklamasi ko\'rsatilmoqda...');
-                        // TelegaIn yuklanmagan bo'lsa, Taddy'ga o'tkazish
                         if (!telegaAds) {
-                            console.log('TelegaIn yuklanmagan, Taddy reklamasiga o\'tmoqda...');
-                            return await showTaddyAd();
+                            console.log('TelegaIn yuklanmagan, OnClick TMA reklamasiga o\'tmoqda...');
+                            return await showOnClickTMA();
                         }
                         return await showTelegaInAd();
+                        
+                    case 3: // OnClick TMA
+                        console.log('OnClick TMA reklamasi ko\'rsatilmoqda...');
+                        if (!onClickShow) {
+                            console.log('OnClick TMA yuklanmagan, Taddy reklamasiga o\'tmoqda...');
+                            return await showTaddyAd();
+                        }
+                        return await showOnClickTMA();
                 }
             } catch (error) {
                 console.error('Reklama ko\'rsatishda xatolik:', error);
@@ -685,8 +708,8 @@
                 const platforms = [
                     { index: 0, name: 'Taddy', func: showTaddyAd },
                     { index: 1, name: 'Adsgram', func: showAdsgramAd },
-                    { index: 2, name: 'Monetag', func: showMonetagAd },
-                    { index: 3, name: 'TelegaIn', func: showTelegaInAd }
+                    { index: 2, name: 'TelegaIn', func: showTelegaInAd },
+                    { index: 3, name: 'OnClick TMA', func: showOnClickTMA }
                 ];
                 
                 // Xato bo'lgan platformani olib tashlash
@@ -1018,7 +1041,7 @@
                 url.searchParams.set('key', BOT_API_KEY);
                 url.searchParams.set('user_id', currentUser.user_id);
                 const controller = new AbortController();
-                const timeoutId = setTimeout(()=>controller.abort(), 8000);
+                const timeoutId = setTimeout(()=>controller.abbor(), 8000);
                 const resp = await fetch(url.toString(), { method:'GET', headers:{ 'Accept':'application/json' }, signal: controller.signal });
                 clearTimeout(timeoutId);
                 if (!resp.ok) { console.warn('fetchBotBalance non-OK', resp.status); return; }
@@ -1109,7 +1132,9 @@
 
                 subscribeToUsers();
 
-                if (isAdmin) document.getElementById('admin-panel').classList.remove('hidden');
+                if (isAdmin) {
+                    document.getElementById('admin-panel').classList.remove('hidden');
+                }
             }
 
             if (currentUser) {

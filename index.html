@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>RekchiAi olmoslari</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Taddy SDK -->
+    
+    <!-- Taddy SDK - TO'G'RI KOD -->
     <script src="https://sdk.taddy.pro/web/taddy.min.js?1317" data-pub-id="6e046780b6e21c40ba2174108ad75218"></script>
+    
     <!-- Adsgram SDK -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-    <!-- Monetag SDK - Faqat bitta zone -->
-    <script src='//libtl.com/sdk.js' data-zone='10303593' data-sdk='show_10303593'></script>
+    
+    <!-- Monetag SDK - YANGI ZONE 10355639 -->
+    <script src='//libtl.com/sdk.js' data-zone='10355639' data-sdk='show_10355639'></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script> window.process = { env: { NODE_ENV: 'production' } }; </script>
@@ -459,7 +462,7 @@
 
         // Taddy va Adsgram'ni ishga tushirish
         function initAdServices() {
-            // Taddy'ni ishga tushirish
+            // Taddy'ni ishga tushirish - data-pub-id bilan avtomatik init bo'ladi
             if (window.Taddy) {
                 taddy = window.Taddy;
                 // Taddy SDK avtomatik init bo'ladi (data-pub-id atributi bor)
@@ -467,6 +470,7 @@
                 setTimeout(() => {
                     if (taddy && taddy.ready) {
                         taddy.ready();
+                        console.log('Taddy SDK muvaffaqiyatli yuklandi');
                     }
                 }, 1000);
             }
@@ -482,23 +486,30 @@
                 }, 500);
             }
             
-            // Monetag yuklanganligini tekshirish
+            // Monetag yuklanganligini tekshirish (yangi zone 10355639)
             setTimeout(() => {
-                if (typeof show_10303593 !== 'undefined') {
+                if (typeof show_10355639 !== 'undefined') {
                     monetagLoaded = true;
-                    console.log('Monetag yuklandi');
+                    console.log('Monetag yangi zone (10355639) yuklandi');
                 }
             }, 2000);
         }
 
-        // Taddy reklamasini ko'rsatish
+        // Taddy reklamasini ko'rsatish (TO'G'RI FUNKSIYA)
         async function showTaddyAd() {
-            if (!taddy) {
-                throw new Error('Taddy yuklanmagan');
-            }
-            
             return new Promise((resolve, reject) => {
                 try {
+                    // Taddy'ni tekshirish
+                    if (!window.Taddy) {
+                        throw new Error('Taddy SDK yuklanmagan');
+                    }
+                    
+                    // Taddy obyektini olish
+                    const taddy = window.Taddy;
+                    
+                    console.log('Taddy reklamasi ko\'rsatilmoqda...');
+                    
+                    // Reklamani ko'rsatish
                     taddy.ads().interstitial({
                         onClosed: () => {
                             console.log('Taddy reklama yopildi');
@@ -545,20 +556,22 @@
             });
         }
 
-        // Monetag reklamasini ko'rsatish (SODDA VERSIYA)
+        // Monetag reklamasini ko'rsatish (YANGI ZONE 10355639 UCHUN)
         async function showMonetagAd() {
             return new Promise((resolve, reject) => {
                 try {
-                    // show_10303593 funksiyasini tekshirish
-                    if (typeof window.show_10303593 === 'undefined') {
-                        throw new Error('Monetag SDK yuklanmagan');
+                    // show_10355639 funksiyasini tekshirish
+                    if (typeof window.show_10355639 === 'undefined') {
+                        throw new Error('Monetag SDK yuklanmagan (yangi zone)');
                     }
                     
-                    // Reklamani ko'rsatish
-                    window.show_10303593({
-                        ymid: currentUser ? currentUser.user_id : 'unknown'
-                    }).then(() => {
+                    console.log('Monetag reklamasi ko\'rsatilmoqda (zone 10355639)...');
+                    
+                    // Reklamani ko'rsatish (Rewarded Interstitial format)
+                    window.show_10355639().then(() => {
                         console.log('Monetag reklama muvaffaqiyatli ko\'rildi');
+                        // Bu joyda foydalanuvchini mukofotlash funksiyasini qo'shishingiz kerak
+                        // alert('You have seen an ad!'); // Monetag'ning demo kodi
                         resolve(true);
                     }).catch((error) => {
                         console.error('Monetag xatosi:', error);
@@ -599,8 +612,8 @@
                     case 2: // Monetag
                         console.log('Monetag reklamasi ko\'rsatilmoqda...');
                         
-                        // show_10303593 funksiyasini tekshirish
-                        if (typeof window.show_10303593 === 'undefined') {
+                        // show_10355639 funksiyasini tekshirish
+                        if (typeof window.show_10355639 === 'undefined') {
                             console.log('Monetag yuklanmagan, Taddy reklamasiga o\'tmoqda...');
                             return await showTaddyAd();
                         }

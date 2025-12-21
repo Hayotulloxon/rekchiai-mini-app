@@ -9,7 +9,7 @@
     <script src="https://sdk.taddy.pro/web/taddy.min.js?1317" data-pub-id="6e046780b6e21c40ba2174108ad75218"></script>
     <!-- Adsgram SDK -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-    <!-- Monetag SDK -->
+    <!-- Monetag SDK - Faqat bitta zone -->
     <script src='//libtl.com/sdk.js' data-zone='10303593' data-sdk='show_10303593'></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -212,8 +212,6 @@
                             <span class="text-2xl">▶️</span>
                             <span>Reklamani boshlash</span>
                         </button>
-                        
-                        
                     </div>
                 </div>
 
@@ -390,9 +388,6 @@
             
             // Admin panelni yangilash
             updateOnlineCount();
-            
-            // Navbatdagi reklama platformasini yangilash
-            updateNextAdPlatform();
         }
 
         // Online foydalanuvchilarni hisoblash
@@ -430,16 +425,6 @@
             const onlineCount = onlineUsersSet.size;
             
             document.getElementById('admin-online-users').textContent = onlineCount;
-        }
-
-        // Navbatdagi reklama platformasini ko'rsatish
-        function updateNextAdPlatform() {
-            const platforms = ['Taddy', 'Adsgram', 'Monetag'];
-            const nextPlatform = platforms[adCounter % 3];
-            const nextPlatformEl = document.getElementById('next-ad-platform');
-            if (nextPlatformEl) {
-                nextPlatformEl.textContent = nextPlatform;
-            }
         }
 
         // Init Telegram & Ads
@@ -560,26 +545,26 @@
             });
         }
 
-        // Monetag reklamasini ko'rsatish
+        // Monetag reklamasini ko'rsatish (SODDA VERSIYA)
         async function showMonetagAd() {
-            if (typeof show_10303593 === 'undefined') {
-                throw new Error('Monetag yuklanmagan');
-            }
-            
             return new Promise((resolve, reject) => {
                 try {
-                    // Telegram WebApp yuklangan bo'lsa, ymid parametrida foydalanuvchi ID'sini yuborish
-                    const ymid = currentUser ? currentUser.user_id : 'unknown';
+                    // show_10303593 funksiyasini tekshirish
+                    if (typeof window.show_10303593 === 'undefined') {
+                        throw new Error('Monetag SDK yuklanmagan');
+                    }
                     
-                    show_10303593({ ymid: ymid })
-                        .then(() => {
-                            console.log('Monetag reklama ko\'rildi');
-                            resolve(true);
-                        })
-                        .catch((err) => {
-                            console.error('Monetag xatosi:', err);
-                            reject(err);
-                        });
+                    // Reklamani ko'rsatish
+                    window.show_10303593({
+                        ymid: currentUser ? currentUser.user_id : 'unknown'
+                    }).then(() => {
+                        console.log('Monetag reklama muvaffaqiyatli ko\'rildi');
+                        resolve(true);
+                    }).catch((error) => {
+                        console.error('Monetag xatosi:', error);
+                        reject(error);
+                    });
+                    
                 } catch (error) {
                     console.error('Monetag interfaol xatosi:', error);
                     reject(error);
@@ -592,8 +577,7 @@
             adCounter++;
             const platformIndex = adCounter % 3; // 0: Taddy, 1: Adsgram, 2: Monetag
             
-            // Navbatdagi reklama platformasini yangilash
-            updateNextAdPlatform();
+            console.log(`Reklama navbati: ${platformIndex} (${['Taddy', 'Adsgram', 'Monetag'][platformIndex]})`);
             
             try {
                 switch (platformIndex) {
@@ -604,13 +588,7 @@
                     case 1: // Adsgram
                         console.log('Adsgram reklamasi ko\'rsatilmoqda...');
                         
-                        // Adsgram yuklanmagan bo'lsa, keyingi platformaga o'tkazish
-                        let attempts = 0;
-                        while (!AdController && attempts < 10) { 
-                            await new Promise(r => setTimeout(r, 250)); 
-                            attempts++; 
-                        }
-                        
+                        // Adsgram yuklanmagan bo'lsa, Monetag'ga o'tkazish
                         if (!AdController) {
                             console.log('Adsgram yuklanmagan, Monetag reklamasiga o\'tmoqda...');
                             return await showMonetagAd();
@@ -621,8 +599,8 @@
                     case 2: // Monetag
                         console.log('Monetag reklamasi ko\'rsatilmoqda...');
                         
-                        // Monetag yuklanmagan bo'lsa, Taddy'ga o'tkazish
-                        if (typeof show_10303593 === 'undefined') {
+                        // show_10303593 funksiyasini tekshirish
+                        if (typeof window.show_10303593 === 'undefined') {
                             console.log('Monetag yuklanmagan, Taddy reklamasiga o\'tmoqda...');
                             return await showTaddyAd();
                         }
@@ -633,25 +611,44 @@
                 console.error('Reklama ko\'rsatishda xatolik:', error);
                 
                 // Xatolik yuz berganda, keyingi platformaga o'tish
-                if (platformIndex === 0) {
-                    console.log('Taddy xatosi, Adsgram reklamasiga o\'tmoqda...');
+                console.log(`Xatolik yuz berdi, boshqa platformaga o'tmoqda...`);
+                
+                if (platformIndex === 0) { // Taddy xatolik
                     try {
+                        console.log('Adsgram reklamasini sinab ko\'rmoqda...');
                         return await showAdsgramAd();
-                    } catch (e) {
-                        console.log('Adsgram ham xato, Monetag reklamasiga o\'tmoqda...');
-                        return await showMonetagAd();
+                    } catch (e1) {
+                        console.log('Adsgram ham xato, Monetag reklamasini sinab ko\'rmoqda...');
+                        try {
+                            return await showMonetagAd();
+                        } catch (e2) {
+                            throw new Error('Barcha reklama platformalari xato');
+                        }
                     }
-                } else if (platformIndex === 1) {
-                    console.log('Adsgram xatosi, Monetag reklamasiga o\'tmoqda...');
+                } else if (platformIndex === 1) { // Adsgram xatolik
                     try {
+                        console.log('Monetag reklamasini sinab ko\'rmoqda...');
                         return await showMonetagAd();
-                    } catch (e) {
-                        console.log('Monetag ham xato, Taddy reklamasiga o\'tmoqda...');
-                        return await showTaddyAd();
+                    } catch (e1) {
+                        console.log('Monetag ham xato, Taddy reklamasini sinab ko\'rmoqda...');
+                        try {
+                            return await showTaddyAd();
+                        } catch (e2) {
+                            throw new Error('Barcha reklama platformalari xato');
+                        }
                     }
-                } else {
-                    console.log('Monetag xatosi, Taddy reklamasiga o\'tmoqda...');
-                    return await showTaddyAd();
+                } else { // Monetag xatolik
+                    try {
+                        console.log('Taddy reklamasini sinab ko\'rmoqda...');
+                        return await showTaddyAd();
+                    } catch (e1) {
+                        console.log('Taddy ham xato, Adsgram reklamasini sinab ko\'rmoqda...');
+                        try {
+                            return await showAdsgramAd();
+                        } catch (e2) {
+                            throw new Error('Barcha reklama platformalari xato');
+                        }
+                    }
                 }
             }
         }
@@ -1044,8 +1041,6 @@
             document.getElementById('user-username').textContent = user.username ? `@${user.username}` : '@nousername';
             // update bot balance display
             document.getElementById('diamond-count').textContent = `${botBalance}`;
-            // Navbatdagi reklama platformasini yangilash
-            updateNextAdPlatform();
         }
 
         // App init

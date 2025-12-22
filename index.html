@@ -41,11 +41,6 @@
         .btn-primary::after{ content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent); transition:left .5s; }
         .btn-primary:hover::after{ left:100%; }
 
-        .btn-secondary{background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%); box-shadow:0 6px 20px rgba(34,197,94,.3); transition:all .3s; position:relative; overflow:hidden;}
-        .btn-secondary:hover:not(:disabled){ transform:translateY(-2px) scale(1.02); box-shadow:0 10px 25px rgba(34,197,94,.4); }
-        .btn-secondary::after{ content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent); transition:left .5s; }
-        .btn-secondary:hover::after{ left:100%; }
-
         .avatar-container{ width:64px; height:64px; border-radius:50%; overflow:hidden; position:relative; background:linear-gradient(135deg,#0096ff,#0066cc); flex:0 0 auto; }
         .avatar-image{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); min-width:100%; min-height:100%; object-fit:cover; display:block; }
         .gradient-avatar{ width:100%; height:100%; background:linear-gradient(135deg,#0096ff,#0066cc); border-radius:50%; display:flex; align-items:center; justify-content:center; }
@@ -93,30 +88,6 @@
             width: 90%;
             animation: slideUp .3s ease-out;
         }
-
-        /* Progress bar */
-        .progress-container {
-            width: 100%;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            margin: 15px 0;
-            overflow: hidden;
-        }
-        .progress-bar {
-            height: 8px;
-            background: linear-gradient(90deg, #0096ff, #00d4ff);
-            border-radius: 10px;
-            transition: width 0.5s ease;
-        }
-        .progress-text {
-            font-size: 12px;
-            color: rgba(255,255,255,0.6);
-            margin-top: 5px;
-        }
-
-        /* Reward badges */
-        .reward-badge-1 { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e; }
-        .reward-badge-05 { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #3b82f6; }
 
         /* Leaderboard styles for standalone menu */
         .leaderboard-wrapper { max-width:640px; margin:10px auto; padding:12px; }
@@ -233,43 +204,22 @@
                                 <div class="text-3xl">💎</div>
                                 <div>
                                     <h2 class="text-xl font-bold text-white/90">Reklama ko'ring</h2>
-                                    <p class="text-white/60 text-sm">Reklama ko'rib, olmos oling</p>
+                                    <p class="text-white/60 text-sm">Olmos bot balansiga avtomatik qo'shiladi</p>
                                 </div>
                             </div>
-                            <div class="reward-badge-05 px-3 py-1.5 rounded-full">
-                                <span class="font-bold text-sm">+0.5 💎</span>
+                            <div class="reward-badge px-3 py-1.5 rounded-full">
+                                <span class="text-green-400 font-bold text-sm">+1 💎</span>
                             </div>
                         </div>
 
-                        <div id="ad-status" class="status-card rounded-2xl p-6 mb-5 text-center min-h-[150px] flex items-center justify-center">
-                            <div>
-                                <p class="text-white/70 mb-3">Reklama ko'rib, olmos oling! 🚀</p>
-                                
-                                <!-- Progress indicator -->
-                                <div class="progress-container">
-                                    <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
-                                </div>
-                                <div id="progress-text" class="progress-text">Boshlash uchun "Reklamani boshlash" tugmasini bosing</div>
-                                
-                                <!-- Next ad button (hidden by default) -->
-                                <button id="next-ad-btn" class="btn-secondary w-full text-white font-bold py-3 px-6 rounded-2xl mt-4 hidden">
-                                    <span class="text-xl">▶️</span>
-                                    <span>Keyingi reklama</span>
-                                </button>
-                            </div>
+                        <div id="ad-status" class="status-card rounded-2xl p-6 mb-5 text-center min-h-[100px] flex items-center justify-center">
+                            <p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>
                         </div>
 
-                        <div id="main-buttons">
-                            <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg transition-all duration-300">
-                                <span class="text-2xl">🎬</span>
-                                <span>Reklamani boshlash</span>
-                            </button>
-                            
-                            <button id="cancel-ad-btn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg transition-all duration-300 mt-3 bg-red-500/20 hover:bg-red-500/30 border-red-500/30 hidden">
-                                <span class="text-2xl">❌</span>
-                                <span>Bekor qilish</span>
-                            </button>
-                        </div>
+                        <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg transition-all duration-300">
+                            <span class="text-2xl">▶️</span>
+                            <span>Reklamani boshlash</span>
+                        </button>
                     </div>
                 </div>
 
@@ -371,8 +321,7 @@
         // Constants
         const ADMIN_IDS = ['7500103239', '7104718080'];
         const AD_BLOCK_ID = '18961';
-        const REWARD_ADSGRAM = 1.0;    // Adsgram uchun 1 olmos
-        const REWARD_OTHER = 0.5;      // Boshqalar uchun 0.5 olmos
+        const REWARD_AMOUNT = 1;
         const ONLINE_TIMEOUT = 5 * 60 * 1000; // 5 daqiqa (300000 ms)
 
         // Server endpoints (host add_balance.php & get_balance.php)
@@ -389,19 +338,25 @@
         let AdController = null;
         let botBalance = 0;
         let currentLeaderboard = 'daily'; // 'daily' | 'overall'
+        
+        // Har bir platforma uchun hisoblagichlar
+        let platformCounters = {
+            'taddy': 0,
+            'adsgram': 0,
+            'telegaIn': 0,
+            'onClickTMA': 0,
+            'monetag': 0
+        };
+        
+        let lastPlatform = null; // Oxirgi ko'rilgan platforma
+        let adCounter = 0; // Umumiy reklama hisoblagichi
+        
         let taddy = null; // Taddy obyekti
         let telegaAds = null; // TelegaIn obyekti
         let onClickShow = null; // OnClick TMA show funksiyasi
         let monetagLoaded = false; // Monetag yuklandi-yuklanmaganligi
         let onlineUsers = new Set(); // Online foydalanuvchilar
         let userActivityTimes = {}; // Har bir foydalanuvchining so'nggi faollik vaqti
-        
-        // Reklama holatlari
-        let adStep = 0; // 0: boshlash, 1: Adsgram (1 olmos), 2: Boshqa reklama (keyingi reklama ko'rilganda 0.5 olmos)
-        let adStatus = 'ready'; // 'ready', 'showing', 'waiting_next', 'completed', 'cancelled'
-        let adProcessActive = false;
-        let lastAdPlatform = '';
-        let pendingReward = 0; // Keyingi reklama uchun kutayotgan mukofot
 
         // Helpers
         async function getTelegramProfilePhoto(userId, username) {
@@ -436,79 +391,6 @@
             const modal = document.getElementById('loading-modal');
             if (modal) {
                 modal.classList.remove('active');
-            }
-        }
-
-        // Progressni yangilash
-        function updateProgress() {
-            const progressBar = document.getElementById('progress-bar');
-            const progressText = document.getElementById('progress-text');
-            
-            if (progressBar && progressText) {
-                if (adStep === 0) {
-                    progressBar.style.width = '0%';
-                    progressText.textContent = 'Boshlash uchun "Reklamani boshlash" tugmasini bosing';
-                } else if (adStep === 1) {
-                    progressBar.style.width = '50%';
-                    progressText.textContent = '1. Adsgram reklamasi - 1 olmos';
-                } else if (adStep === 2) {
-                    progressBar.style.width = '100%';
-                    progressText.textContent = '2. Boshqa reklama - 0.5 olmos (keyingi reklamada)';
-                }
-            }
-        }
-
-        // Statusni yangilash
-        function updateAdStatus(message, showNextButton = false, rewardAmount = 0) {
-            const statusDiv = document.getElementById('ad-status');
-            const watchBtn = document.getElementById('watch-ad-btn');
-            const cancelBtn = document.getElementById('cancel-ad-btn');
-            
-            if (statusDiv) {
-                let rewardInfo = '';
-                if (rewardAmount > 0) {
-                    const badgeClass = rewardAmount === 1 ? 'reward-badge-1' : 'reward-badge-05';
-                    const badgeText = rewardAmount === 1 ? '+1 💎' : '+0.5 💎';
-                    rewardInfo = `<div class="${badgeClass} px-3 py-1.5 rounded-full inline-block mb-3">
-                        <span class="font-bold text-sm">${badgeText}</span>
-                    </div>`;
-                }
-                
-                statusDiv.innerHTML = `
-                    <div>
-                        <p class="text-white/70 mb-3">${message}</p>
-                        ${rewardInfo}
-                        
-                        <!-- Progress indicator -->
-                        <div class="progress-container">
-                            <div id="progress-bar" class="progress-bar" style="width: ${adStep === 0 ? 0 : adStep === 1 ? 50 : 100}%"></div>
-                        </div>
-                        <div id="progress-text" class="progress-text">
-                            ${adStep === 0 ? 'Boshlash uchun "Reklamani boshlash" tugmasini bosing' : 
-                              adStep === 1 ? '1. Adsgram reklamasi - 1 olmos' : 
-                              '2. Boshqa reklama - 0.5 olmos (keyingi reklamada)'}
-                        </div>
-                        
-                        <!-- Next ad button -->
-                        <button id="next-ad-btn" class="btn-secondary w-full text-white font-bold py-3 px-6 rounded-2xl mt-4 ${showNextButton ? '' : 'hidden'}">
-                            <span class="text-xl">▶️</span>
-                            <span>Keyingi reklama</span>
-                        </button>
-                    </div>
-                `;
-                
-                // Keyingi reklama tugmasini qayta bog'lash
-                if (showNextButton) {
-                    document.getElementById('next-ad-btn')?.addEventListener('click', startNextAd);
-                }
-            }
-            
-            // Asosiy tugmalarni ko'rsatish/yashirish
-            if (watchBtn) {
-                watchBtn.classList.toggle('hidden', adProcessActive && !showNextButton);
-            }
-            if (cancelBtn) {
-                cancelBtn.classList.toggle('hidden', !adProcessActive || showNextButton);
             }
         }
 
@@ -642,7 +524,6 @@
             // Taddy'ni ishga tushirish - data-pub-id bilan avtomatik init bo'ladi
             if (window.Taddy) {
                 taddy = window.Taddy;
-                
                 // Taddy SDK avtomatik init bo'ladi (data-pub-id atributi bor)
                 // ready event'ini yuborish
                 setTimeout(() => {
@@ -837,220 +718,94 @@
             });
         }
 
-        // Boshqa platformani tanlash (Monetag/Taddy)
-        async function showOtherAd() {
-            // 50% ehtimol bilan Monetag yoki Taddy
-            const useMonetag = Math.random() > 0.5 && monetagLoaded;
+        // Platformalar ro'yxati
+        const platformOrder = ['taddy', 'adsgram', 'telegaIn', 'onClickTMA', 'monetag'];
+        
+        // Platforma nomini ingiliz tiliga o'tkazish
+        function getPlatformName(platform) {
+            const names = {
+                'taddy': 'Taddy',
+                'adsgram': 'Adsgram',
+                'telegaIn': 'TelegaIn',
+                'onClickTMA': 'OnClick TMA',
+                'monetag': 'Monetag'
+            };
+            return names[platform] || platform;
+        }
+        
+        // Platforma funktsiyasini qaytarish
+        function getPlatformFunction(platform) {
+            const functions = {
+                'taddy': showTaddyAd,
+                'adsgram': showAdsgramAd,
+                'telegaIn': showTelegaInAd,
+                'onClickTMA': showOnClickTMA,
+                'monetag': showMonetagAd
+            };
+            return functions[platform];
+        }
+        
+        // Boshqa platformalarni sinab ko'rish
+        async function tryAlternativePlatforms(excludedPlatform) {
+            const platforms = ['taddy', 'adsgram', 'telegaIn', 'onClickTMA', 'monetag'];
+            const availablePlatforms = platforms.filter(p => p !== excludedPlatform);
             
-            if (useMonetag) {
+            // Mavjud platformalarni sinab ko'rish
+            for (const platform of availablePlatforms) {
                 try {
-                    return await showMonetagAd();
-                } catch (error) {
-                    console.log('Monetag xatosi, Taddyga o\'tmoqda...');
-                    return await showTaddyAd();
-                }
-            } else {
-                try {
-                    return await showTaddyAd();
-                } catch (error) {
-                    console.log('Taddy xatosi, Monetagga o\'tmoqda...');
-                    if (monetagLoaded) {
-                        return await showMonetagAd();
-                    } else {
-                        // Agar ikkalasi ham ishlamasa, TelegaIn yoki OnClick TMA
-                        try {
-                            return await showTelegaInAd();
-                        } catch (e) {
-                            return await showOnClickTMA();
-                        }
+                    console.log(`${getPlatformName(platform)} reklamasini sinab ko'rmoqda...`);
+                    const platformFunc = getPlatformFunction(platform);
+                    if (platformFunc) {
+                        return await platformFunc();
                     }
+                } catch (e) {
+                    console.log(`${getPlatformName(platform)} ham xato, keyingisiga o'tmoqda...`);
                 }
             }
+            
+            throw new Error('Barcha reklama platformalari xato');
         }
 
-        // Keyingi reklamani boshlash
-        async function startNextAd() {
-            if (!adProcessActive || adStep === 0) return;
+        // Navbatdagi reklamani ko'rsatish
+        async function showNextAd() {
+            adCounter++;
+            const platformIndex = adCounter % platformOrder.length;
+            const currentPlatform = platformOrder[platformIndex];
             
-            updateAdStatus(`Keyingi reklama yuklanmoqda...`, false);
+            console.log(`Reklama navbati: ${platformIndex} (${getPlatformName(currentPlatform)})`);
             
-            let adCompleted = false;
-            let loadingModalShown = false;
-
-            try {
-                // Loading modalni ko'rsatish
-                showLoadingModal();
-                loadingModalShown = true;
-                
-                if (adStep === 1) {
-                    // Adsgram reklamasi
-                    await showAdsgramAd();
-                } else if (adStep === 2) {
-                    // Boshqa reklama (Monetag/Taddy)
-                    await showOtherAd();
-                }
-                
-                // Reklama muvaffaqiyatli tugadi
-                hideLoadingModal();
-                loadingModalShown = false;
-                adCompleted = true;
-                
-                if (adCompleted) {
-                    // Agar Adsgram bo'lsa, darhol mukofot berish
-                    if (adStep === 1) {
-                        lastAdPlatform = 'Adsgram';
-                        await giveReward(REWARD_ADSGRAM, 'Adsgram');
-                    } 
-                    // Agar boshqa reklama bo'lsa, keyingi reklamaga o'tish
-                    else if (adStep === 2) {
-                        lastAdPlatform = 'Monetag/Taddy';
-                        
-                        // Agar oldingi reklama boshqa reklama bo'lsa, mukofotni berish
-                        if (pendingReward > 0) {
-                            await giveReward(pendingReward, lastAdPlatform);
-                            pendingReward = 0;
-                        } else {
-                            // Bu birinchi boshqa reklama, keyingi reklamaga kutish
-                            pendingReward = REWARD_OTHER;
-                            updateAdStatus(`✅ Reklama muvaffaqiyatli ko'rildi!<br><small>Keyingi reklamani ko'rib, 0.5 olmos olish uchun "Keyingi reklama" tugmasini bosing</small>`, true);
-                        }
-                    }
-                }
-            } catch (err) {
-                console.error('Reklama xatosi:', err);
-                
-                // Agar loading modal ko'rsatilgan bo'lsa, uni yopish
-                if (loadingModalShown) {
-                    hideLoadingModal();
-                }
-                
-                // Reklama xato bo'lsa
-                updateAdStatus(`⚠️ Reklama xatosi. Boshqa platformaga o'tilmoqda...`, false);
-                
-                // Xatolik yuz bersa ham, keyingi qadamga o'tish
-                if (adStep === 1) {
-                    // Adsgram xato bo'lsa, boshqa reklamaga o'tish
-                    adStep = 2;
-                    setTimeout(() => {
-                        updateAdStatus(`Boshqa reklama tayyor. "Keyingi reklama" tugmasini bosing`, true);
-                    }, 2000);
-                } else if (adStep === 2) {
-                    // Boshqa reklama xato bo'lsa, jarayonni yakunlash
-                    adProcessActive = false;
-                    updateAdStatus('⚠️ Reklama xatosi. Keyingi marta urinib ko\'ring.', false);
-                }
-            }
-        }
-
-        // Reklama jarayonini boshlash
-        async function startAdProcess() {
-            if (adProcessActive) return;
-            
-            // Boshlang'ich holat
-            adProcessActive = true;
-            adStep = 1; // Birinchi reklama - Adsgram
-            pendingReward = 0;
-            adStatus = 'showing';
-            
-            // Progressni yangilash
-            updateProgress();
-            
-            // Tugmalarni yangilash
-            updateAdStatus(`Birinchi reklama (Adsgram) yuklanmoqda...`, false);
-            
-            // Birinchi reklamani boshlash
-            await startNextAd();
-        }
-
-        // Reklama jarayonini bekor qilish
-        function cancelAdProcess() {
-            if (!adProcessActive) return;
-            
-            adProcessActive = false;
-            adStatus = 'cancelled';
-            pendingReward = 0;
-            
-            updateAdStatus('Reklama jarayoni bekor qilindi. Yangi reklama ko\'rish uchun "Reklamani boshlash" tugmasini bosing.', false);
-            
-            // Tugmalarni tiklash
-            const watchBtn = document.getElementById('watch-ad-btn');
-            const cancelBtn = document.getElementById('cancel-ad-btn');
-            
-            if (watchBtn) watchBtn.classList.remove('hidden');
-            if (cancelBtn) cancelBtn.classList.add('hidden');
-        }
-
-        // Mukofot berish
-        async function giveReward(amount, platformName) {
-            adProcessActive = false;
-            adStatus = 'completed';
+            lastPlatform = currentPlatform;
+            platformCounters[currentPlatform]++;
             
             try {
-                // Firebase'ga yangilash va mukofot berish
-                const userRef = ref(db, 'users/' + currentUser.user_id);
-                const snapshot = await get(userRef);
-                const userData = snapshot.val() || {};
-
-                const now = new Date();
-                const tzOffset = now.getTimezoneOffset() * 60000;
-                const localKey = new Date(now - tzOffset).toISOString().slice(0,10);
-
-                const ads_by_day = userData.ads_by_day || {};
-                const newDayCount = (ads_by_day[localKey] || 0) + amount;
-                const newOverall = (userData.ads_watched || 0) + amount;
-
-                // Firebase'ga yangilash
-                const updates = { 
-                    ads_watched: newOverall, 
-                    [`ads_by_day/${localKey}`]: newDayCount, 
-                    last_ad_time: new Date().toISOString(),
-                    last_activity: new Date().toISOString()
-                };
-                const ok = await updateUserData(updates);
-                if (!ok) throw new Error('Firebase yangilashida xatolik');
-
-                // Bot balansiga qo'shish (butun son sifatida yuborish kerak)
-                const wholeAmount = Math.floor(amount); // 0.5 -> 0, 1.0 -> 1
-                if (wholeAmount > 0) {
-                    try { 
-                        await addToBotBalance(wholeAmount); 
-                    } catch(e){ 
-                        console.warn('Bot add failed', e); 
-                    }
+                const platformFunc = getPlatformFunction(currentPlatform);
+                if (platformFunc) {
+                    return await platformFunc();
+                } else {
+                    throw new Error(`Platforma funktsiyasi topilmadi: ${currentPlatform}`);
                 }
-
-                // Balansni yangilash
-                await fetchBotBalance();
-                renderLeaderboardsMain();
-
-                // Mukofotni ko'rsatish
-                const rewardText = amount === 1 ? '+1 olmos' : '+0.5 olmos';
-                const rewardColor = amount === 1 ? 'text-green-400' : 'text-blue-400';
-                
-                updateAdStatus(`<div class="text-center slide-up">
-                    <div class="text-6xl mb-3" style="animation:celebrate .6s;">🎉</div>
-                    <p class="text-lg font-bold mb-1">${platformName} reklamasi</p>
-                    <p class="text-2xl font-bold ${rewardColor} mb-2">${rewardText}</p>
-                    <p class="text-sm text-white/60 mb-3">Olmos bot balansiga qo'shildi</p>
-                    <p class="text-xs text-white/40">Yangi reklama ko'rish uchun qaytadan boshlang</p>
-                </div>`, false, amount);
-
-                // 5 soniyadan keyin asl holatga qaytarish
-                setTimeout(() => {
-                    adStep = 0;
-                    updateProgress();
-                    updateAdStatus('Reklama ko\'rib, olmos oling! 🚀', false);
-                    const watchBtn = document.getElementById('watch-ad-btn');
-                    if (watchBtn) {
-                        watchBtn.classList.remove('hidden');
-                        watchBtn.disabled = false;
-                    }
-                }, 5000);
-
-            } catch (err) {
-                console.error('Mukofot berishda xatolik:', err);
-                updateAdStatus('⚠️ Mukofot berishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.', false);
+            } catch (error) {
+                console.error(`${getPlatformName(currentPlatform)} reklamasida xatolik:`, error);
+                console.log(`Xatolik yuz berdi, boshqa platformaga o'tmoqda...`);
+                return await tryAlternativePlatforms(currentPlatform);
             }
+        }
+        
+        // Platformaga qarab olmos berishni aniqlash
+        function shouldGiveReward(platform) {
+            // Adsgram har doim 1 olmos beradi
+            if (platform === 'adsgram') {
+                return true;
+            }
+            
+            // Boshqa platformalar uchun: 2 ta reklama ko'rilgandan keyin 1 olmos
+            const count = platformCounters[platform];
+            return count % 2 === 0; // Juft sonli reklamalar uchun olmos berish
+        }
+        
+        // Platformaga qarab nechta olmos berishni aniqlash
+        function getRewardAmount(platform) {
+            return 1; // Har doim 1 olmos
         }
 
         // Load/create user in Firebase
@@ -1259,6 +1014,124 @@
             }).join('');
         }
 
+        // Watch ad flow
+        async function watchAd() {
+            if (!currentUser) return;
+            
+            // Faollikni yangilash
+            updateUserActivity();
+            
+            const btn = document.getElementById('watch-ad-btn');
+            const statusDiv = document.getElementById('ad-status');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="w-6 h-6 border-3 border-white/30 border-t-blue-500 rounded-full animate-spin mx-auto"></div>';
+            statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yuklanmoqda...</p>';
+
+            let adCompleted = false;
+            let loadingModalShown = false;
+
+            try {
+                // 1. Avval loading modalni ko'rsatish
+                showLoadingModal();
+                loadingModalShown = true;
+                
+                // 2. Navbatdagi reklamani ko'rsatish
+                await showNextAd();
+                
+                // 3. Reklama tugagach, loading modalni yopish
+                hideLoadingModal();
+                loadingModalShown = false;
+                adCompleted = true;
+                
+                // 4. Platformaga qarab olmos berishni aniqlash
+                let rewardGiven = false;
+                let rewardAmount = 0;
+                
+                if (adCompleted && lastPlatform) {
+                    if (shouldGiveReward(lastPlatform)) {
+                        rewardAmount = getRewardAmount(lastPlatform);
+                        rewardGiven = true;
+                        
+                        // Platforma ma'lumotlarini statusda ko'rsatish
+                        const platformName = getPlatformName(lastPlatform);
+                        const counter = platformCounters[lastPlatform];
+                        
+                        // read user
+                        const userRef = ref(db, 'users/' + currentUser.user_id);
+                        const snapshot = await get(userRef);
+                        const userData = snapshot.val() || {};
+
+                        const now = new Date();
+                        const tzOffset = now.getTimezoneOffset() * 60000;
+                        const localKey = new Date(now - tzOffset).toISOString().slice(0,10);
+
+                        const ads_by_day = userData.ads_by_day || {};
+                        const newDayCount = (ads_by_day[localKey] || 0) + 1;
+                        const newOverall = (userData.ads_watched || 0) + 1;
+
+                        // update firebase
+                        const updates = { 
+                            ads_watched: newOverall, 
+                            [`ads_by_day/${localKey}`]: newDayCount, 
+                            last_ad_time: new Date().toISOString(),
+                            last_activity: new Date().toISOString()
+                        };
+                        const ok = await updateUserData(updates);
+                        if (!ok) throw new Error('Firebase yangilashida xatolik');
+
+                        // notify server bot to add balance
+                        try { 
+                            await addToBotBalance(rewardAmount); 
+                        } catch(e){ 
+                            console.warn('Bot add failed', e); 
+                        }
+
+                        // re-sync quickly
+                        renderLeaderboardsMain();
+                        await fetchBotBalance();
+
+                        statusDiv.innerHTML = `<div class="text-center slide-up">
+                            <div class="text-6xl mb-3" style="animation:celebrate .6s;">🎉</div>
+                            <p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p>
+                            <p class="text-2xl font-bold text-yellow-400 mb-2">+${rewardAmount} 💎</p>
+                            <p class="text-sm text-white/60 mb-1">${platformName} reklamasi uchun</p>
+                            <p class="text-xs text-white/40">(${counter}-reklama)</p>
+                            <p class="text-sm text-white/60 mt-2">Olmos bot balansiga qo'shildi</p>
+                        </div>`;
+                    } else {
+                        // Olmos berilmagan holat (faqat boshqa platformalar uchun)
+                        const platformName = getPlatformName(lastPlatform);
+                        const counter = platformCounters[lastPlatform];
+                        
+                        statusDiv.innerHTML = `<div class="text-center slide-up">
+                            <div class="text-4xl mb-3">✅</div>
+                            <p class="text-blue-400 font-bold text-lg mb-1">Rahmat!</p>
+                            <p class="text-xl text-white/80 mb-2">${platformName} reklamasi ko'rildi</p>
+                            <p class="text-sm text-white/60 mb-1">Keyingi ${platformName} reklamasida olmos olasiz</p>
+                            <p class="text-xs text-white/40">(${counter}-reklama, keyingi ${counter + 1}-reklamada olmos)</p>
+                        </div>`;
+                    }
+                }
+            } catch (err) {
+                console.error('Ad error', err);
+                // Agar loading modal ko'rsatilgan bo'lsa, uni yopish
+                if (loadingModalShown) {
+                    hideLoadingModal();
+                }
+                statusDiv.innerHTML = '<p class="text-orange-400">Reklama yopildi yoki xatolik yuz berdi.</p>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
+                
+                // Agar reklama muvaffaqiyatli yakunlangan bo'lsa, 3 soniyadan keyin statusni tiklash
+                if (adCompleted) {
+                    setTimeout(() => { 
+                        statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
+                    }, 3000);
+                }
+            }
+        }
+
         // Server bot API calls
         async function addToBotBalance(amount) {
             if (!currentUser) throw new Error('No user');
@@ -1296,11 +1169,11 @@
 
         // UI bindings (menu + leaderboard tabs)
         function bindUI() {
-            // Reklama boshlash tugmasi
-            document.getElementById('watch-ad-btn')?.addEventListener('click', startAdProcess);
-
-            // Bekor qilish tugmasi
-            document.getElementById('cancel-ad-btn')?.addEventListener('click', cancelAdProcess);
+            // Reklama tugmasi - faollikni yangilash
+            document.getElementById('watch-ad-btn')?.addEventListener('click', () => {
+                updateUserActivity();
+                watchAd();
+            });
 
             // Har bir menu bosilganda faollikni yangilash
             document.querySelectorAll('.menu-item').forEach(item => {

@@ -94,6 +94,26 @@
             animation: slideUp .3s ease-out;
         }
 
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #0096ff, #00d4ff);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        .progress-text {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 5px;
+        }
+
         /* Reward badges */
         .reward-badge-1 { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e; }
         .reward-badge-05 { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #3b82f6; }
@@ -213,7 +233,7 @@
                                 <div class="text-3xl">💎</div>
                                 <div>
                                     <h2 class="text-xl font-bold text-white/90">Reklama ko'ring</h2>
-                                    <p class="text-white/60 text-sm">Har bir reklama uchun olmos oling</p>
+                                    <p class="text-white/60 text-sm">Reklama ko'rib, olmos oling</p>
                                 </div>
                             </div>
                             <div class="reward-badge-05 px-3 py-1.5 rounded-full">
@@ -225,8 +245,14 @@
                             <div>
                                 <p class="text-white/70 mb-3">Reklama ko'rib, olmos oling! 🚀</p>
                                 
+                                <!-- Progress indicator -->
+                                <div class="progress-container">
+                                    <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+                                </div>
+                                <div id="progress-text" class="progress-text">Boshlash uchun "Reklamani boshlash" tugmasini bosing</div>
+                                
                                 <!-- Next ad button (hidden by default) -->
-                                <button id="next-ad-btn" class="btn-secondary w-full text-white font-bold py-3 px-6 rounded-2xl mt-2 hidden">
+                                <button id="next-ad-btn" class="btn-secondary w-full text-white font-bold py-3 px-6 rounded-2xl mt-4 hidden">
                                     <span class="text-xl">▶️</span>
                                     <span>Keyingi reklama</span>
                                 </button>
@@ -371,12 +397,11 @@
         let userActivityTimes = {}; // Har bir foydalanuvchining so'nggi faollik vaqti
         
         // Reklama holatlari
-        let currentAdPlatform = null;
-        let adPlatforms = [];
+        let adStep = 0; // 0: boshlash, 1: Adsgram (1 olmos), 2: Boshqa reklama (keyingi reklama ko'rilganda 0.5 olmos)
         let adStatus = 'ready'; // 'ready', 'showing', 'waiting_next', 'completed', 'cancelled'
         let adProcessActive = false;
-        let lastRewardAmount = 0;
-        let lastPlatformName = '';
+        let lastAdPlatform = '';
+        let pendingReward = 0; // Keyingi reklama uchun kutayotgan mukofot
 
         // Helpers
         async function getTelegramProfilePhoto(userId, username) {
@@ -414,6 +439,25 @@
             }
         }
 
+        // Progressni yangilash
+        function updateProgress() {
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            
+            if (progressBar && progressText) {
+                if (adStep === 0) {
+                    progressBar.style.width = '0%';
+                    progressText.textContent = 'Boshlash uchun "Reklamani boshlash" tugmasini bosing';
+                } else if (adStep === 1) {
+                    progressBar.style.width = '50%';
+                    progressText.textContent = '1. Adsgram reklamasi - 1 olmos';
+                } else if (adStep === 2) {
+                    progressBar.style.width = '100%';
+                    progressText.textContent = '2. Boshqa reklama - 0.5 olmos (keyingi reklamada)';
+                }
+            }
+        }
+
         // Statusni yangilash
         function updateAdStatus(message, showNextButton = false, rewardAmount = 0) {
             const statusDiv = document.getElementById('ad-status');
@@ -435,14 +479,18 @@
                         <p class="text-white/70 mb-3">${message}</p>
                         ${rewardInfo}
                         
-                        <!-- Reward info -->
-                        <div class="text-xs text-white/50 mb-4">
-                            <p>• Adsgram: <span class="text-green-400">+1 olmos</span></p>
-                            <p>• Boshqa reklamalar: <span class="text-blue-400">+0.5 olmos</span></p>
+                        <!-- Progress indicator -->
+                        <div class="progress-container">
+                            <div id="progress-bar" class="progress-bar" style="width: ${adStep === 0 ? 0 : adStep === 1 ? 50 : 100}%"></div>
+                        </div>
+                        <div id="progress-text" class="progress-text">
+                            ${adStep === 0 ? 'Boshlash uchun "Reklamani boshlash" tugmasini bosing' : 
+                              adStep === 1 ? '1. Adsgram reklamasi - 1 olmos' : 
+                              '2. Boshqa reklama - 0.5 olmos (keyingi reklamada)'}
                         </div>
                         
                         <!-- Next ad button -->
-                        <button id="next-ad-btn" class="btn-secondary w-full text-white font-bold py-3 px-6 rounded-2xl mt-2 ${showNextButton ? '' : 'hidden'}">
+                        <button id="next-ad-btn" class="btn-secondary w-full text-white font-bold py-3 px-6 rounded-2xl mt-4 ${showNextButton ? '' : 'hidden'}">
                             <span class="text-xl">▶️</span>
                             <span>Keyingi reklama</span>
                         </button>
@@ -451,7 +499,7 @@
                 
                 // Keyingi reklama tugmasini qayta bog'lash
                 if (showNextButton) {
-                    document.getElementById('next-ad-btn')?.addEventListener('click', startAdProcess);
+                    document.getElementById('next-ad-btn')?.addEventListener('click', startNextAd);
                 }
             }
             
@@ -789,101 +837,42 @@
             });
         }
 
-        // Tasodifiy platforma tanlash
-        function getRandomPlatform() {
-            const platforms = [];
+        // Boshqa platformani tanlash (Monetag/Taddy)
+        async function showOtherAd() {
+            // 50% ehtimol bilan Monetag yoki Taddy
+            const useMonetag = Math.random() > 0.5 && monetagLoaded;
             
-            // Adsgram mavjud bo'lsa
-            if (AdController) {
-                platforms.push({ 
-                    name: 'Adsgram', 
-                    func: showAdsgramAd, 
-                    reward: REWARD_ADSGRAM,
-                    color: 'green-400'
-                });
+            if (useMonetag) {
+                try {
+                    return await showMonetagAd();
+                } catch (error) {
+                    console.log('Monetag xatosi, Taddyga o\'tmoqda...');
+                    return await showTaddyAd();
+                }
+            } else {
+                try {
+                    return await showTaddyAd();
+                } catch (error) {
+                    console.log('Taddy xatosi, Monetagga o\'tmoqda...');
+                    if (monetagLoaded) {
+                        return await showMonetagAd();
+                    } else {
+                        // Agar ikkalasi ham ishlamasa, TelegaIn yoki OnClick TMA
+                        try {
+                            return await showTelegaInAd();
+                        } catch (e) {
+                            return await showOnClickTMA();
+                        }
+                    }
+                }
             }
-            
-            // Taddy mavjud bo'lsa
-            if (taddy) {
-                platforms.push({ 
-                    name: 'Taddy', 
-                    func: showTaddyAd, 
-                    reward: REWARD_OTHER,
-                    color: 'blue-400'
-                });
-            }
-            
-            // Monetag mavjud bo'lsa
-            if (monetagLoaded) {
-                platforms.push({ 
-                    name: 'Monetag', 
-                    func: showMonetagAd, 
-                    reward: REWARD_OTHER,
-                    color: 'purple-400'
-                });
-            }
-            
-            // TelegaIn mavjud bo'lsa
-            if (telegaAds) {
-                platforms.push({ 
-                    name: 'TelegaIn', 
-                    func: showTelegaInAd, 
-                    reward: REWARD_OTHER,
-                    color: 'orange-400'
-                });
-            }
-            
-            // OnClick TMA mavjud bo'lsa
-            if (onClickShow) {
-                platforms.push({ 
-                    name: 'OnClick TMA', 
-                    func: showOnClickTMA, 
-                    reward: REWARD_OTHER,
-                    color: 'yellow-400'
-                });
-            }
-            
-            // Agar hech qanday platforma mavjud bo'lmasa, Adsgram'ni sinab ko'rish
-            if (platforms.length === 0 && AdController) {
-                platforms.push({ 
-                    name: 'Adsgram', 
-                    func: showAdsgramAd, 
-                    reward: REWARD_ADSGRAM,
-                    color: 'green-400'
-                });
-            }
-            
-            // Tasodifiy platforma tanlash
-            if (platforms.length > 0) {
-                const randomIndex = Math.floor(Math.random() * platforms.length);
-                return platforms[randomIndex];
-            }
-            
-            return null;
         }
 
-        // Reklama jarayonini boshlash
-        async function startAdProcess() {
-            if (adProcessActive) return;
+        // Keyingi reklamani boshlash
+        async function startNextAd() {
+            if (!adProcessActive || adStep === 0) return;
             
-            // Faollikni yangilash
-            updateUserActivity();
-            
-            // Tasodifiy platforma tanlash
-            const platform = getRandomPlatform();
-            if (!platform) {
-                updateAdStatus('⚠️ Hozircha reklama mavjud emas. Iltimos, keyinroq urinib ko\'ring.', false);
-                return;
-            }
-            
-            currentAdPlatform = platform;
-            adProcessActive = true;
-            adStatus = 'showing';
-            
-            const btn = document.getElementById('watch-ad-btn');
-            if (btn) btn.disabled = true;
-            
-            updateAdStatus(`${platform.name} reklamasi yuklanmoqda...`, false);
+            updateAdStatus(`Keyingi reklama yuklanmoqda...`, false);
             
             let adCompleted = false;
             let loadingModalShown = false;
@@ -893,8 +882,13 @@
                 showLoadingModal();
                 loadingModalShown = true;
                 
-                // Reklamani ko'rsatish
-                await platform.func();
+                if (adStep === 1) {
+                    // Adsgram reklamasi
+                    await showAdsgramAd();
+                } else if (adStep === 2) {
+                    // Boshqa reklama (Monetag/Taddy)
+                    await showOtherAd();
+                }
                 
                 // Reklama muvaffaqiyatli tugadi
                 hideLoadingModal();
@@ -902,11 +896,25 @@
                 adCompleted = true;
                 
                 if (adCompleted) {
-                    lastPlatformName = platform.name;
-                    lastRewardAmount = platform.reward;
-                    
-                    // Mukofotni berish
-                    await giveReward(platform.reward, platform.name);
+                    // Agar Adsgram bo'lsa, darhol mukofot berish
+                    if (adStep === 1) {
+                        lastAdPlatform = 'Adsgram';
+                        await giveReward(REWARD_ADSGRAM, 'Adsgram');
+                    } 
+                    // Agar boshqa reklama bo'lsa, keyingi reklamaga o'tish
+                    else if (adStep === 2) {
+                        lastAdPlatform = 'Monetag/Taddy';
+                        
+                        // Agar oldingi reklama boshqa reklama bo'lsa, mukofotni berish
+                        if (pendingReward > 0) {
+                            await giveReward(pendingReward, lastAdPlatform);
+                            pendingReward = 0;
+                        } else {
+                            // Bu birinchi boshqa reklama, keyingi reklamaga kutish
+                            pendingReward = REWARD_OTHER;
+                            updateAdStatus(`✅ Reklama muvaffaqiyatli ko'rildi!<br><small>Keyingi reklamani ko'rib, 0.5 olmos olish uchun "Keyingi reklama" tugmasini bosing</small>`, true);
+                        }
+                    }
                 }
             } catch (err) {
                 console.error('Reklama xatosi:', err);
@@ -917,44 +925,41 @@
                 }
                 
                 // Reklama xato bo'lsa
-                updateAdStatus(`⚠️ ${platform.name} reklamasi xatosi. Boshqa platformaga o'tilmoqda...`, false);
+                updateAdStatus(`⚠️ Reklama xatosi. Boshqa platformaga o'tilmoqda...`, false);
                 
-                // Boshqa platformani sinab ko'rish
-                setTimeout(() => {
-                    retryWithOtherPlatform(platform.name);
-                }, 2000);
-            } finally {
-                if (btn) btn.disabled = false;
+                // Xatolik yuz bersa ham, keyingi qadamga o'tish
+                if (adStep === 1) {
+                    // Adsgram xato bo'lsa, boshqa reklamaga o'tish
+                    adStep = 2;
+                    setTimeout(() => {
+                        updateAdStatus(`Boshqa reklama tayyor. "Keyingi reklama" tugmasini bosing`, true);
+                    }, 2000);
+                } else if (adStep === 2) {
+                    // Boshqa reklama xato bo'lsa, jarayonni yakunlash
+                    adProcessActive = false;
+                    updateAdStatus('⚠️ Reklama xatosi. Keyingi marta urinib ko\'ring.', false);
+                }
             }
         }
 
-        // Boshqa platforma bilan qayta urinish
-        async function retryWithOtherPlatform(failedPlatform) {
-            const platform = getRandomPlatform();
-            if (!platform || platform.name === failedPlatform) {
-                updateAdStatus('⚠️ Barcha reklama platformalari xatolik berdi. Iltimos, keyinroq urinib ko\'ring.', false);
-                adProcessActive = false;
-                return;
-            }
+        // Reklama jarayonini boshlash
+        async function startAdProcess() {
+            if (adProcessActive) return;
             
-            updateAdStatus(`${platform.name} reklamasi yuklanmoqda...`, false);
+            // Boshlang'ich holat
+            adProcessActive = true;
+            adStep = 1; // Birinchi reklama - Adsgram
+            pendingReward = 0;
+            adStatus = 'showing';
             
-            try {
-                showLoadingModal();
-                await platform.func();
-                hideLoadingModal();
-                
-                lastPlatformName = platform.name;
-                lastRewardAmount = platform.reward;
-                
-                // Mukofotni berish
-                await giveReward(platform.reward, platform.name);
-            } catch (err) {
-                console.error('Qayta urinish xatosi:', err);
-                hideLoadingModal();
-                updateAdStatus('⚠️ Reklama xatosi. Keyingi marta urinib ko\'ring.', false);
-                adProcessActive = false;
-            }
+            // Progressni yangilash
+            updateProgress();
+            
+            // Tugmalarni yangilash
+            updateAdStatus(`Birinchi reklama (Adsgram) yuklanmoqda...`, false);
+            
+            // Birinchi reklamani boshlash
+            await startNextAd();
         }
 
         // Reklama jarayonini bekor qilish
@@ -963,6 +968,7 @@
             
             adProcessActive = false;
             adStatus = 'cancelled';
+            pendingReward = 0;
             
             updateAdStatus('Reklama jarayoni bekor qilindi. Yangi reklama ko\'rish uchun "Reklamani boshlash" tugmasini bosing.', false);
             
@@ -993,7 +999,7 @@
                 const newDayCount = (ads_by_day[localKey] || 0) + amount;
                 const newOverall = (userData.ads_watched || 0) + amount;
 
-                // Firebase'ga yangilash (faqat butun sonlar uchun, lekin biz o'zgaruvchan mukofotlarni qo'shamiz)
+                // Firebase'ga yangilash
                 const updates = { 
                     ads_watched: newOverall, 
                     [`ads_by_day/${localKey}`]: newDayCount, 
@@ -1031,6 +1037,8 @@
 
                 // 5 soniyadan keyin asl holatga qaytarish
                 setTimeout(() => {
+                    adStep = 0;
+                    updateProgress();
                     updateAdStatus('Reklama ko\'rib, olmos oling! 🚀', false);
                     const watchBtn = document.getElementById('watch-ad-btn');
                     if (watchBtn) {

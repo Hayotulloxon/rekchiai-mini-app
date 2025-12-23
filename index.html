@@ -21,7 +21,7 @@
         .float-animation{animation:float 3s ease-in-out infinite} .pulse-glow{animation:pulse-glow 2s ease-in-out infinite} .slide-up{animation:slideUp .4s ease-out}
 
         .app-card{background:linear-gradient(135deg, rgba(20,20,20,.95), rgba(30,30,30,.95)); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,.08); border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.5);}
-        .gradient-bg{background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#2d2d2d 100%)}
+        .gradient-bg{background:linear-gradient(135deg,#0f0f0f 0%,#1a1a2a 50%,#2d2d3d 100%)}
         .diamond-icon{filter:drop-shadow(0 0 8px rgba(0,150,255,.6)); color:#0096ff}
 
         .btn-primary{background:linear-gradient(135deg,#0096ff 0%,#0066cc 100%); box-shadow:0 6px 20px rgba(0,150,255,.3); transition:all .3s; position:relative; overflow:hidden;}
@@ -372,7 +372,7 @@
             
             // Firebase'ga yangilash (ixtiyoriy)
             try {
-                const userRef = ref(db, 'users/' + userId);
+                const userRef = ref(db, 'users/' + currentUser.user_id);
                 update(userRef, { last_activity: new Date().toISOString() });
             } catch (err) {
                 console.warn('Activity update failed', err);
@@ -452,7 +452,7 @@
             updateUserActivity();
         }
 
-        // Adsgram'ni ishga tushirish - BIRTA REKLAMA UCHUN
+        // Adsgram'ni ishga tushirish
         function initAdServices() {
             console.log('Adsgram SDK yuklanmoqda...');
             
@@ -463,54 +463,29 @@
                 // Adsgram'ni ishga tushirish
                 try {
                     AdController = window.Adsgram.init({ 
-                        blockId: AD_BLOCK_ID,
-                        onReady: function() {
-                            console.log('Adsgram muvaffaqiyatli ishga tushdi');
-                        },
-                        onError: function(error) {
-                            console.error('Adsgram xatosi:', error);
-                        }
+                        blockId: AD_BLOCK_ID
                     });
-                    console.log('Adsgram SDK muvaffaqiyatli yuklandi');
+                    console.log('Adsgram muvaffaqiyatli ishga tushdi');
                 } catch (error) {
                     console.error('Adsgram init xatosi:', error);
                 }
             } else {
-                console.warn('Adsgram SDK yuklanmadi, qayta urinib ko\'ramiz...');
-                
-                // 2 soniyadan keyin qayta urinib ko'rish
-                setTimeout(() => {
-                    if (typeof window.Adsgram !== 'undefined') {
-                        try {
-                            AdController = window.Adsgram.init({ 
-                                blockId: AD_BLOCK_ID
-                            });
-                            console.log('Adsgram SDK kechiktirilgan yuklandi');
-                        } catch (error) {
-                            console.error('Adsgram kechiktirilgan init xatosi:', error);
-                        }
-                    } else {
-                        console.error('Adsgram SDK hali ham yuklanmadi');
-                    }
-                }, 2000);
+                console.warn('Adsgram SDK yuklanmadi');
             }
         }
 
-        // Adsgram reklamasini ko'rsatish - BIRTA REKLAMA
+        // Adsgram reklamasini ko'rsatish
         async function showAdsgramAd() {
             return new Promise((resolve, reject) => {
                 try {
                     if (!AdController) {
-                        console.warn('Adsgram controller yuklanmagan, qayta ishga tushiramiz...');
-                        
-                        // Qayta ishga tushirish
-                        try {
+                        // Controller yuklanmagan bo'lsa, yangi init qilish
+                        if (typeof window.Adsgram !== 'undefined') {
                             AdController = window.Adsgram.init({ 
                                 blockId: AD_BLOCK_ID
                             });
-                            console.log('Adsgram controller qayta ishga tushdi');
-                        } catch (initError) {
-                            console.error('Adsgram qayta ishga tushirish xatosi:', initError);
+                            console.log('Adsgram controller yangilandi');
+                        } else {
                             reject(new Error('Adsgram yuklanmagan'));
                             return;
                         }
@@ -518,7 +493,7 @@
                     
                     console.log('Adsgram reklamasi ko\'rsatilmoqda...');
                     
-                    // Faqat bitta reklama ko'rsatish
+                    // Reklamani ko'rsatish
                     AdController.show()
                         .then(() => {
                             console.log('Adsgram reklamasi muvaffaqiyatli ko\'rildi');
@@ -526,15 +501,7 @@
                         })
                         .catch(err => {
                             console.error('Adsgram reklama xatosi:', err);
-                            
-                            // Xatoni tahlil qilish
-                            if (err.message && err.message.includes('no fill')) {
-                                reject(new Error('Reklama mavjud emas'));
-                            } else if (err.message && err.message.includes('timeout')) {
-                                reject(new Error('Reklama vaqti tugadi'));
-                            } else {
-                                reject(err);
-                            }
+                            reject(err);
                         });
                         
                 } catch (error) {
@@ -542,18 +509,6 @@
                     reject(error);
                 }
             });
-        }
-
-        // Navbatdagi reklamani ko'rsatish
-        async function showNextAd() {
-            console.log('Adsgram reklamasi ko\'rsatilmoqda...');
-            
-            try {
-                return await showAdsgramAd();
-            } catch (error) {
-                console.error('Reklama ko\'rsatishda xatolik:', error);
-                throw new Error('Adsgram reklamasi xato: ' + error.message);
-            }
         }
 
         // Load/create user in Firebase
@@ -781,8 +736,8 @@
                 // 1. Avval loading modalni ko'rsatish
                 showLoadingModal();
                 
-                // 2. Navbatdagi reklamani ko'rsatish
-                await showNextAd();
+                // 2. Reklamani ko'rsatish
+                await showAdsgramAd();
                 
                 // 3. Reklama tugagach, loading modalni yopish
                 hideLoadingModal();
@@ -836,30 +791,21 @@
                 adCompletedSuccessfully = false;
                 
                 // Xato xabarini aniqroq qilish
-                let errorMessage = 'Reklama yopildi yoki xatolik yuz berdi. Olmos berilmadi.';
-                if (err.message && err.message.includes('no fill')) {
-                    errorMessage = 'Hozircha reklama mavjud emas. Iltimos, keyinroq urinib ko\'ring.';
-                } else if (err.message && err.message.includes('timeout')) {
-                    errorMessage = 'Reklama vaqti tugadi. Iltimos, qayta urinib ko\'ring.';
-                } else if (err.message && err.message.includes('Adsgram yuklanmagan')) {
-                    errorMessage = 'Reklama tizimi yuklanmadi. Iltimos, sahifani yangilang.';
-                }
-                
-                statusDiv.innerHTML = `<p class="text-orange-400">${errorMessage}</p>`;
+                statusDiv.innerHTML = '<p class="text-orange-400">Reklama yopildi yoki xatolik yuz berdi. Olmos berilmadi.</p>';
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
                 
-                // Agar reklama muvaffaqiyatli yakunlangan bo'lsa, 5 soniyadan keyin statusni tiklash
+                // Agar reklama muvaffaqiyatli yakunlangan bo'lsa, 3 soniyadan keyin statusni tiklash
                 if (adCompletedSuccessfully) {
                     setTimeout(() => { 
                         statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
-                    }, 5000);
+                    }, 3000);
                 } else {
-                    // Agar reklama to'liq ko'rilmagan bo'lsa, 3 soniyadan keyin statusni tiklash
+                    // Agar reklama to'liq ko'rilmagan bo'lsa, 2 soniyadan keyin statusni tiklash
                     setTimeout(() => { 
                         statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
-                    }, 3000);
+                    }, 2000);
                 }
             }
         }

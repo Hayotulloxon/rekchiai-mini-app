@@ -9,9 +9,6 @@
     <!-- Adsgram SDK -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     
-    <!-- Sonar SDK -->
-
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script> window.process = { env: { NODE_ENV: 'production' } }; </script>
     <style>
@@ -78,22 +75,6 @@
             max-width: 320px;
             width: 90%;
             animation: slideUp .3s ease-out;
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            width: 100%;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #0096ff, #00d4ff);
-            border-radius: 4px;
-            transition: width 0.3s ease;
         }
 
         /* Leaderboard styles for standalone menu */
@@ -223,11 +204,6 @@
                             <p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>
                         </div>
 
-                        <!-- Progress bar (hidden by default) -->
-                        <div id="ad-progress-container" class="progress-container hidden">
-                            <div id="ad-progress-bar" class="progress-bar" style="width: 0%"></div>
-                        </div>
-
                         <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg transition-all duration-300">
                             <span class="text-2xl">▶️</span>
                             <span>Reklamani boshlash</span>
@@ -347,12 +323,9 @@
         let AdController = null;
         let botBalance = 0;
         let currentLeaderboard = 'daily'; // 'daily' | 'overall'
-        let adCounter = 0; // Reklamalarni navbatlash uchun
         let onlineUsers = new Set(); // Online foydalanuvchilar
         let userActivityTimes = {}; // Har bir foydalanuvchining so'nggi faollik vaqti
         let adCompletedSuccessfully = false; // Reklama to'liq ko'rilganligini tekshirish
-        let progressInterval = null; // Progress bar intervali
-        let currentPlatform = ''; // Joriy reklama platformasi
 
         // Helpers
         async function getTelegramProfilePhoto(userId, username) {
@@ -387,42 +360,6 @@
             const modal = document.getElementById('loading-modal');
             if (modal) {
                 modal.classList.remove('active');
-            }
-        }
-
-        // Progress bar'ni ko'rsatish
-        function showProgressBar() {
-            const progressContainer = document.getElementById('ad-progress-container');
-            const progressBar = document.getElementById('ad-progress-bar');
-            if (progressContainer && progressBar) {
-                progressContainer.classList.remove('hidden');
-                progressBar.style.width = '0%';
-                
-                // Progress bar'ni yangilash
-                let progress = 0;
-                if (progressInterval) clearInterval(progressInterval);
-                
-                progressInterval = setInterval(() => {
-                    progress += 1;
-                    progressBar.style.width = progress + '%';
-                    
-                    // 100% bo'lganda to'xtatish
-                    if (progress >= 100) {
-                        clearInterval(progressInterval);
-                    }
-                }, 50); // 5 soniyada 100% (50ms * 100 = 5000ms = 5s)
-            }
-        }
-
-        // Progress bar'ni yopish
-        function hideProgressBar() {
-            const progressContainer = document.getElementById('ad-progress-container');
-            if (progressContainer) {
-                progressContainer.classList.add('hidden');
-            }
-            if (progressInterval) {
-                clearInterval(progressInterval);
-                progressInterval = null;
             }
         }
 
@@ -517,26 +454,45 @@
 
         // Adsgram'ni ishga tushirish - BIRTA REKLAMA UCHUN
         function initAdServices() {
-            // Adsgram'ni ishga tushirish
-            if (window.Adsgram) {
-                AdController = window.Adsgram.init({ 
-                    blockId: AD_BLOCK_ID
-                });
-                console.log('Adsgram SDK muvaffaqiyatli yuklandi (bitta reklama)');
-            } else {
-                setTimeout(() => {
-                    if (window.Adsgram) {
-                        AdController = window.Adsgram.init({ 
-                            blockId: AD_BLOCK_ID
-                        });
-                        console.log('Adsgram SDK kechiktirilgan yuklandi');
-                    }
-                }, 500);
-            }
+            console.log('Adsgram SDK yuklanmoqda...');
             
-            // Sonar SDK avtomatik ishga tushadi
-            if (window.Sonar) {
-                console.log('Sonar SDK muvaffaqiyatli yuklandi');
+            // Adsgram SDK'ni yuklanganligini tekshirish
+            if (typeof window.Adsgram !== 'undefined') {
+                console.log('Adsgram SDK yuklandi');
+                
+                // Adsgram'ni ishga tushirish
+                try {
+                    AdController = window.Adsgram.init({ 
+                        blockId: AD_BLOCK_ID,
+                        onReady: function() {
+                            console.log('Adsgram muvaffaqiyatli ishga tushdi');
+                        },
+                        onError: function(error) {
+                            console.error('Adsgram xatosi:', error);
+                        }
+                    });
+                    console.log('Adsgram SDK muvaffaqiyatli yuklandi');
+                } catch (error) {
+                    console.error('Adsgram init xatosi:', error);
+                }
+            } else {
+                console.warn('Adsgram SDK yuklanmadi, qayta urinib ko\'ramiz...');
+                
+                // 2 soniyadan keyin qayta urinib ko'rish
+                setTimeout(() => {
+                    if (typeof window.Adsgram !== 'undefined') {
+                        try {
+                            AdController = window.Adsgram.init({ 
+                                blockId: AD_BLOCK_ID
+                            });
+                            console.log('Adsgram SDK kechiktirilgan yuklandi');
+                        } catch (error) {
+                            console.error('Adsgram kechiktirilgan init xatosi:', error);
+                        }
+                    } else {
+                        console.error('Adsgram SDK hali ham yuklanmadi');
+                    }
+                }, 2000);
             }
         }
 
@@ -545,125 +501,58 @@
             return new Promise((resolve, reject) => {
                 try {
                     if (!AdController) {
-                        throw new Error('Adsgram yuklanmagan');
+                        console.warn('Adsgram controller yuklanmagan, qayta ishga tushiramiz...');
+                        
+                        // Qayta ishga tushirish
+                        try {
+                            AdController = window.Adsgram.init({ 
+                                blockId: AD_BLOCK_ID
+                            });
+                            console.log('Adsgram controller qayta ishga tushdi');
+                        } catch (initError) {
+                            console.error('Adsgram qayta ishga tushirish xatosi:', initError);
+                            reject(new Error('Adsgram yuklanmagan'));
+                            return;
+                        }
                     }
                     
-                    console.log('Adsgram reklamasi ko\'rsatilmoqda (bitta reklama)...');
-                    
-                    // Progress bar'ni ko'rsatish
-                    showProgressBar();
+                    console.log('Adsgram reklamasi ko\'rsatilmoqda...');
                     
                     // Faqat bitta reklama ko'rsatish
-                    AdController.show().then(() => {
-                        console.log('Adsgram reklamasi muvaffaqiyatli ko\'rildi');
-                        // Progress bar'ni to'ldirish
-                        setTimeout(() => {
-                            document.getElementById('ad-progress-bar').style.width = '100%';
-                            setTimeout(() => {
-                                hideProgressBar();
-                                resolve(true);
-                            }, 300);
-                        }, 500);
-                    }).catch(err => {
-                        console.error('Adsgram xatosi:', err);
-                        hideProgressBar();
-                        reject(err);
-                    });
+                    AdController.show()
+                        .then(() => {
+                            console.log('Adsgram reklamasi muvaffaqiyatli ko\'rildi');
+                            resolve(true);
+                        })
+                        .catch(err => {
+                            console.error('Adsgram reklama xatosi:', err);
+                            
+                            // Xatoni tahlil qilish
+                            if (err.message && err.message.includes('no fill')) {
+                                reject(new Error('Reklama mavjud emas'));
+                            } else if (err.message && err.message.includes('timeout')) {
+                                reject(new Error('Reklama vaqti tugadi'));
+                            } else {
+                                reject(err);
+                            }
+                        });
+                        
                 } catch (error) {
                     console.error('Adsgram interfaol xatosi:', error);
-                    hideProgressBar();
                     reject(error);
                 }
             });
         }
 
-        // Sonar reklamasini ko'rsatish
-        async function showSonarAd() {
-            return new Promise((resolve, reject) => {
-                try {
-                    // Sonar obyektini tekshirish
-                    if (!window.Sonar) {
-                        throw new Error('Sonar SDK yuklanmagan');
-                    }
-                    
-                    console.log('Sonar reklamasi ko\'rsatilmoqda...');
-                    
-                    // Progress bar'ni ko'rsatish
-                    showProgressBar();
-                    
-                    // Reklamani ko'rsatish
-                    window.Sonar.show({ adUnit: "rekchiai" })
-                        .then(() => {
-                            console.log('Sonar reklama muvaffaqiyatli ko\'rildi');
-                            // Progress bar'ni to'ldirish
-                            setTimeout(() => {
-                                document.getElementById('ad-progress-bar').style.width = '100%';
-                                setTimeout(() => {
-                                    hideProgressBar();
-                                    resolve(true);
-                                }, 300);
-                            }, 500);
-                        })
-                        .catch(error => {
-                            console.error('Sonar reklama xatosi:', error);
-                            hideProgressBar();
-                            reject(error);
-                        });
-                    
-                } catch (error) {
-                    console.error('Sonar interfaol xatosi:', error);
-                    hideProgressBar();
-                    reject(error);
-                }
-            });
-        }
-
-        // Navbatdagi reklamani ko'rsatish (2 ta platforma: Adsgram va Sonar)
+        // Navbatdagi reklamani ko'rsatish
         async function showNextAd() {
-            adCounter++;
-            const platformIndex = adCounter % 2; // 0: Adsgram, 1: Sonar
-            
-            console.log(`Reklama navbati: ${platformIndex} (${['Adsgram', 'Sonar'][platformIndex]})`);
+            console.log('Adsgram reklamasi ko\'rsatilmoqda...');
             
             try {
-                switch (platformIndex) {
-                    case 0: // Adsgram
-                        console.log('Adsgram reklamasi ko\'rsatilmoqda...');
-                        currentPlatform = 'adsgram';
-                        return await showAdsgramAd();
-                        
-                    case 1: // Sonar
-                        console.log('Sonar reklamasi ko\'rsatilmoqda...');
-                        currentPlatform = 'sonar';
-                        return await showSonarAd();
-                }
+                return await showAdsgramAd();
             } catch (error) {
                 console.error('Reklama ko\'rsatishda xatolik:', error);
-                
-                // Xatolik yuz berganda, keyingi platformaga o'tish
-                console.log(`Xatolik yuz berdi, boshqa platformaga o'tmoqda...`);
-                
-                // Bir platforma xato bo'lsa, qolgan platformalarni sinab ko'rish
-                const platforms = [
-                    { index: 0, name: 'Adsgram', func: showAdsgramAd },
-                    { index: 1, name: 'Sonar', func: showSonarAd }
-                ];
-                
-                // Xato bo'lgan platformani olib tashlash
-                const otherPlatforms = platforms.filter(p => p.index !== platformIndex);
-                
-                // Qolgan platformalarni sinab ko'rish
-                for (const platform of otherPlatforms) {
-                    try {
-                        console.log(`${platform.name} reklamasini sinab ko'rmoqda...`);
-                        currentPlatform = platform.name.toLowerCase();
-                        return await platform.func();
-                    } catch (e) {
-                        console.log(`${platform.name} ham xato, keyingisiga o'tmoqda...`);
-                    }
-                }
-                
-                throw new Error('Barcha reklama platformalari xato');
+                throw new Error('Adsgram reklamasi xato: ' + error.message);
             }
         }
 
@@ -898,10 +787,7 @@
                 // 3. Reklama tugagach, loading modalni yopish
                 hideLoadingModal();
                 
-                // 4. Progress bar'ni yopish
-                hideProgressBar();
-                
-                // 5. Faqat reklama to'liq ko'rilgandan keyin bonusni berish
+                // 4. Faqat reklama to'liq ko'rilgandan keyin bonusni berish
                 adCompletedSuccessfully = true;
                 
                 if (adCompletedSuccessfully) {
@@ -945,12 +831,21 @@
                 console.error('Ad error', err);
                 // Agar loading modal ko'rsatilgan bo'lsa, uni yopish
                 hideLoadingModal();
-                hideProgressBar();
                 
                 // Reklama to'liq ko'rilmagan bo'lsa, bonus bermaslik
                 adCompletedSuccessfully = false;
                 
-                statusDiv.innerHTML = '<p class="text-orange-400">Reklama yopildi yoki xatolik yuz berdi. Olmos berilmadi.</p>';
+                // Xato xabarini aniqroq qilish
+                let errorMessage = 'Reklama yopildi yoki xatolik yuz berdi. Olmos berilmadi.';
+                if (err.message && err.message.includes('no fill')) {
+                    errorMessage = 'Hozircha reklama mavjud emas. Iltimos, keyinroq urinib ko\'ring.';
+                } else if (err.message && err.message.includes('timeout')) {
+                    errorMessage = 'Reklama vaqti tugadi. Iltimos, qayta urinib ko\'ring.';
+                } else if (err.message && err.message.includes('Adsgram yuklanmagan')) {
+                    errorMessage = 'Reklama tizimi yuklanmadi. Iltimos, sahifani yangilang.';
+                }
+                
+                statusDiv.innerHTML = `<p class="text-orange-400">${errorMessage}</p>`;
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';

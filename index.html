@@ -5,23 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>RekchiAi olmoslari</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <!-- Adsgram SDK -->
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- AdsGram SDK -->
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <script> window.process = { env: { NODE_ENV: 'production' } }; </script>
     <style>
-        /* Base styles */
         body { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif; background: #0f0f0f; color: #fff; }
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
         @keyframes pulse-glow { 0%,100%{box-shadow:0 0 20px rgba(0,150,255,.3),0 0 40px rgba(0,150,255,.1)} 50%{box-shadow:0 0 30px rgba(0,150,255,.5),0 0 60px rgba(0,150,255,.2)} }
         @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1; transform:translateY(0)} }
         @keyframes celebrate { 0%,100%{transform:scale(1) rotate(0)} 25%{transform:scale(1.15) rotate(-3deg)} 75%{transform:scale(1.15) rotate(3deg)} }
-        .float-animation{animation:float 3s ease-in-out infinite} .pulse-glow{animation:pulse-glow 2s ease-in-out infinite} .slide-up{animation:slideUp .4s ease-out}
+        .float-animation{animation:float 3s ease-in-out infinite} 
+        .pulse-glow{animation:pulse-glow 2s ease-in-out infinite} 
+        .slide-up{animation:slideUp .4s ease-out}
 
         .app-card{background:linear-gradient(135deg, rgba(20,20,20,.95), rgba(30,30,30,.95)); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,.08); border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.5);}
-        .gradient-bg{background:linear-gradient(135deg,#0f0f0f 0%,#1a1a2a 50%,#2d2d3d 100%)}
+        .gradient-bg{background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#2d2d2d 100%)}
         .diamond-icon{filter:drop-shadow(0 0 8px rgba(0,150,255,.6)); color:#0096ff}
 
         .btn-primary{background:linear-gradient(135deg,#0096ff 0%,#0066cc 100%); box-shadow:0 6px 20px rgba(0,150,255,.3); transition:all .3s; position:relative; overflow:hidden;}
@@ -49,35 +48,6 @@
         .content-section{ display:none; animation:fadeIn .3s ease-out; } .content-section.active{ display:block; }
         @keyframes fadeIn{ from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
 
-        /* Loading Modal */
-        .loading-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(15, 15, 15, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        .loading-modal.active {
-            display: flex;
-        }
-        .loading-content {
-            background: linear-gradient(135deg, rgba(30,30,30,.95), rgba(40,40,40,.95));
-            border: 1px solid rgba(255,255,255,.1);
-            border-radius: 24px;
-            padding: 32px;
-            text-align: center;
-            max-width: 320px;
-            width: 90%;
-            animation: slideUp .3s ease-out;
-        }
-
-        /* Leaderboard styles for standalone menu */
         .leaderboard-wrapper { max-width:640px; margin:10px auto; padding:12px; }
         .leaderboard-card { background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:12px; }
         .leaderboard-tabs { display:flex; gap:8px; margin-bottom:12px; }
@@ -92,54 +62,241 @@
         .leader-username { font-size:12px; color:rgba(255,255,255,.6) }
         .leader-count { font-weight:800; color:#ffd54a; margin-left:auto; white-space:nowrap; }
 
-        /* Online indicator */
-        .online-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: #22c55e;
-            border-radius: 50%;
-            margin-right: 4px;
-            animation: pulse 2s infinite;
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        .modal-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .modal-footer {
+            padding: 16px 20px 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+        }
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-icon {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(0, 150, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .info-content h4 {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: rgba(255,255,255,0.95);
+            font-size: 16px;
+        }
+        .info-content p {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .highlight-text {
+            color: #0096ff;
+            font-weight: 600;
+        }
+        .warning-text {
+            color: #ffd54a;
+            font-weight: 600;
         }
         
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        /* Telefon uchun optimallashtirishlar */
+        @media (max-width: 420px) { 
+            .leaderboard-list{ max-height:300px } 
+            .leader-avatar{ width:40px; height:40px }
+            
+            /* Modal optimallashtirish */
+            .modal-overlay {
+                padding: 16px;
+            }
+            .modal-content {
+                max-width: 100%;
+                max-height: 85vh;
+                border-radius: 20px;
+            }
+            .modal-header {
+                padding: 20px 20px 12px;
+            }
+            .modal-header .text-6xl {
+                font-size: 4rem;
+            }
+            .modal-header h2 {
+                font-size: 1.5rem;
+                line-height: 1.3;
+            }
+            .modal-header p {
+                font-size: 14px;
+            }
+            .modal-body {
+                padding: 16px;
+            }
+            .modal-footer {
+                padding: 12px 16px 16px;
+            }
+            .info-item {
+                padding: 10px 0;
+            }
+            .info-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 18px;
+            }
+            .info-content h4 {
+                font-size: 15px;
+                line-height: 1.3;
+            }
+            .info-content p {
+                font-size: 13px;
+                line-height: 1.4;
+            }
+            .btn-primary {
+                padding: 16px;
+                font-size: 16px;
+                font-weight: 600;
+            }
         }
-
-        .online-count {
-            color: #22c55e;
-            font-weight: bold;
+        
+        @media (max-width: 360px) {
+            .modal-header .text-6xl {
+                font-size: 3.5rem;
+            }
+            .modal-header h2 {
+                font-size: 1.3rem;
+            }
+            .info-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 16px;
+            }
+            .info-content h4 {
+                font-size: 14px;
+            }
+            .info-content p {
+                font-size: 12px;
+            }
         }
-
-        .user-count {
-            color: #60a5fa;
-            font-weight: bold;
+        
+        @media (max-height: 700px) {
+            .modal-content {
+                max-height: 85vh;
+            }
+            .modal-body {
+                max-height: 45vh;
+                overflow-y: auto;
+            }
         }
-
-        .ad-count {
-            color: #fbbf24;
-            font-weight: bold;
+        
+        @media (max-height: 600px) {
+            .modal-content {
+                max-height: 90vh;
+            }
+            .modal-body {
+                max-height: 40vh;
+            }
+            .modal-header {
+                padding: 16px 16px 12px;
+            }
         }
-
-        @media (max-width:420px) { .leaderboard-list{ max-height:300px } .leader-avatar{ width:40px; height:40px } }
+        
+        /* AdsGram ad container styles */
+        .adsgram-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .adsgram-container.active {
+            display: flex;
+        }
+        .adsgram-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10001;
+        }
+        .adsgram-loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #0096ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="h-full gradient-bg text-white overflow-auto">
-    <!-- Loading Modal -->
-    <div id="loading-modal" class="loading-modal">
-        <div class="loading-content">
-            <div class="text-6xl mb-6 float-animation diamond-icon">💎</div>
-            <div class="w-20 h-20 border-4 border-white/20 border-t-blue-500 rounded-full animate-spin mx-auto mb-6"></div>
-            <p class="text-xl font-semibold text-white/90">Reklama yuklanyapti...</p>
-            <p class="text-white/60 mt-2">Iltimos, kuting</p>
-        </div>
-    </div>
-
     <div id="app" class="min-h-full w-full">
-        <!-- Loading -->
         <div id="loading" class="flex items-center justify-center min-h-screen p-4">
             <div class="text-center slide-up">
                 <div class="text-7xl mb-6 float-animation diamond-icon">💎</div>
@@ -149,9 +306,59 @@
             </div>
         </div>
 
-        <!-- Content -->
+        <!-- Welcome Modal -->
+        <div id="welcome-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="text-6xl mb-4 float-animation diamond-icon">💎</div>
+                    <h2 class="text-2xl font-bold text-white/90 mb-2">RekchiAi olmoslari</h2>
+                    <p class="text-white/60">Mini appga xush kelibsiz!</p>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="space-y-4">
+                        <div class="info-item">
+                            <div class="info-icon">💎</div>
+                            <div class="info-content">
+                                <h4>Cheksiz olmoslar yeg'ishingiz mumkin!</h4>
+                                <p>Bu joyda siz reklama ko'rib va bosib <span class="highlight-text">cheksiz olmoslar</span> yeg'ishingiz mumkin.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-icon">⚠️</div>
+                            <div class="info-content">
+                                <h4>Diqqat! Muhim qoida:</h4>
+                                <p>Har <span class="warning-text">3 ta olmos</span> yeg'ganingizda <span class="warning-text">bitta klik</span> qiling. Ya'ni reklama qilayotgan joyga kirib chiqing. (2-3 sekund vaqt ketishi mumkin).</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-icon">🎥</div>
+                            <div class="info-content">
+                                <h4>Tushunmagan bo'lsangiz:</h4>
+                                <p>Botdagi <span class="highlight-text">"Videoqo'llanma"</span> tugmasini bosib, olmos yeg'ish haqidagi videoni ko'ring!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button id="modal-ok-btn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-2xl text-lg transition-all duration-300">
+                        Tushundim
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AdsGram Ad Container -->
+        <div id="adsgram-container" class="adsgram-container">
+            <button id="adsgram-close-btn" class="adsgram-close-btn" style="display: none;">✕</button>
+            <div id="adsgram-loader" class="adsgram-loader" style="display: none;"></div>
+            <div id="adsgram-ad-element"></div>
+        </div>
+
         <div id="content" class="hidden">
-            <!-- Top bar -->
             <div class="sticky top-0 z-50 top-bar border-b border-white/5">
                 <div class="max-w-lg mx-auto px-4 py-4">
                     <div class="flex items-center justify-between">
@@ -171,9 +378,7 @@
             </div>
 
             <div class="max-w-lg mx-auto px-4 py-6 space-y-4 content-container">
-                <!-- Earn Section -->
                 <div id="earn-section" class="content-section active">
-                    <!-- User card -->
                     <div class="app-card p-5 slide-up">
                         <div class="flex items-center space-x-4">
                             <div id="user-avatar" class="avatar-container user-avatar"></div>
@@ -185,7 +390,6 @@
                         </div>
                     </div>
 
-                    <!-- Ad watch card -->
                     <div class="app-card p-6 slide-up" style="animation-delay:0.1s;">
                         <div class="flex items-center justify-between mb-6">
                             <div class="flex items-center space-x-3">
@@ -208,10 +412,26 @@
                             <span class="text-2xl">▶️</span>
                             <span>Reklamani boshlash</span>
                         </button>
+                        
+                        <!-- Ad format selection -->
+                        <div class="mt-6 pt-6 border-t border-white/10">
+                            <h4 class="text-sm font-semibold text-white/70 mb-3">Reklama formati:</h4>
+                            <div class="flex space-x-3">
+                                <button id="rewarded-ad-btn" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl py-3 px-4 transition-all active-format">
+                                    <div class="text-lg mb-1">🎁</div>
+                                    <div class="text-sm font-semibold">Rewarded</div>
+                                    <div class="text-xs text-white/50">To'liq ko'ring</div>
+                                </button>
+                                <button id="interstitial-ad-btn" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl py-3 px-4 transition-all">
+                                    <div class="text-lg mb-1">📱</div>
+                                    <div class="text-sm font-semibold">Interstitial</div>
+                                    <div class="text-xs text-white/50">Tezkor reklama</div>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Leaderboard Section (standalone menu) -->
                 <div id="leaderboard-section" class="content-section">
                     <div class="leaderboard-wrapper slide-up">
                         <div class="leaderboard-card">
@@ -233,7 +453,6 @@
                     </div>
                 </div>
 
-                <!-- Admin panel (kept) -->
                 <div id="admin-panel" class="hidden app-card p-6 border-2 border-yellow-500/20 slide-up" style="animation-delay:0.3s;">
                     <div class="flex items-center space-x-3 mb-6">
                         <div class="text-3xl">👑</div>
@@ -247,18 +466,16 @@
                         </div>
                         <div class="grid grid-cols-3 gap-4 text-center">
                             <div>
-                                <p class="text-2xl font-bold user-count" id="admin-total-users">1500</p>
+                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-users">0</p>
                                 <p class="text-xs text-white/60 mt-1">Foydalanuvchi</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-bold ad-count" id="admin-total-ads">63230</p>
+                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-ads">0</p>
                                 <p class="text-xs text-white/60 mt-1">Reklamalar</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-bold online-count" id="admin-online-users">3</p>
-                                <p class="text-xs text-white/60 mt-1 flex items-center justify-center">
-                                    <span class="online-indicator"></span> Online
-                                </p>
+                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-diamonds">0</p>
+                                <p class="text-xs text-white/60 mt-1">Olmoslar</p>
                             </div>
                         </div>
                     </div>
@@ -271,7 +488,6 @@
                 </div>
             </div>
 
-            <!-- Bottom menu: Olmos ishlash + Reytinglar -->
             <div class="menu-container">
                 <nav class="menu-nav">
                     <button class="menu-item active" data-section="earn-section" id="menu-earn">
@@ -292,7 +508,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-        // Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyAFzNDoLlxHEpJOuZO8nhc-D2SmUId2dEc",
             authDomain: "rekchi-2dc2f.firebaseapp.com",
@@ -306,26 +521,122 @@
         const firebaseApp = initializeApp(firebaseConfig);
         const db = getDatabase(firebaseApp);
 
-        // Constants
         const ADMIN_IDS = ['7500103239', '7104718080'];
-        const AD_BLOCK_ID = '18961';
         const REWARD_AMOUNT = 1;
-        const ONLINE_TIMEOUT = 5 * 60 * 1000; // 5 daqiqa (300000 ms)
-
-        // Server endpoints (host add_balance.php & get_balance.php)
         const BOT_API_ADD_URL = 'https://68ed1ab05ca4e.myxvest1.ru/add_balance.php';
         const BOT_API_GET_URL = 'https://68ed1ab05ca4e.myxvest1.ru/get_balance.php';
-        const BOT_API_KEY = '4564123:hkjhfadfhieapkdnga'; // ideally keep on server
+        const BOT_API_KEY = '4564123:hkjhfadfhieapkdnga';
+        const ADSGRAM_BLOCK_ID = "19784"; // Sizning blockId'ingiz
 
         let currentUser = null;
         let allUsers = [];
         let isAdmin = false;
-        let AdController = null;
         let botBalance = 0;
-        let currentLeaderboard = 'daily'; // 'daily' | 'overall'
-        let onlineUsers = new Set(); // Online foydalanuvchilar
-        let userActivityTimes = {}; // Har bir foydalanuvchining so'nggi faollik vaqti
-        let adCompletedSuccessfully = false; // Reklama to'liq ko'rilganligini tekshirish
+        let currentLeaderboard = 'daily';
+        let isWatchingAd = false;
+        let adsgramController = null;
+        let hasShownWelcomeModal = false;
+        let currentAdFormat = 'rewarded'; // 'rewarded' yoki 'interstitial'
+
+        // AdsGram initialization
+        function initializeAdsGram() {
+            try {
+                if (window.Adsgram && ADSGRAM_BLOCK_ID) {
+                    adsgramController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
+                    console.log('AdsGram SDK initialized successfully');
+                    
+                    // Event listeners for AdsGram
+                    if (adsgramController) {
+                        // You can add event listeners for debugging or analytics
+                        adsgramController.on('load', (data) => {
+                            console.log('Ad loaded:', data);
+                            hideLoader();
+                        });
+                        
+                        adsgramController.on('render', (data) => {
+                            console.log('Ad rendered:', data);
+                        });
+                        
+                        adsgramController.on('playing', (data) => {
+                            console.log('Ad playing:', data);
+                        });
+                        
+                        adsgramController.on('destroy', (data) => {
+                            console.log('Ad destroyed:', data);
+                            hideAdContainer();
+                        });
+                        
+                        adsgramController.on('error', (data) => {
+                            console.error('Ad error:', data);
+                            hideAdContainer();
+                            hideLoader();
+                            showAdError();
+                        });
+                    }
+                } else {
+                    console.warn('AdsGram SDK not available or blockId missing');
+                }
+            } catch (error) {
+                console.error('AdsGram initialization error:', error);
+            }
+        }
+
+        // Helper functions for AdsGram UI
+        function showAdContainer() {
+            const container = document.getElementById('adsgram-container');
+            if (container) {
+                container.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function hideAdContainer() {
+            const container = document.getElementById('adsgram-container');
+            if (container) {
+                container.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                
+                // Clear ad element
+                const adElement = document.getElementById('adsgram-ad-element');
+                if (adElement) {
+                    adElement.innerHTML = '';
+                }
+            }
+        }
+
+        function showLoader() {
+            const loader = document.getElementById('adsgram-loader');
+            const closeBtn = document.getElementById('adsgram-close-btn');
+            if (loader) loader.style.display = 'block';
+            if (closeBtn) closeBtn.style.display = 'none';
+        }
+
+        function hideLoader() {
+            const loader = document.getElementById('adsgram-loader');
+            const closeBtn = document.getElementById('adsgram-close-btn');
+            if (loader) loader.style.display = 'none';
+            if (closeBtn && currentAdFormat === 'interstitial') {
+                closeBtn.style.display = 'block';
+            }
+        }
+
+        function showAdError() {
+            const statusDiv = document.getElementById('ad-status');
+            if (statusDiv) {
+                statusDiv.innerHTML = '<p class="text-red-400">Reklama yuklanmadi. Iltimos, keyinroq urinib ko\'ring.</p>';
+                setTimeout(() => { 
+                    statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
+                }, 3000);
+            }
+            resetWatchButton();
+        }
+
+        function showCloseButton(show) {
+            const closeBtn = document.getElementById('adsgram-close-btn');
+            if (closeBtn) {
+                closeBtn.style.display = show ? 'block' : 'none';
+            }
+        }
 
         // Helpers
         async function getTelegramProfilePhoto(userId, username) {
@@ -347,82 +658,36 @@
             return 'data:image/svg+xml;base64,' + btoa(svg);
         }
 
-        // Modalni ko'rsatish
-        function showLoadingModal() {
-            const modal = document.getElementById('loading-modal');
-            if (modal) {
-                modal.classList.add('active');
+        function escapeHtml(str) { 
+            if (!str) return ''; 
+            return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); 
+        }
+
+        // Modal functions
+        function showWelcomeModal() {
+            if (hasShownWelcomeModal) return;
+            
+            const modal = document.getElementById('welcome-modal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Check if this is first visit
+            const firstVisit = localStorage.getItem('rekchiai_first_visit');
+            if (!firstVisit) {
+                hasShownWelcomeModal = true;
             }
         }
 
-        // Modalni yopish
-        function hideLoadingModal() {
-            const modal = document.getElementById('loading-modal');
-            if (modal) {
-                modal.classList.remove('active');
-            }
+        function hideWelcomeModal() {
+            const modal = document.getElementById('welcome-modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            
+            // Mark as visited
+            localStorage.setItem('rekchiai_first_visit', 'true');
         }
 
-        // Faollikni yangilash (har safar foydalanuvchi biror amal bajarsa)
-        function updateUserActivity() {
-            if (!currentUser) return;
-            
-            const userId = currentUser.user_id;
-            userActivityTimes[userId] = Date.now();
-            
-            // Firebase'ga yangilash (ixtiyoriy)
-            try {
-                const userRef = ref(db, 'users/' + currentUser.user_id);
-                update(userRef, { last_activity: new Date().toISOString() });
-            } catch (err) {
-                console.warn('Activity update failed', err);
-            }
-            
-            // Online ro'yxatga qo'shish
-            onlineUsers.add(userId);
-            
-            // Admin panelni yangilash
-            updateOnlineCount();
-        }
-
-        // Online foydalanuvchilarni hisoblash
-        function calculateOnlineUsers() {
-            const now = Date.now();
-            const activeUsers = new Set();
-            
-            // Oxirgi 5 daqiqada faol bo'lgan foydalanuvchilar
-            Object.keys(userActivityTimes).forEach(userId => {
-                const lastActive = userActivityTimes[userId];
-                if (now - lastActive <= ONLINE_TIMEOUT) {
-                    activeUsers.add(userId);
-                }
-            });
-            
-            // Har bir foydalanuvchi uchun Firebase'dan oxirgi faollikni tekshirish
-            allUsers.forEach(user => {
-                if (user.last_activity) {
-                    const lastActive = new Date(user.last_activity).getTime();
-                    if (now - lastActive <= ONLINE_TIMEOUT) {
-                        activeUsers.add(user.user_id);
-                    }
-                }
-            });
-            
-            return activeUsers;
-        }
-
-        // Online sonini yangilash
-        function updateOnlineCount() {
-            if (!isAdmin) return;
-            
-            const onlineUsersSet = calculateOnlineUsers();
-            onlineUsers = onlineUsersSet;
-            const onlineCount = onlineUsersSet.size;
-            
-            document.getElementById('admin-online-users').textContent = onlineCount;
-        }
-
-        // Init Telegram & Ads
+        // Init Telegram
         function initTelegram() {
             if (window.Telegram?.WebApp) {
                 window.Telegram.WebApp.ready();
@@ -442,73 +707,25 @@
                     };
                     isAdmin = ADMIN_IDS.includes(currentUser.user_id);
                 } else {
-                    currentUser = { user_id: 'web_' + Date.now(), username: 'foydalanuvchi', first_name: 'Foydalanuvchi', last_name:'', photo_url:null, language_code:'uz' };
+                    currentUser = { 
+                        user_id: 'web_' + Date.now(), 
+                        username: 'foydalanuvchi', 
+                        first_name: 'Foydalanuvchi', 
+                        last_name:'', 
+                        photo_url:null, 
+                        language_code:'uz' 
+                    };
                 }
             } else {
-                currentUser = { user_id: 'web_' + Date.now(), username: 'foydalanuvchi', first_name: 'Foydalanuvchi', last_name:'', photo_url:null, language_code:'uz' };
+                currentUser = { 
+                    user_id: 'web_' + Date.now(), 
+                    username: 'foydalanuvchi', 
+                    first_name: 'Foydalanuvchi', 
+                    last_name:'', 
+                    photo_url:null, 
+                    language_code:'uz' 
+                };
             }
-            
-            // Dastlabki faollikni yangilash
-            updateUserActivity();
-        }
-
-        // Adsgram'ni ishga tushirish
-        function initAdServices() {
-            console.log('Adsgram SDK yuklanmoqda...');
-            
-            // Adsgram SDK'ni yuklanganligini tekshirish
-            if (typeof window.Adsgram !== 'undefined') {
-                console.log('Adsgram SDK yuklandi');
-                
-                // Adsgram'ni ishga tushirish
-                try {
-                    AdController = window.Adsgram.init({ 
-                        blockId: AD_BLOCK_ID
-                    });
-                    console.log('Adsgram muvaffaqiyatli ishga tushdi');
-                } catch (error) {
-                    console.error('Adsgram init xatosi:', error);
-                }
-            } else {
-                console.warn('Adsgram SDK yuklanmadi');
-            }
-        }
-
-        // Adsgram reklamasini ko'rsatish
-        async function showAdsgramAd() {
-            return new Promise((resolve, reject) => {
-                try {
-                    if (!AdController) {
-                        // Controller yuklanmagan bo'lsa, yangi init qilish
-                        if (typeof window.Adsgram !== 'undefined') {
-                            AdController = window.Adsgram.init({ 
-                                blockId: AD_BLOCK_ID
-                            });
-                            console.log('Adsgram controller yangilandi');
-                        } else {
-                            reject(new Error('Adsgram yuklanmagan'));
-                            return;
-                        }
-                    }
-                    
-                    console.log('Adsgram reklamasi ko\'rsatilmoqda...');
-                    
-                    // Reklamani ko'rsatish
-                    AdController.show()
-                        .then(() => {
-                            console.log('Adsgram reklamasi muvaffaqiyatli ko\'rildi');
-                            resolve(true);
-                        })
-                        .catch(err => {
-                            console.error('Adsgram reklama xatosi:', err);
-                            reject(err);
-                        });
-                        
-                } catch (error) {
-                    console.error('Adsgram interfaol xatosi:', error);
-                    reject(error);
-                }
-            });
         }
 
         // Load/create user in Firebase
@@ -526,14 +743,23 @@
                         last_name: currentUser.last_name || '',
                         photo_url: profilePhoto,
                         language_code: currentUser.language_code || 'uz',
-                        ads_by_day: {}, // counts per YYYY-MM-DD
+                        ads_by_day: {},
                         diamonds: 0,
                         ads_watched: 0,
                         withdraw_history: [],
                         last_ad_time: new Date().toISOString(),
-                        last_activity: new Date().toISOString(),
                         created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
+                        updated_at: new Date().toISOString(),
+                        total_clicks: 0,
+                        verified_clicks: 0,
+                        fake_clicks: 0,
+                        click_history: [],
+                        last_click_time: null,
+                        last_verified_click: null,
+                        avg_click_duration: 0,
+                        external_clicks: 0,
+                        adsgram_rewarded_ads: 0,
+                        adsgram_interstitial_ads: 0
                     };
                     await set(userRef, newUser);
                     return newUser;
@@ -545,7 +771,6 @@
                             photo_url: profilePhoto, 
                             username: currentUser.username || userData.username, 
                             first_name: currentUser.first_name || userData.first_name, 
-                            last_activity: new Date().toISOString(),
                             updated_at: new Date().toISOString() 
                         };
                         await update(userRef, updates);
@@ -555,9 +780,11 @@
                         await update(userRef, { ads_by_day: {} });
                         userData.ads_by_day = {};
                     }
-                    if (!userData.last_activity) {
-                        await update(userRef, { last_activity: new Date().toISOString() });
-                        userData.last_activity = new Date().toISOString();
+                    if (typeof userData.adsgram_rewarded_ads === 'undefined') {
+                        await update(userRef, { 
+                            adsgram_rewarded_ads: userData.adsgram_rewarded_ads || 0,
+                            adsgram_interstitial_ads: userData.adsgram_interstitial_ads || 0
+                        });
                     }
                     return userData;
                 }
@@ -589,7 +816,6 @@
                     Object.keys(data).forEach(k => allUsers.push(data[k]));
                 }
                 updateAdminPanel();
-                updateOnlineCount();
                 renderLeaderboardsMain();
             }, (err) => console.error('subscribeToUsers error', err));
         }
@@ -610,15 +836,16 @@
                     username: u.username || '',
                     photo_url: u.photo_url || '',
                     todayCount: parseInt(ads_by_day[localKey] || 0),
-                    overallCount: parseInt(u.ads_watched || 0)
+                    overallCount: parseInt(u.ads_watched || 0),
+                    verified_clicks: u.verified_clicks || 0
                 };
             });
 
             let sorted;
             if (currentLeaderboard === 'daily') {
-                sorted = mapped.sort((a,b) => b.todayCount - a.todayCount || b.overallCount - a.overallCount);
+                sorted = mapped.sort((a,b) => b.todayCount - a.todayCount || b.verified_clicks - a.verified_clicks);
             } else {
-                sorted = mapped.sort((a,b) => b.overallCount - a.overallCount || b.todayCount - a.todayCount);
+                sorted = mapped.sort((a,b) => b.overallCount - a.overallCount || b.verified_clicks - a.verified_clicks);
             }
 
             const top = sorted.slice(0,10);
@@ -642,69 +869,30 @@
             `).join('');
         }
 
-        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
-
         // Admin panel render (avatars same style)
         function updateAdminPanel() {
             const totalUsers = allUsers.length;
             const totalAds = allUsers.reduce((s,u)=> s + (u.ads_watched||0), 0);
-            
+            const totalDiamonds = allUsers.reduce((s,u)=> s + (u.diamonds||0), 0);
             document.getElementById('admin-total-users').textContent = totalUsers;
             document.getElementById('admin-total-ads').textContent = totalAds;
-            
-            // Online sonini yangilash
-            updateOnlineCount();
+            document.getElementById('admin-total-diamonds').textContent = totalDiamonds;
 
             const usersList = document.getElementById('users-list');
             if (!usersList) return;
-            
-            // Foydalanuvchilarni online holatiga qarab tartiblash
-            const sortedUsers = allUsers
-                .map(u => {
-                    const isOnline = onlineUsers.has(u.user_id);
-                    const lastActivityTime = u.last_activity ? new Date(u.last_activity).getTime() : 0;
-                    const now = Date.now();
-                    const minutesAgo = lastActivityTime ? Math.floor((now - lastActivityTime) / 60000) : 999;
-                    
-                    return {
-                        ...u,
-                        isOnline,
-                        lastActivityTime,
-                        minutesAgo
-                    };
-                })
-                .sort((a, b) => {
-                    // Avval onlinelar, keyin offlinelar
-                    if (a.isOnline && !b.isOnline) return -1;
-                    if (!a.isOnline && b.isOnline) return 1;
-                    
-                    // Online bo'lsa, oxirgi faollik bo'yicha tartiblash
-                    if (a.isOnline && b.isOnline) {
-                        return a.lastActivityTime > b.lastActivityTime ? -1 : 1;
-                    }
-                    
-                    // Offline bo'lsa, olmoslar soni bo'yicha tartiblash
-                    return (b.diamonds||0) - (a.diamonds||0);
-                })
-                .slice(0,20);
-            
-            usersList.innerHTML = sortedUsers.map(u => {
-                const isOnline = onlineUsers.has(u.user_id);
-                const statusColor = isOnline ? '#22c55e' : '#ef4444';
-                const statusText = isOnline ? 'Online' : `${u.minutesAgo < 60 ? u.minutesAgo + ' min oldin' : 'Offline'}`;
-                
-                return `
+            usersList.innerHTML = allUsers
+                .sort((a,b)=>(b.diamonds||0)-(a.diamonds||0))
+                .slice(0,20)
+                .map(u => `
                     <div class="app-card p-4 hover:bg-white/5 transition-all duration-300">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-3">
-                                <div class="avatar-container relative">
+                                <div class="avatar-container">
                                     ${u.photo_url ? `<img src="${u.photo_url}" alt="${(u.first_name||'Foydalanuvchi')}" class="avatar-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'gradient-avatar\\'></div>'">` : `<div class="gradient-avatar"></div>`}
-                                    <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[#0f0f0f]" style="background-color: ${statusColor};"></div>
                                 </div>
                                 <div>
                                     <p class="font-bold text-sm text-white/90">${u.first_name || 'Foydalanuvchi'}</p>
                                     <p class="text-xs text-white/50">${u.username ? '@'+u.username : '@nousername'}</p>
-                                    <p class="text-xs mt-1" style="color: ${statusColor};">${statusText}</p>
                                 </div>
                             </div>
                             <div class="text-right">
@@ -713,101 +901,185 @@
                             </div>
                         </div>
                     </div>
-                `;
-            }).join('');
+                `).join('');
         }
 
-        // Watch ad flow: update Firebase (ads_by_day & ads_watched) + call server add_balance then refresh leaderboards
+        // REKLAMA KO'RISH FUNCTIONS
         async function watchAd() {
-            if (!currentUser) return;
-            
-            // Faollikni yangilash
-            updateUserActivity();
+            if (!currentUser || isWatchingAd) return;
             
             const btn = document.getElementById('watch-ad-btn');
             const statusDiv = document.getElementById('ad-status');
+            
+            isWatchingAd = true;
             btn.disabled = true;
             btn.innerHTML = '<div class="w-6 h-6 border-3 border-white/30 border-t-blue-500 rounded-full animate-spin mx-auto"></div>';
-            statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yuklanmoqda...</p>';
-
-            adCompletedSuccessfully = false;
-
+            statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama tayyorlanmoqda...</p>';
+            
             try {
-                // 1. Avval loading modalni ko'rsatish
-                showLoadingModal();
+                // AdsGram reklamasi
+                await showAdsGramAd();
                 
-                // 2. Reklamani ko'rsatish
-                await showAdsgramAd();
-                
-                // 3. Reklama tugagach, loading modalni yopish
-                hideLoadingModal();
-                
-                // 4. Faqat reklama to'liq ko'rilgandan keyin bonusni berish
-                adCompletedSuccessfully = true;
-                
-                if (adCompletedSuccessfully) {
-                    // read user
-                    const userRef = ref(db, 'users/' + currentUser.user_id);
-                    const snapshot = await get(userRef);
-                    const userData = snapshot.val() || {};
-
-                    const now = new Date();
-                    const tzOffset = now.getTimezoneOffset() * 60000;
-                    const localKey = new Date(now - tzOffset).toISOString().slice(0,10);
-
-                    const ads_by_day = userData.ads_by_day || {};
-                    const newDayCount = (ads_by_day[localKey] || 0) + 1;
-                    const newOverall = (userData.ads_watched || 0) + 1;
-
-                    // update firebase
-                    const updates = { 
-                        ads_watched: newOverall, 
-                        [`ads_by_day/${localKey}`]: newDayCount, 
-                        last_ad_time: new Date().toISOString(),
-                        last_activity: new Date().toISOString()
-                    };
-                    const ok = await updateUserData(updates);
-                    if (!ok) throw new Error('Firebase yangilashida xatolik');
-
-                    // notify server bot to add balance
-                    try { 
-                        await addToBotBalance(REWARD_AMOUNT); 
-                    } catch(e){ 
-                        console.warn('Bot add failed', e); 
-                    }
-
-                    // re-sync quickly
-                    renderLeaderboardsMain();
-                    await fetchBotBalance();
-
-                    statusDiv.innerHTML = `<div class="text-center slide-up"><div class="text-6xl mb-3" style="animation:celebrate .6s;">🎉</div><p class="text-green-400 font-bold text-lg mb-1">Tabriklaymiz!</p><p class="text-2xl font-bold text-yellow-400 mb-2">+${REWARD_AMOUNT} 💎</p><p class="text-sm text-white/60">Olmos bot balansiga qo'shildi</p></div>`;
-                }
             } catch (err) {
-                console.error('Ad error', err);
-                // Agar loading modal ko'rsatilgan bo'lsa, uni yopish
-                hideLoadingModal();
+                console.error('Xatolik:', err);
+                statusDiv.innerHTML = '<p class="text-red-400">Reklama ochishda xatolik.</p>';
+                resetWatchButton();
+                setTimeout(() => { 
+                    statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
+                }, 3000);
+            }
+        }
+
+        // ADSGRAM REKLAMASI
+        async function showAdsGramAd() {
+            return new Promise((resolve, reject) => {
+                const statusDiv = document.getElementById('ad-status');
                 
-                // Reklama to'liq ko'rilmagan bo'lsa, bonus bermaslik
-                adCompletedSuccessfully = false;
+                if (!adsgramController) {
+                    statusDiv.innerHTML = '<p class="text-red-400">Reklama tizimi ishga tushmagan.</p>';
+                    resetWatchButton();
+                    reject(new Error('AdsGram not initialized'));
+                    return;
+                }
                 
-                // Xato xabarini aniqroq qilish
-                statusDiv.innerHTML = '<p class="text-orange-400">Reklama yopildi yoki xatolik yuz berdi. Olmos berilmadi.</p>';
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
+                showAdContainer();
+                showLoader();
                 
-                // Agar reklama muvaffaqiyatli yakunlangan bo'lsa, 3 soniyadan keyin statusni tiklash
-                if (adCompletedSuccessfully) {
+                adsgramController.show().then((result) => {
+                    console.log('AdsGram natijasi:', result);
+                    
+                    // Reklama to'liq ko'rildi yoki (interstitial uchun) yopildi
+                    hideAdContainer();
+                    
+                    // Reward berish
+                    if (currentAdFormat === 'rewarded') {
+                        // Faqat rewarded reklama to'liq ko'rilgan bo'lsa bonus berish
+                        if (result.done) {
+                            statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yakunlandi, bonus berilmoqda...</p>';
+                            setTimeout(async () => {
+                                await giveBonusToUser('adsgram', currentAdFormat);
+                                resolve(result);
+                            }, 1000);
+                        } else {
+                            // Reklama to'liq ko'rilmagan
+                            statusDiv.innerHTML = '<p class="text-red-400">Reklama to\'liq ko\'rilmadi. Keyingi safar to\'liq ko\'ring!</p>';
+                            setTimeout(() => { 
+                                statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
+                            }, 3000);
+                            resetWatchButton();
+                            resolve(result);
+                        }
+                    } else if (currentAdFormat === 'interstitial') {
+                        // Interstitial reklama ko'rilgan bo'lsa bonus berish
+                        statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yakunlandi, bonus berilmoqda...</p>';
+                        setTimeout(async () => {
+                            await giveBonusToUser('adsgram', currentAdFormat);
+                            resolve(result);
+                        }, 1000);
+                    }
+                    
+                }).catch((errorResult) => {
+                    console.error('AdsGram xatosi:', errorResult);
+                    hideAdContainer();
+                    hideLoader();
+                    statusDiv.innerHTML = '<p class="text-red-400">Reklama xatosi. Iltimos, keyinroq urinib ko\'ring.</p>';
+                    resetWatchButton();
                     setTimeout(() => { 
                         statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
                     }, 3000);
-                } else {
-                    // Agar reklama to'liq ko'rilmagan bo'lsa, 2 soniyadan keyin statusni tiklash
-                    setTimeout(() => { 
-                        statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
-                    }, 2000);
+                    reject(new Error('Ad error'));
+                });
+            });
+        }
+
+        // BONUS BERISH
+        async function giveBonusToUser(provider = 'adsgram', format = 'rewarded') {
+            const statusDiv = document.getElementById('ad-status');
+            
+            try {
+                statusDiv.innerHTML = '<p class="text-green-400 font-bold">Bonus hisoblanmoqda...</p>';
+                
+                const userRef = ref(db, 'users/' + currentUser.user_id);
+                const snapshot = await get(userRef);
+                const userData = snapshot.val() || {};
+
+                const now = new Date();
+                const tzOffset = now.getTimezoneOffset() * 60000;
+                const localKey = new Date(now - tzOffset).toISOString().slice(0,10);
+
+                const ads_by_day = userData.ads_by_day || {};
+                const newDayCount = (ads_by_day[localKey] || 0) + 1;
+                const newOverall = (userData.ads_watched || 0) + 1;
+                
+                const clickHistory = userData.click_history || [];
+                clickHistory.push({
+                    time: new Date().toISOString(),
+                    duration: 0,
+                    rewarded: true,
+                    type: 'ad_completed',
+                    verified: true,
+                    provider: provider,
+                    format: format
+                });
+                const limitedHistory = clickHistory.slice(-20);
+
+                const updates = { 
+                    ads_watched: newOverall, 
+                    [`ads_by_day/${localKey}`]: newDayCount, 
+                    last_ad_time: new Date().toISOString(),
+                    click_history: limitedHistory
+                };
+                
+                // Format bo'yicha statistikani yangilash
+                if (format === 'rewarded') {
+                    updates.adsgram_rewarded_ads = (userData.adsgram_rewarded_ads || 0) + 1;
+                } else if (format === 'interstitial') {
+                    updates.adsgram_interstitial_ads = (userData.adsgram_interstitial_ads || 0) + 1;
                 }
+                
+                const ok = await updateUserData(updates);
+                if (!ok) throw new Error('Firebase yangilashida xatolik');
+
+                // Bot balansiga qo'shish
+                try { 
+                    await addToBotBalance(REWARD_AMOUNT);
+                } catch(e){ 
+                    console.warn('Bot add failed', e); 
+                }
+
+                renderLeaderboardsMain();
+                await fetchBotBalance();
+
+                statusDiv.innerHTML = `
+                    <div class="text-center slide-up">
+                        <div class="text-6xl mb-3" style="animation:celebrate .8s;">🎉</div>
+                        <p class="text-green-400 font-bold text-xl mb-1">Tabriklaymiz!</p>
+                        <div class="my-4">
+                            <div class="text-3xl font-bold text-yellow-400 mb-2">+${REWARD_AMOUNT} 💎</div>
+                            <p class="text-white/60 text-sm">Reklama to'liq ko'rildi</p>
+                            <p class="text-white/40 text-xs mt-2">Format: ${format === 'rewarded' ? 'Rewarded' : 'Interstitial'}</p>
+                        </div>
+                    </div>
+                `;
+                
+                resetWatchButton();
+                
+                setTimeout(() => {
+                    statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>';
+                }, 4000);
+                
+            } catch (err) {
+                console.error('Bonus berishda xatolik', err);
+                statusDiv.innerHTML = '<p class="text-red-400">Xatolik!</p>';
+                resetWatchButton();
             }
+        }
+
+        function resetWatchButton() {
+            const btn = document.getElementById('watch-ad-btn');
+            isWatchingAd = false;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
         }
 
         // Server bot API calls
@@ -815,10 +1087,19 @@
             if (!currentUser) throw new Error('No user');
             const body = new URLSearchParams({ key: BOT_API_KEY, user_id: currentUser.user_id, amount: amount });
             const controller = new AbortController();
-            const timeoutId = setTimeout(()=>controller.abort(), 10000);
-            const resp = await fetch(BOT_API_ADD_URL, { method:'POST', headers:{ 'Content-Type':'application/x-www-form-urlencoded' }, body: body.toString(), signal: controller.signal });
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            const resp = await fetch(BOT_API_ADD_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, 
+                body: body.toString(), 
+                signal: controller.signal 
+            });
             clearTimeout(timeoutId);
-            if (!resp.ok) { const txt = await resp.text().catch(()=>null); console.warn('addToBotBalance non-OK', resp.status, txt); return { success:false, message:'HTTP '+resp.status }; }
+            if (!resp.ok) { 
+                const txt = await resp.text().catch(() => null); 
+                console.warn('addToBotBalance non-OK', resp.status, txt); 
+                return { success: false, message: 'HTTP ' + resp.status }; 
+            }
             return await resp.json();
         }
 
@@ -829,10 +1110,17 @@
                 url.searchParams.set('key', BOT_API_KEY);
                 url.searchParams.set('user_id', currentUser.user_id);
                 const controller = new AbortController();
-                const timeoutId = setTimeout(()=>controller.abort(), 8000);
-                const resp = await fetch(url.toString(), { method:'GET', headers:{ 'Accept':'application/json' }, signal: controller.signal });
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                const resp = await fetch(url.toString(), { 
+                    method: 'GET', 
+                    headers: { 'Accept': 'application/json' }, 
+                    signal: controller.signal 
+                });
                 clearTimeout(timeoutId);
-                if (!resp.ok) { console.warn('fetchBotBalance non-OK', resp.status); return; }
+                if (!resp.ok) { 
+                    console.warn('fetchBotBalance non-OK', resp.status); 
+                    return; 
+                }
                 const json = await resp.json();
                 if (json && json.success) {
                     botBalance = parseInt(json.balance || 0) || 0;
@@ -847,21 +1135,10 @@
 
         // UI bindings (menu + leaderboard tabs)
         function bindUI() {
-            // Reklama tugmasi - faollikni yangilash
-            document.getElementById('watch-ad-btn')?.addEventListener('click', () => {
-                updateUserActivity();
-                watchAd();
-            });
-
-            // Har bir menu bosilganda faollikni yangilash
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.addEventListener('click', updateUserActivity);
-            });
-
-            // Har bir leaderboard tab bosilganda faollikni yangilash
-            document.querySelectorAll('.leaderboard-tab').forEach(tab => {
-                tab.addEventListener('click', updateUserActivity);
-            });
+            document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
+            
+            // Modal OK button
+            document.getElementById('modal-ok-btn')?.addEventListener('click', hideWelcomeModal);
 
             // bottom menu
             document.getElementById('menu-earn')?.addEventListener('click', () => switchSection('earn-section', 'menu-earn'));
@@ -880,6 +1157,62 @@
                 document.getElementById('lb-tab-daily-main').classList.remove('active');
                 renderLeaderboardsMain();
             });
+
+            // Ad format selection buttons
+            document.getElementById('rewarded-ad-btn')?.addEventListener('click', () => {
+                currentAdFormat = 'rewarded';
+                updateAdFormatButtons();
+            });
+            
+            document.getElementById('interstitial-ad-btn')?.addEventListener('click', () => {
+                currentAdFormat = 'interstitial';
+                updateAdFormatButtons();
+            });
+
+            // AdsGram close button
+            document.getElementById('adsgram-close-btn')?.addEventListener('click', () => {
+                hideAdContainer();
+                resetWatchButton();
+                
+                const statusDiv = document.getElementById('ad-status');
+                if (currentAdFormat === 'interstitial') {
+                    statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yakunlandi, bonus berilmoqda...</p>';
+                    setTimeout(async () => {
+                        await giveBonusToUser('adsgram', currentAdFormat);
+                    }, 1000);
+                } else {
+                    statusDiv.innerHTML = '<p class="text-red-400">Reklama to\'liq ko\'rilmadi.</p>';
+                    setTimeout(() => { 
+                        statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
+                    }, 3000);
+                }
+            });
+        }
+
+        function updateAdFormatButtons() {
+            const rewardedBtn = document.getElementById('rewarded-ad-btn');
+            const interstitialBtn = document.getElementById('interstitial-ad-btn');
+            
+            if (rewardedBtn && interstitialBtn) {
+                // Remove active class from both
+                rewardedBtn.classList.remove('active-format');
+                interstitialBtn.classList.remove('active-format');
+                
+                // Reset border styles
+                rewardedBtn.style.border = '1px solid rgba(255,255,255,0.1)';
+                interstitialBtn.style.border = '1px solid rgba(255,255,255,0.1)';
+                
+                // Add active style to selected button
+                if (currentAdFormat === 'rewarded') {
+                    rewardedBtn.classList.add('active-format');
+                    rewardedBtn.style.border = '1px solid #0096ff';
+                    rewardedBtn.style.background = 'rgba(0, 150, 255, 0.1)';
+                } else {
+                    interstitialBtn.classList.add('active-format');
+                    interstitialBtn.style.border = '1px solid #0096ff';
+                    interstitialBtn.style.background = 'rgba(0, 150, 255, 0.1)';
+                }
+            }
         }
 
         function switchSection(sectionId, menuButtonId) {
@@ -887,7 +1220,6 @@
             document.getElementById(sectionId).classList.add('active');
             document.querySelectorAll('.menu-item').forEach(mi => mi.classList.remove('active'));
             if (menuButtonId) document.getElementById(menuButtonId).classList.add('active');
-            // if leaderboard opened, render it
             if (sectionId === 'leaderboard-section') renderLeaderboardsMain();
         }
 
@@ -903,14 +1235,13 @@
             document.getElementById('user-name').textContent = user.first_name || 'Foydalanuvchi';
             document.getElementById('user-id').textContent = `ID: ${user.user_id}`;
             document.getElementById('user-username').textContent = user.username ? `@${user.username}` : '@nousername';
-            // update bot balance display
             document.getElementById('diamond-count').textContent = `${botBalance}`;
         }
 
         // App init
         async function initializeAppMain() {
             initTelegram();
-            initAdServices();
+            initializeAdsGram(); // Initialize AdsGram SDK
             bindUI();
 
             const user = await loadOrCreateUser();
@@ -920,9 +1251,7 @@
 
                 subscribeToUsers();
 
-                if (isAdmin) {
-                    document.getElementById('admin-panel').classList.remove('hidden');
-                }
+                if (isAdmin) document.getElementById('admin-panel').classList.remove('hidden');
             }
 
             if (currentUser) {
@@ -930,14 +1259,16 @@
                 setInterval(fetchBotBalance, 30000);
             }
 
-            // Online sonini har 30 soniyada yangilash
-            setInterval(updateOnlineCount, 30000);
-
-            // Har 10 soniyada faollikni yangilash (sessionni saqlash uchun)
-            setInterval(updateUserActivity, 10000);
-
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('content').classList.remove('hidden');
+            
+            // Initialize ad format buttons
+            updateAdFormatButtons();
+            
+            // Show welcome modal after a short delay
+            setTimeout(() => {
+                showWelcomeModal();
+            }, 500);
         }
 
         // start

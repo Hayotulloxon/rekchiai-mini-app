@@ -8,109 +8,157 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- AdsGram SDK -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-    <script> 
-        window.process = { env: { NODE_ENV: 'production' } }; 
-    </script>
+    <script> window.process = { env: { NODE_ENV: 'production' } }; </script>
     <style>
-        body { 
-            box-sizing: border-box; 
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif; 
-            background: #0f0f0f; 
-            color: #fff; 
-            overflow-x: hidden;
-        }
-        
-        @keyframes float { 
-            0%,100%{transform:translateY(0)} 
-            50%{transform:translateY(-10px)} 
-        }
-        
-        @keyframes pulse-glow { 
-            0%,100%{box-shadow:0 0 20px rgba(0,150,255,.3),0 0 40px rgba(0,150,255,.1)} 
-            50%{box-shadow:0 0 30px rgba(0,150,255,.5),0 0 60px rgba(0,150,255,.2)} 
-        }
-        
-        @keyframes slideUp { 
-            from{opacity:0;transform:translateY(20px)} 
-            to{opacity:1; transform:translateY(0)} 
-        }
-        
-        @keyframes celebrate { 
-            0%,100%{transform:scale(1) rotate(0)} 
-            25%{transform:scale(1.15) rotate(-3deg)} 
-            75%{transform:scale(1.15) rotate(3deg)} 
-        }
-        
-        .float-animation { animation:float 3s ease-in-out infinite } 
-        .pulse-glow { animation:pulse-glow 2s ease-in-out infinite } 
-        .slide-up { animation:slideUp .4s ease-out }
-        
-        .app-card {
-            background:linear-gradient(135deg, rgba(20,20,20,.95), rgba(30,30,30,.95)); 
-            backdrop-filter:blur(20px); 
-            border:1px solid rgba(255,255,255,.08); 
-            border-radius:20px; 
-            box-shadow:0 10px 30px rgba(0,0,0,.5);
-        }
-        
-        .gradient-bg {
-            background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#2d2d2d 100%);
-        }
-        
-        .diamond-icon {
-            filter:drop-shadow(0 0 8px rgba(0,150,255,.6)); 
-            color:#0096ff;
-        }
-        
-        .btn-primary {
-            background:linear-gradient(135deg,#0096ff 0%,#0066cc 100%); 
-            box-shadow:0 6px 20px rgba(0,150,255,.3); 
-            transition:all .3s; 
-            position:relative; 
-            overflow:hidden;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .btn-primary:hover:not(:disabled) { 
-            transform:translateY(-2px) scale(1.02); 
-            box-shadow:0 10px 25px rgba(0,150,255,.4); 
-        }
-        
-        .btn-primary::after { 
-            content:''; 
-            position:absolute; 
-            top:0; 
-            left:-100%; 
-            width:100%; 
-            height:100%; 
-            background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent); 
-            transition:left .5s; 
-        }
-        
-        .btn-primary:hover::after { 
-            left:100%; 
-        }
-        
-        .status-card { 
-            background:rgba(255,255,255,.03); 
-            border:1px solid rgba(255,255,255,.06); 
-        }
-        
-        .reward-badge { 
-            background:rgba(34,197,94,.1); 
-            border:1px solid rgba(34,197,94,.2); 
-        }
-        
-        .diamond-count { 
-            background:rgba(0,150,255,.1); 
-            border:1px solid rgba(0,150,255,.2); 
-        }
-        
-        /* Interstitial reklama modal */
-        .interstitial-modal {
+        body { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif; background: #0f0f0f; color: #fff; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes pulse-glow { 0%,100%{box-shadow:0 0 20px rgba(0,150,255,.3),0 0 40px rgba(0,150,255,.1)} 50%{box-shadow:0 0 30px rgba(0,150,255,.5),0 0 60px rgba(0,150,255,.2)} }
+        @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1; transform:translateY(0)} }
+        @keyframes celebrate { 0%,100%{transform:scale(1) rotate(0)} 25%{transform:scale(1.15) rotate(-3deg)} 75%{transform:scale(1.15) rotate(3deg)} }
+        .float-animation{animation:float 3s ease-in-out infinite} 
+        .pulse-glow{animation:pulse-glow 2s ease-in-out infinite} 
+        .slide-up{animation:slideUp .4s ease-out}
+
+        .app-card{background:linear-gradient(135deg, rgba(20,20,20,.95), rgba(30,30,30,.95)); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,.08); border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.5);}
+        .gradient-bg{background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#2d2d2d 100%)}
+        .diamond-icon{filter:drop-shadow(0 0 8px rgba(0,150,255,.6)); color:#0096ff}
+
+        .btn-primary{background:linear-gradient(135deg,#0096ff 0%,#0066cc 100%); box-shadow:0 6px 20px rgba(0,150,255,.3); transition:all .3s; position:relative; overflow:hidden;}
+        .btn-primary:hover:not(:disabled){ transform:translateY(-2px) scale(1.02); box-shadow:0 10px 25px rgba(0,150,255,.4); }
+        .btn-primary::after{ content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent); transition:left .5s; }
+        .btn-primary:hover::after{ left:100%; }
+
+        .avatar-container{ width:64px; height:64px; border-radius:50%; overflow:hidden; position:relative; background:linear-gradient(135deg,#0096ff,#0066cc); flex:0 0 auto; }
+        .avatar-image{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); min-width:100%; min-height:100%; object-fit:cover; display:block; }
+        .gradient-avatar{ width:100%; height:100%; background:linear-gradient(135deg,#0096ff,#0066cc); border-radius:50%; display:flex; align-items:center; justify-content:center; }
+
+        .status-card{ background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); }
+        .reward-badge{ background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.2); }
+        .diamond-count{ background:rgba(0,150,255,.1); border:1px solid rgba(0,150,255,.2); }
+
+        .menu-container{ position:fixed; bottom:0; left:0; right:0; background:rgba(15,15,15,.95); backdrop-filter:blur(20px); border-top:1px solid rgba(255,255,255,.1); z-index:100; padding-bottom:env(safe-area-inset-bottom); }
+        .menu-nav{ display:flex; max-width:600px; margin:0 auto; padding:12px 16px; gap:8px; }
+        .menu-item{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px 8px; border-radius:16px; background:transparent; border:none; color:rgba(255,255,255,.5); transition:all .3s; cursor:pointer; position:relative; }
+        .menu-item.active{ background:rgba(255,255,255,.1); color:white; }
+        .content-container{ padding-bottom:100px; }
+
+        ::-webkit-scrollbar{ width:6px } ::-webkit-scrollbar-track{ background:rgba(255,255,255,.05); border-radius:10px } ::-webkit-scrollbar-thumb{ background:#0096ff; border-radius:10px } ::-webkit-scrollbar-thumb:hover{ background:#0066cc }
+        ::selection{ background:rgba(0,150,255,.3); color:white }
+
+        .content-section{ display:none; animation:fadeIn .3s ease-out; } .content-section.active{ display:block; }
+        @keyframes fadeIn{ from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
+
+        .leaderboard-wrapper { max-width:640px; margin:10px auto; padding:12px; }
+        .leaderboard-card { background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:12px; }
+        .leaderboard-tabs { display:flex; gap:8px; margin-bottom:12px; }
+        .leaderboard-tab { padding:8px 12px; border-radius:10px; cursor:pointer; color:rgba(255,255,255,.75); background:transparent; font-weight:600; border:1px solid transparent; }
+        .leaderboard-tab.active { background:linear-gradient(90deg,#0096ff,#0066cc); color:white; box-shadow:0 6px 18px rgba(0,150,255,0.12); }
+        .leaderboard-list { display:flex; flex-direction:column; gap:8px; max-height:420px; overflow:auto; }
+        .leaderboard-item { display:flex; align-items:center; gap:12px; padding:10px; border-radius:10px; transition:background .12s; }
+        .leader-rank { width:36px; text-align:center; font-weight:800; color:#ffd54a; }
+        .leader-avatar { width:48px; height:48px; border-radius:50%; overflow:hidden; flex:0 0 auto; }
+        .leader-meta { flex:1; }
+        .leader-name { font-weight:700; color:#fff; }
+        .leader-username { font-size:12px; color:rgba(255,255,255,.6) }
+        .leader-count { font-weight:800; color:#ffd54a; margin-left:auto; white-space:nowrap; }
+
+        /* Modal styles */
+        .modal-overlay {
             position: fixed;
             inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        .modal-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .modal-footer {
+            padding: 16px 20px 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+        }
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-icon {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(0, 150, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .info-content h4 {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: rgba(255,255,255,0.95);
+            font-size: 16px;
+        }
+        .info-content p {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .highlight-text {
+            color: #0096ff;
+            font-weight: 600;
+        }
+        .warning-text {
+            color: #ffd54a;
+            font-weight: 600;
+        }
+        
+        /* AdsGram Interstitial Modal */
+        .adsgram-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: rgba(0, 0, 0, 0.95);
             backdrop-filter: blur(10px);
             z-index: 10000;
@@ -122,13 +170,11 @@
             visibility: hidden;
             transition: all 0.3s ease;
         }
-        
-        .interstitial-modal.active {
+        .adsgram-modal.active {
             opacity: 1;
             visibility: visible;
         }
-        
-        .ad-container {
+        .adsgram-container {
             width: 100%;
             max-width: 400px;
             height: 600px;
@@ -137,118 +183,152 @@
             overflow: hidden;
             position: relative;
         }
-        
-        .ad-close-btn {
+        .adsgram-close-btn {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             cursor: pointer;
-            z-index: 100;
-            font-size: 16px;
+            z-index: 10;
+            font-size: 20px;
+            display: none;
         }
-        
-        .ad-loader {
+        .adsgram-loader {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 50px;
             height: 50px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top: 3px solid #0096ff;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #0096ff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            display: none;
         }
-        
         @keyframes spin {
             0% { transform: translate(-50%, -50%) rotate(0deg); }
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
         
-        .content-section { 
-            display:none; 
-            animation:fadeIn .3s ease-out; 
-        } 
-        
-        .content-section.active { 
-            display:block; 
-        }
-        
-        @keyframes fadeIn { 
-            from{opacity:0; transform:translateY(10px)} 
-            to{opacity:1; transform:translateY(0)} 
-        }
-        
-        .menu-container { 
-            position:fixed; 
-            bottom:0; 
-            left:0; 
-            right:0; 
-            background:rgba(15,15,15,.95); 
-            backdrop-filter:blur(20px); 
-            border-top:1px solid rgba(255,255,255,.1); 
-            z-index:100; 
-            padding-bottom:env(safe-area-inset-bottom); 
-        }
-        
-        .menu-nav { 
-            display:flex; 
-            max-width:600px; 
-            margin:0 auto; 
-            padding:12px 16px; 
-            gap:8px; 
-        }
-        
-        .menu-item { 
-            flex:1; 
-            display:flex; 
-            flex-direction:column; 
-            align-items:center; 
-            justify-content:center; 
-            padding:12px 8px; 
-            border-radius:16px; 
-            background:transparent; 
-            border:none; 
-            color:rgba(255,255,255,.5); 
-            transition:all .3s; 
-            cursor:pointer; 
-            position:relative; 
-        }
-        
-        .menu-item.active { 
-            background:rgba(255,255,255,.1); 
-            color:white; 
-        }
-        
-        .content-container { 
-            padding-bottom:100px; 
-        }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar { width:6px } 
-        ::-webkit-scrollbar-track { background:rgba(255,255,255,.05); border-radius:10px } 
-        ::-webkit-scrollbar-thumb { background:#0096ff; border-radius:10px } 
-        ::-webkit-scrollbar-thumb:hover { background:#0066cc }
-        ::selection { background:rgba(0,150,255,.3); color:white }
-        
         /* Telefon uchun optimallashtirishlar */
         @media (max-width: 420px) { 
-            .ad-container {
+            .leaderboard-list{ max-height:300px } 
+            .leader-avatar{ width:40px; height:40px }
+            
+            /* Modal optimallashtirish */
+            .modal-overlay {
+                padding: 16px;
+            }
+            .modal-content {
+                max-width: 100%;
+                max-height: 85vh;
+                border-radius: 20px;
+            }
+            .modal-header {
+                padding: 20px 20px 12px;
+            }
+            .modal-header .text-6xl {
+                font-size: 4rem;
+            }
+            .modal-header h2 {
+                font-size: 1.5rem;
+                line-height: 1.3;
+            }
+            .modal-header p {
+                font-size: 14px;
+            }
+            .modal-body {
+                padding: 16px;
+            }
+            .modal-footer {
+                padding: 12px 16px 16px;
+            }
+            .info-item {
+                padding: 10px 0;
+            }
+            .info-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 18px;
+            }
+            .info-content h4 {
+                font-size: 15px;
+                line-height: 1.3;
+            }
+            .info-content p {
+                font-size: 13px;
+                line-height: 1.4;
+            }
+            .btn-primary {
+                padding: 16px;
+                font-size: 16px;
+                font-weight: 600;
+            }
+            
+            /* AdsGram modal optimallashtirish */
+            .adsgram-container {
                 height: 500px;
                 max-width: 350px;
             }
         }
         
         @media (max-width: 360px) {
-            .ad-container {
+            .modal-header .text-6xl {
+                font-size: 3.5rem;
+            }
+            .modal-header h2 {
+                font-size: 1.3rem;
+            }
+            .info-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 16px;
+            }
+            .info-content h4 {
+                font-size: 14px;
+            }
+            .info-content p {
+                font-size: 12px;
+            }
+            
+            /* AdsGram modal optimallashtirish */
+            .adsgram-container {
                 height: 450px;
                 max-width: 320px;
+            }
+        }
+        
+        @media (max-height: 700px) {
+            .modal-content {
+                max-height: 85vh;
+            }
+            .modal-body {
+                max-height: 45vh;
+                overflow-y: auto;
+            }
+            .adsgram-container {
+                height: 500px;
+            }
+        }
+        
+        @media (max-height: 600px) {
+            .modal-content {
+                max-height: 90vh;
+            }
+            .modal-body {
+                max-height: 40vh;
+            }
+            .modal-header {
+                padding: 16px 16px 12px;
+            }
+            .adsgram-container {
+                height: 450px;
             }
         }
     </style>
@@ -264,12 +344,57 @@
             </div>
         </div>
 
-        <!-- Interstitial reklama modal -->
-        <div id="interstitial-modal" class="interstitial-modal">
-            <div class="ad-container">
-                <button id="ad-close-btn" class="ad-close-btn" style="display: none;">✕</button>
-                <div id="ad-loader" class="ad-loader" style="display: none;"></div>
-                <div id="ad-content"></div>
+        <!-- Welcome Modal -->
+        <div id="welcome-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="text-6xl mb-4 float-animation diamond-icon">💎</div>
+                    <h2 class="text-2xl font-bold text-white/90 mb-2">RekchiAi olmoslari</h2>
+                    <p class="text-white/60">Mini appga xush kelibsiz!</p>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="space-y-4">
+                        <div class="info-item">
+                            <div class="info-icon">💎</div>
+                            <div class="info-content">
+                                <h4>Cheksiz olmoslar yeg'ishingiz mumkin!</h4>
+                                <p>Bu joyda siz reklama ko'rib va bosib <span class="highlight-text">cheksiz olmoslar</span> yeg'ishingiz mumkin.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-icon">⚠️</div>
+                            <div class="info-content">
+                                <h4>Diqqat! Muhim qoida:</h4>
+                                <p>Har <span class="warning-text">3 ta olmos</span> yeg'ganingizda <span class="warning-text">bitta klik</span> qiling. Ya'ni reklama qilayotgan joyga kirib chiqing. (2-3 sekund vaqt ketishi mumkin).</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-icon">🎥</div>
+                            <div class="info-content">
+                                <h4>Tushunmagan bo'lsangiz:</h4>
+                                <p>Botdagi <span class="highlight-text">"Videoqo'llanma"</span> tugmasini bosib, olmos yeg'ish haqidagi videoni ko'ring!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button id="modal-ok-btn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-2xl text-lg transition-all duration-300">
+                        Tushundim
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AdsGram Interstitial Modal -->
+        <div id="adsgram-modal" class="adsgram-modal">
+            <div class="adsgram-container">
+                <button id="adsgram-close-btn" class="adsgram-close-btn">✕</button>
+                <div id="adsgram-loader" class="adsgram-loader"></div>
+                <div id="adsgram-content"></div>
             </div>
         </div>
 
@@ -325,9 +450,68 @@
 
                         <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg transition-all duration-300">
                             <span class="text-2xl">▶️</span>
-                            <span>Interstitial reklamani boshlash</span>
+                            <span>Interstitial Reklamani boshlash</span>
                         </button>
+                        
+                        <div class="mt-4 text-center">
+                            <p class="text-sm text-white/50">Full-screen Interstitial reklama • To'liq ko'rilganda bonus</p>
+                        </div>
                     </div>
+                </div>
+
+                <div id="leaderboard-section" class="content-section">
+                    <div class="leaderboard-wrapper slide-up">
+                        <div class="leaderboard-card">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-lg font-bold">Reytinglar</h3>
+                                    <p class="text-xs text-white/60">Kunlik va umumiy top 10</p>
+                                </div>
+                                <div class="leaderboard-tabs" role="tablist" aria-label="Reyting turlari">
+                                    <button id="lb-tab-daily-main" class="leaderboard-tab active" type="button">Kunlik</button>
+                                    <button id="lb-tab-overall-main" class="leaderboard-tab" type="button">Umumiy</button>
+                                </div>
+                            </div>
+
+                            <div id="leaderboard-list" class="leaderboard-list" aria-live="polite">
+                                <div class="text-white/60 text-sm">Yuklanmoqda...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="admin-panel" class="hidden app-card p-6 border-2 border-yellow-500/20 slide-up" style="animation-delay:0.3s;">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="text-3xl">👑</div>
+                        <h2 class="text-xl font-bold text-white/90">Admin Panel</h2>
+                    </div>
+
+                    <div class="admin-card rounded-2xl p-5 mb-6">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="text-xl">📈</div>
+                            <h3 class="font-bold text-white/90">Umumiy statistika</h3>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div>
+                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-users">0</p>
+                                <p class="text-xs text-white/60 mt-1">Foydalanuvchi</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-ads">0</p>
+                                <p class="text-xs text-white/60 mt-1">Reklamalar</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-yellow-400" id="admin-total-diamonds">0</p>
+                                <p class="text-xs text-white/60 mt-1">Olmoslar</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="text-xl">👥</div>
+                        <h3 class="font-bold text-white/90">Foydalanuvchilar</h3>
+                    </div>
+                    <div id="users-list" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
                 </div>
             </div>
 
@@ -337,11 +521,16 @@
                         <span class="menu-icon">💎</span>
                         <span class="menu-label">Olmos ishlash</span>
                     </button>
+                    <button class="menu-item" data-section="leaderboard-section" id="menu-leaderboard">
+                        <span class="menu-icon">🏆</span>
+                        <span class="menu-label">Reytinglar</span>
+                    </button>
                 </nav>
             </div>
         </div>
     </div>
 
+    <!-- Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
@@ -366,22 +555,54 @@
         const BOT_API_GET_URL = 'https://68ed1ab05ca4e.myxvest1.ru/get_balance.php';
         const BOT_API_KEY = '4564123:hkjhfadfhieapkdnga';
         
-        // Interstitial reklama uchun blockId (int-20018)
+        // AdsGram Interstitial blockId
         const INTERSTITIAL_BLOCK_ID = "int-20018";
 
         let currentUser = null;
         let allUsers = [];
         let isAdmin = false;
         let botBalance = 0;
+        let currentLeaderboard = 'daily';
         let isWatchingAd = false;
         let interstitialAdController = null;
+        let hasShownWelcomeModal = false;
 
-        // AdsGram initialization faqat Interstitial uchun
+        // AdsGram initialization
         function initializeAdsGram() {
             try {
                 if (window.Adsgram && INTERSTITIAL_BLOCK_ID) {
-                    interstitialAdController = window.Adsgram.init({ blockId: INTERSTITIAL_BLOCK_ID });
-                    console.log('Interstitial AdsGram SDK initialized successfully');
+                    interstitialAdController = window.Adsgram.init({ 
+                        blockId: INTERSTITIAL_BLOCK_ID 
+                    });
+                    console.log('AdsGram Interstitial SDK initialized successfully');
+                    
+                    // Event listeners for debugging
+                    if (interstitialAdController) {
+                        interstitialAdController.on('load', (data) => {
+                            console.log('Ad loaded:', data);
+                            hideAdsGramLoader();
+                        });
+                        
+                        interstitialAdController.on('render', (data) => {
+                            console.log('Ad rendered:', data);
+                        });
+                        
+                        interstitialAdController.on('playing', (data) => {
+                            console.log('Ad playing:', data);
+                        });
+                        
+                        interstitialAdController.on('destroy', (data) => {
+                            console.log('Ad destroyed:', data);
+                            hideAdsGramModal();
+                        });
+                        
+                        interstitialAdController.on('error', (data) => {
+                            console.error('Ad error:', data);
+                            hideAdsGramModal();
+                            showAdError('Reklama yuklanmadi');
+                        });
+                    }
+                    
                     return true;
                 } else {
                     console.warn('AdsGram SDK not available or blockId missing');
@@ -393,88 +614,380 @@
             }
         }
 
-        // Interstitial reklama modal funksiyalari
-        function showInterstitialModal() {
-            const modal = document.getElementById('interstitial-modal');
+        // AdsGram UI functions
+        function showAdsGramModal() {
+            const modal = document.getElementById('adsgram-modal');
+            const closeBtn = document.getElementById('adsgram-close-btn');
             if (modal) {
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
+                
+                // Show close button after 5 seconds for Interstitial
+                setTimeout(() => {
+                    if (closeBtn) {
+                        closeBtn.style.display = 'block';
+                    }
+                }, 5000);
             }
         }
 
-        function hideInterstitialModal() {
-            const modal = document.getElementById('interstitial-modal');
+        function hideAdsGramModal() {
+            const modal = document.getElementById('adsgram-modal');
+            const closeBtn = document.getElementById('adsgram-close-btn');
             if (modal) {
                 modal.classList.remove('active');
                 document.body.style.overflow = 'auto';
                 
-                // Clear content
-                const adContent = document.getElementById('ad-content');
-                if (adContent) {
-                    adContent.innerHTML = '';
+                if (closeBtn) {
+                    closeBtn.style.display = 'none';
                 }
             }
         }
 
-        function showAdLoader() {
-            const loader = document.getElementById('ad-loader');
-            const closeBtn = document.getElementById('ad-close-btn');
+        function showAdsGramLoader() {
+            const loader = document.getElementById('adsgram-loader');
             if (loader) loader.style.display = 'block';
-            if (closeBtn) closeBtn.style.display = 'none';
         }
 
-        function hideAdLoader() {
-            const loader = document.getElementById('ad-loader');
+        function hideAdsGramLoader() {
+            const loader = document.getElementById('adsgram-loader');
             if (loader) loader.style.display = 'none';
         }
 
-        function showCloseButton() {
-            const closeBtn = document.getElementById('ad-close-btn');
-            if (closeBtn) closeBtn.style.display = 'block';
+        function showAdError(message) {
+            const statusDiv = document.getElementById('ad-status');
+            if (statusDiv) {
+                statusDiv.innerHTML = `<p class="text-red-400">${message}</p>`;
+                setTimeout(() => { 
+                    statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
+                }, 3000);
+            }
+            resetWatchButton();
+        }
+
+        // Helper functions
+        async function getTelegramProfilePhoto(userId, username) {
+            try {
+                const tg = window.Telegram?.WebApp;
+                if (tg?.initDataUnsafe?.user?.photo_url) return tg.initDataUnsafe.user.photo_url;
+                if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
+                return createFullGradientAvatar(userId);
+            } catch (e) {
+                return createFullGradientAvatar(userId);
+            }
+        }
+        
+        function createFullGradientAvatar(userId) {
+            const gradients = [['#FF6B6B','#FF8E53'],['#4ECDC4','#44A08D'],['#FFD93D','#FF6B6B'],['#6BC5D2','#4A9CC2'],['#9D50BB','#6E48AA'],['#00C9FF','#92FE9D'],['#FF9A9E','#FAD0C4'],['#A18CD1','#FBC2EB'],['#667eea','#764ba2'],['#f093fb','#f5576c']];
+            const idx = (userId||'').split('').reduce((s,c)=>s+c.charCodeAt(0),0) % gradients.length;
+            const [c1,c2] = gradients[idx];
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><defs><linearGradient id="g${userId}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="100%" height="100%" rx="128" fill="url(#g${userId})"/></svg>`;
+            return 'data:image/svg+xml;base64,' + btoa(svg);
+        }
+
+        function escapeHtml(str) { 
+            if (!str) return ''; 
+            return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); 
+        }
+
+        // Modal functions
+        function showWelcomeModal() {
+            if (hasShownWelcomeModal) return;
+            
+            const modal = document.getElementById('welcome-modal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            const firstVisit = localStorage.getItem('rekchiai_first_visit');
+            if (!firstVisit) {
+                hasShownWelcomeModal = true;
+            }
+        }
+
+        function hideWelcomeModal() {
+            const modal = document.getElementById('welcome-modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            
+            localStorage.setItem('rekchiai_first_visit', 'true');
+        }
+
+        // Init Telegram
+        function initTelegram() {
+            if (window.Telegram?.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+                window.Telegram.WebApp.setBackgroundColor('#0f0f0f');
+                window.Telegram.WebApp.setHeaderColor('#0f0f0f');
+                const tg = window.Telegram.WebApp;
+                const user = tg.initDataUnsafe?.user;
+                if (user) {
+                    currentUser = {
+                        user_id: user.id.toString(),
+                        username: user.username || '',
+                        first_name: user.first_name || 'Foydalanuvchi',
+                        last_name: user.last_name || '',
+                        photo_url: user.photo_url || null,
+                        language_code: user.language_code || 'uz'
+                    };
+                    isAdmin = ADMIN_IDS.includes(currentUser.user_id);
+                } else {
+                    currentUser = { 
+                        user_id: 'web_' + Date.now(), 
+                        username: 'foydalanuvchi', 
+                        first_name: 'Foydalanuvchi', 
+                        last_name:'', 
+                        photo_url:null, 
+                        language_code:'uz' 
+                    };
+                }
+            } else {
+                currentUser = { 
+                    user_id: 'web_' + Date.now(), 
+                    username: 'foydalanuvchi', 
+                    first_name: 'Foydalanuvchi', 
+                    last_name:'', 
+                    photo_url:null, 
+                    language_code:'uz' 
+                };
+            }
+        }
+
+        // Load/create user in Firebase
+        async function loadOrCreateUser() {
+            if (!currentUser) return null;
+            try {
+                const userRef = ref(db, 'users/' + currentUser.user_id);
+                const snapshot = await get(userRef);
+                if (!snapshot.exists()) {
+                    const profilePhoto = await getTelegramProfilePhoto(currentUser.user_id, currentUser.username);
+                    const newUser = {
+                        user_id: currentUser.user_id,
+                        username: currentUser.username || '',
+                        first_name: currentUser.first_name || 'Foydalanuvchi',
+                        last_name: currentUser.last_name || '',
+                        photo_url: profilePhoto,
+                        language_code: currentUser.language_code || 'uz',
+                        ads_by_day: {},
+                        diamonds: 0,
+                        ads_watched: 0,
+                        withdraw_history: [],
+                        last_ad_time: new Date().toISOString(),
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        interstitial_ads: 0,
+                        total_rewards: 0
+                    };
+                    await set(userRef, newUser);
+                    return newUser;
+                } else {
+                    let userData = snapshot.val();
+                    if (!userData.photo_url) {
+                        const profilePhoto = await getTelegramProfilePhoto(currentUser.user_id, currentUser.username);
+                        const updates = { 
+                            photo_url: profilePhoto, 
+                            username: currentUser.username || userData.username, 
+                            first_name: currentUser.first_name || userData.first_name, 
+                            updated_at: new Date().toISOString() 
+                        };
+                        await update(userRef, updates);
+                        userData = { ...userData, ...updates };
+                    }
+                    if (!userData.ads_by_day) {
+                        await update(userRef, { ads_by_day: {} });
+                        userData.ads_by_day = {};
+                    }
+                    if (typeof userData.interstitial_ads === 'undefined') {
+                        await update(userRef, { 
+                            interstitial_ads: userData.interstitial_ads || 0,
+                            total_rewards: userData.total_rewards || 0
+                        });
+                    }
+                    return userData;
+                }
+            } catch (err) {
+                console.error('loadOrCreateUser error', err);
+                return null;
+            }
+        }
+        
+        async function updateUserData(updates) {
+            if (!currentUser) return false;
+            try {
+                const userRef = ref(db, 'users/' + currentUser.user_id);
+                await update(userRef, { ...updates, updated_at: new Date().toISOString() });
+                return true;
+            } catch (err) {
+                console.error('updateUserData error', err);
+                return false;
+            }
+        }
+
+        // Subscribe to all users for leaderboard + admin
+        function subscribeToUsers() {
+            const usersRef = ref(db, 'users');
+            onValue(usersRef, (snapshot) => {
+                allUsers = [];
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    Object.keys(data).forEach(k => allUsers.push(data[k]));
+                }
+                updateAdminPanel();
+                renderLeaderboardsMain();
+            }, (err) => console.error('subscribeToUsers error', err));
+        }
+
+        // Render leaderboards
+        function renderLeaderboardsMain() {
+            const listEl = document.getElementById('leaderboard-list');
+            if (!listEl) return;
+            const now = new Date();
+            const tzOffset = now.getTimezoneOffset() * 60000;
+            const localKey = new Date(now - tzOffset).toISOString().slice(0,10);
+
+            const mapped = allUsers.map(u => {
+                const ads_by_day = u.ads_by_day || {};
+                return {
+                    id: u.user_id,
+                    name: u.first_name || 'Foydalanuvchi',
+                    username: u.username || '',
+                    photo_url: u.photo_url || '',
+                    todayCount: parseInt(ads_by_day[localKey] || 0),
+                    overallCount: parseInt(u.ads_watched || 0),
+                    diamonds: parseInt(u.diamonds || 0)
+                };
+            });
+
+            let sorted;
+            if (currentLeaderboard === 'daily') {
+                sorted = mapped.sort((a,b) => b.todayCount - a.todayCount || b.diamonds - a.diamonds);
+            } else {
+                sorted = mapped.sort((a,b) => b.overallCount - a.overallCount || b.diamonds - a.diamonds);
+            }
+
+            const top = sorted.slice(0,10);
+            if (top.length === 0) {
+                listEl.innerHTML = `<div class="text-white/60 text-sm">Hozircha ma'lumot yo'q.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = top.map((u,i) => `
+                <div class="leaderboard-item">
+                    <div class="leader-rank">${i+1}</div>
+                    <div class="leader-avatar">
+                        ${u.photo_url ? `<img src="${u.photo_url}" alt="${escapeHtml(u.name)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'gradient-avatar\\' style=\\'width:100%;height:100%\\'></div>'">` : `<div class="gradient-avatar" style="width:100%;height:100%"></div>`}
+                    </div>
+                    <div class="leader-meta">
+                        <div class="leader-name">${escapeHtml(u.name)}</div>
+                        <div class="leader-username">${u.username ? '@'+escapeHtml(u.username) : ''}</div>
+                    </div>
+                    <div class="leader-count">${currentLeaderboard === 'daily' ? u.todayCount : u.overallCount} 💎</div>
+                </div>
+            `).join('');
+        }
+
+        // Admin panel render
+        function updateAdminPanel() {
+            const totalUsers = allUsers.length;
+            const totalAds = allUsers.reduce((s,u)=> s + (u.ads_watched||0), 0);
+            const totalDiamonds = allUsers.reduce((s,u)=> s + (u.diamonds||0), 0);
+            document.getElementById('admin-total-users').textContent = totalUsers;
+            document.getElementById('admin-total-ads').textContent = totalAds;
+            document.getElementById('admin-total-diamonds').textContent = totalDiamonds;
+
+            const usersList = document.getElementById('users-list');
+            if (!usersList) return;
+            usersList.innerHTML = allUsers
+                .sort((a,b)=>(b.diamonds||0)-(a.diamonds||0))
+                .slice(0,20)
+                .map(u => `
+                    <div class="app-card p-4 hover:bg-white/5 transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="avatar-container">
+                                    ${u.photo_url ? `<img src="${u.photo_url}" alt="${(u.first_name||'Foydalanuvchi')}" class="avatar-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'gradient-avatar\\'></div>'">` : `<div class="gradient-avatar"></div>`}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-sm text-white/90">${u.first_name || 'Foydalanuvchi'}</p>
+                                    <p class="text-xs text-white/50">${u.username ? '@'+u.username : '@nousername'}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-yellow-400">${u.diamonds || 0} 💎</p>
+                                <p class="text-xs text-white/50">${u.ads_watched || 0} reklama</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
         }
 
         // Interstitial reklama ko'rsatish
         async function showInterstitialAd() {
-            if (!interstitialAdController) {
-                if (!initializeAdsGram()) {
-                    throw new Error('AdsGram not initialized');
-                }
-            }
-
             return new Promise((resolve, reject) => {
-                // Modalni ko'rsatish
-                showInterstitialModal();
-                showAdLoader();
+                if (!interstitialAdController) {
+                    if (!initializeAdsGram()) {
+                        reject(new Error('AdsGram not initialized'));
+                        return;
+                    }
+                }
 
-                // Interstitial reklama - oddiy ko'rsatish, bonus faqat ko'rilgandan keyin
+                showAdsGramModal();
+                showAdsGramLoader();
+
                 interstitialAdController.show()
                     .then((result) => {
-                        console.log('Interstitial ad result:', result);
-                        
-                        // Interstitial reklama to'liq ko'rilgan yoki yopilgan
-                        hideInterstitialModal();
-                        hideAdLoader();
-                        
-                        // Bonus berish (reklama ko'rilgan)
-                        resolve({ success: true, watched: true });
+                        console.log('Interstitial ad completed:', result);
+                        hideAdsGramModal();
+                        hideAdsGramLoader();
+                        resolve({ success: true, watched: result.done });
                     })
                     .catch((errorResult) => {
                         console.error('Interstitial ad error:', errorResult);
-                        hideInterstitialModal();
-                        hideAdLoader();
+                        hideAdsGramModal();
+                        hideAdsGramLoader();
                         
                         if (errorResult.error && errorResult.description?.includes('no banner')) {
-                            // Reklama mavjud emas
                             reject(new Error('No ads available'));
                         } else {
-                            // Boshqa xato
-                            reject(new Error('Ad error'));
+                            reject(new Error('Ad error: ' + (errorResult.description || 'Unknown error')));
                         }
                     });
             });
         }
 
-        // Bonus berish funksiyasi
+        // Asosiy reklama ko'rish funksiyasi
+        async function watchAd() {
+            if (!currentUser || isWatchingAd) return;
+            
+            const btn = document.getElementById('watch-ad-btn');
+            const statusDiv = document.getElementById('ad-status');
+            
+            isWatchingAd = true;
+            btn.disabled = true;
+            btn.innerHTML = '<div class="w-6 h-6 border-3 border-white/30 border-t-blue-500 rounded-full animate-spin mx-auto"></div>';
+            statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Interstitial reklama tayyorlanmoqda...</p>';
+            
+            try {
+                const result = await showInterstitialAd();
+                
+                if (result.success && result.watched) {
+                    await giveBonusToUser();
+                } else {
+                    showAdError('Reklama to\'liq ko\'rilmadi');
+                }
+                
+            } catch (err) {
+                console.error('Reklama xatosi:', err);
+                
+                if (err.message === 'No ads available') {
+                    showAdError('Hozircha reklama mavjud emas. Iltimos, keyinroq urinib ko\'ring.');
+                } else {
+                    showAdError('Reklama ochishda xatolik: ' + err.message);
+                }
+            }
+        }
+
+        // Bonus berish
         async function giveBonusToUser() {
             const statusDiv = document.getElementById('ad-status');
             
@@ -492,12 +1005,17 @@
                 const ads_by_day = userData.ads_by_day || {};
                 const newDayCount = (ads_by_day[localKey] || 0) + 1;
                 const newOverall = (userData.ads_watched || 0) + 1;
+                const newInterstitial = (userData.interstitial_ads || 0) + 1;
+                const newDiamonds = (userData.diamonds || 0) + REWARD_AMOUNT;
+                const newTotalRewards = (userData.total_rewards || 0) + REWARD_AMOUNT;
 
                 const updates = { 
                     ads_watched: newOverall, 
                     [`ads_by_day/${localKey}`]: newDayCount, 
                     last_ad_time: new Date().toISOString(),
-                    interstitial_ads: (userData.interstitial_ads || 0) + 1
+                    interstitial_ads: newInterstitial,
+                    diamonds: newDiamonds,
+                    total_rewards: newTotalRewards
                 };
                 
                 const ok = await updateUserData(updates);
@@ -510,6 +1028,7 @@
                     console.warn('Bot add failed', e); 
                 }
 
+                renderLeaderboardsMain();
                 await fetchBotBalance();
 
                 statusDiv.innerHTML = `
@@ -518,7 +1037,8 @@
                         <p class="text-green-400 font-bold text-xl mb-1">Tabriklaymiz!</p>
                         <div class="my-4">
                             <div class="text-3xl font-bold text-yellow-400 mb-2">+${REWARD_AMOUNT} 💎</div>
-                            <p class="text-white/60 text-sm">Interstitial reklama ko'rildi</p>
+                            <p class="text-white/60 text-sm">Interstitial reklama to'liq ko'rildi</p>
+                            <p class="text-white/40 text-xs mt-2">Jami: ${newDiamonds} olmos</p>
                         </div>
                     </div>
                 `;
@@ -536,65 +1056,17 @@
             }
         }
 
-        // Asosiy reklama ko'rish funksiyasi
-        async function watchAd() {
-            if (!currentUser || isWatchingAd) return;
-            
-            const btn = document.getElementById('watch-ad-btn');
-            const statusDiv = document.getElementById('ad-status');
-            
-            isWatchingAd = true;
-            btn.disabled = true;
-            btn.innerHTML = '<div class="w-6 h-6 border-3 border-white/30 border-t-blue-500 rounded-full animate-spin mx-auto"></div>';
-            statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Interstitial reklama tayyorlanmoqda...</p>';
-            
-            try {
-                // Interstitial reklamani ko'rsatish
-                const result = await showInterstitialAd();
-                
-                if (result.success && result.watched) {
-                    // Bonus berish
-                    await giveBonusToUser();
-                } else {
-                    // Reklama ko'rilmagan
-                    statusDiv.innerHTML = '<p class="text-red-400">Reklama ko\'rilmadi. Iltimos, keyinroq urinib ko\'ring!</p>';
-                    resetWatchButton();
-                    setTimeout(() => { 
-                        statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
-                    }, 3000);
-                }
-                
-            } catch (err) {
-                console.error('Reklama xatosi:', err);
-                
-                if (err.message === 'No ads available') {
-                    statusDiv.innerHTML = '<p class="text-yellow-400">Hozircha reklama mavjud emas. Iltimos, keyinroq urinib ko\'ring.</p>';
-                } else {
-                    statusDiv.innerHTML = '<p class="text-red-400">Reklama ochishda xatolik.</p>';
-                }
-                
-                resetWatchButton();
-                setTimeout(() => { 
-                    statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
-                }, 3000);
-            }
-        }
-
         function resetWatchButton() {
             const btn = document.getElementById('watch-ad-btn');
             isWatchingAd = false;
             btn.disabled = false;
-            btn.innerHTML = '<span class="text-2xl">▶️</span><span>Interstitial reklamani boshlash</span>';
+            btn.innerHTML = '<span class="text-2xl">▶️</span><span>Interstitial Reklamani boshlash</span>';
         }
 
-        // Bot API funksiyalari
+        // Server bot API calls
         async function addToBotBalance(amount) {
             if (!currentUser) throw new Error('No user');
-            const body = new URLSearchParams({ 
-                key: BOT_API_KEY, 
-                user_id: currentUser.user_id, 
-                amount: amount 
-            });
+            const body = new URLSearchParams({ key: BOT_API_KEY, user_id: currentUser.user_id, amount: amount });
             
             try {
                 const resp = await fetch(BOT_API_ADD_URL, { 
@@ -604,7 +1076,9 @@
                 });
                 
                 if (!resp.ok) { 
-                    throw new Error('HTTP ' + resp.status); 
+                    const txt = await resp.text().catch(() => null); 
+                    console.warn('addToBotBalance non-OK', resp.status, txt); 
+                    return { success: false, message: 'HTTP ' + resp.status }; 
                 }
                 return await resp.json();
             } catch (err) {
@@ -640,156 +1114,16 @@
             }
         }
 
-        // User management funksiyalari
-        async function getTelegramProfilePhoto(userId, username) {
-            try {
-                const tg = window.Telegram?.WebApp;
-                if (tg?.initDataUnsafe?.user?.photo_url) return tg.initDataUnsafe.user.photo_url;
-                if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
-                return createGradientAvatar(userId);
-            } catch (e) {
-                return createGradientAvatar(userId);
-            }
-        }
-        
-        function createGradientAvatar(userId) {
-            const gradients = [
-                ['#FF6B6B','#FF8E53'], ['#4ECDC4','#44A08D'], 
-                ['#FFD93D','#FF6B6B'], ['#6BC5D2','#4A9CC2'],
-                ['#9D50BB','#6E48AA'], ['#00C9FF','#92FE9D']
-            ];
-            const idx = (userId||'').split('').reduce((s,c)=>s+c.charCodeAt(0),0) % gradients.length;
-            const [c1,c2] = gradients[idx];
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-                <defs>
-                    <linearGradient id="g${userId}" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" stop-color="${c1}"/>
-                        <stop offset="1" stop-color="${c2}"/>
-                    </linearGradient>
-                </defs>
-                <rect width="100%" height="100%" rx="128" fill="url(#g${userId})"/>
-            </svg>`;
-            return 'data:image/svg+xml;base64,' + btoa(svg);
-        }
-
-        function initTelegram() {
-            if (window.Telegram?.WebApp) {
-                window.Telegram.WebApp.ready();
-                window.Telegram.WebApp.expand();
-                window.Telegram.WebApp.setBackgroundColor('#0f0f0f');
-                window.Telegram.WebApp.setHeaderColor('#0f0f0f');
-                const tg = window.Telegram.WebApp;
-                const user = tg.initDataUnsafe?.user;
-                if (user) {
-                    currentUser = {
-                        user_id: user.id.toString(),
-                        username: user.username || '',
-                        first_name: user.first_name || 'Foydalanuvchi',
-                        last_name: user.last_name || '',
-                        photo_url: user.photo_url || null,
-                        language_code: user.language_code || 'uz'
-                    };
-                    isAdmin = ADMIN_IDS.includes(currentUser.user_id);
-                }
-            } else {
-                // Test uchun
-                currentUser = { 
-                    user_id: 'test_' + Date.now(), 
-                    username: 'testuser', 
-                    first_name: 'Test User', 
-                    photo_url: null, 
-                    language_code: 'uz' 
-                };
-            }
-        }
-
-        async function loadOrCreateUser() {
-            if (!currentUser) return null;
-            try {
-                const userRef = ref(db, 'users/' + currentUser.user_id);
-                const snapshot = await get(userRef);
-                
-                if (!snapshot.exists()) {
-                    const profilePhoto = await getTelegramProfilePhoto(currentUser.user_id, currentUser.username);
-                    const newUser = {
-                        user_id: currentUser.user_id,
-                        username: currentUser.username || '',
-                        first_name: currentUser.first_name || 'Foydalanuvchi',
-                        last_name: currentUser.last_name || '',
-                        photo_url: profilePhoto,
-                        language_code: currentUser.language_code || 'uz',
-                        ads_by_day: {},
-                        diamonds: 0,
-                        ads_watched: 0,
-                        interstitial_ads: 0,
-                        last_ad_time: new Date().toISOString(),
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    };
-                    await set(userRef, newUser);
-                    return newUser;
-                } else {
-                    let userData = snapshot.val();
-                    // Yangilash kerak bo'lsa
-                    return userData;
-                }
-            } catch (err) {
-                console.error('loadOrCreateUser error', err);
-                return null;
-            }
-        }
-        
-        async function updateUserData(updates) {
-            if (!currentUser) return false;
-            try {
-                const userRef = ref(db, 'users/' + currentUser.user_id);
-                await update(userRef, { ...updates, updated_at: new Date().toISOString() });
-                return true;
-            } catch (err) {
-                console.error('updateUserData error', err);
-                return false;
-            }
-        }
-
-        function updateUI(user) {
-            if (!user) return;
-            
-            const avatarDiv = document.getElementById('user-avatar');
-            if (!avatarDiv) return;
-            
-            avatarDiv.innerHTML = '';
-            if (user.photo_url) {
-                const img = document.createElement('img');
-                img.src = user.photo_url;
-                img.alt = user.first_name || 'Foydalanuvchi';
-                img.className = 'avatar-image';
-                img.onerror = function() {
-                    this.parentElement.innerHTML = '<div class="gradient-avatar"></div>';
-                };
-                avatarDiv.appendChild(img);
-            } else {
-                avatarDiv.innerHTML = '<div class="gradient-avatar"></div>';
-            }
-            
-            const userName = document.getElementById('user-name');
-            const userId = document.getElementById('user-id');
-            const userUsername = document.getElementById('user-username');
-            
-            if (userName) userName.textContent = user.first_name || 'Foydalanuvchi';
-            if (userId) userId.textContent = `ID: ${user.user_id}`;
-            if (userUsername) userUsername.textContent = user.username ? `@${user.username}` : '@nousername';
-            
-            document.getElementById('diamond-count').textContent = `${botBalance}`;
-        }
-
-        // Event listeners
+        // UI bindings
         function bindUI() {
-            // Reklama ko'rish tugmasi
             document.getElementById('watch-ad-btn')?.addEventListener('click', watchAd);
             
-            // Interstitial reklama yopish tugmasi
-            document.getElementById('ad-close-btn')?.addEventListener('click', () => {
-                hideInterstitialModal();
+            // Welcome modal OK button
+            document.getElementById('modal-ok-btn')?.addEventListener('click', hideWelcomeModal);
+
+            // AdsGram close button
+            document.getElementById('adsgram-close-btn')?.addEventListener('click', () => {
+                hideAdsGramModal();
                 resetWatchButton();
                 
                 const statusDiv = document.getElementById('ad-status');
@@ -798,10 +1132,24 @@
                     statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
                 }, 3000);
             });
+
+            // Bottom menu
+            document.getElementById('menu-earn')?.addEventListener('click', () => switchSection('earn-section', 'menu-earn'));
+            document.getElementById('menu-leaderboard')?.addEventListener('click', () => switchSection('leaderboard-section', 'menu-leaderboard'));
+
+            // Leaderboard tabs
+            document.getElementById('lb-tab-daily-main')?.addEventListener('click', () => {
+                currentLeaderboard = 'daily';
+                document.getElementById('lb-tab-daily-main').classList.add('active');
+                document.getElementById('lb-tab-overall-main').classList.remove('active');
+                renderLeaderboardsMain();
+            });
             
-            // Menu items
-            document.getElementById('menu-earn')?.addEventListener('click', () => {
-                switchSection('earn-section', 'menu-earn');
+            document.getElementById('lb-tab-overall-main')?.addEventListener('click', () => {
+                currentLeaderboard = 'overall';
+                document.getElementById('lb-tab-overall-main').classList.add('active');
+                document.getElementById('lb-tab-daily-main').classList.remove('active');
+                renderLeaderboardsMain();
             });
         }
 
@@ -810,97 +1158,59 @@
             document.getElementById(sectionId).classList.add('active');
             document.querySelectorAll('.menu-item').forEach(mi => mi.classList.remove('active'));
             if (menuButtonId) document.getElementById(menuButtonId).classList.add('active');
+            if (sectionId === 'leaderboard-section') renderLeaderboardsMain();
         }
 
-        // Avatar uchun qo'shimcha CSS
-        const style = document.createElement('style');
-        style.textContent = `
-            .avatar-container { 
-                width:64px; 
-                height:64px; 
-                border-radius:50%; 
-                overflow:hidden; 
-                position:relative; 
-                background:linear-gradient(135deg,#0096ff,#0066cc); 
-                flex:0 0 auto; 
+        // Update user UI
+        function updateUI(user) {
+            if (!user) return;
+            const avatarDiv = document.getElementById('user-avatar');
+            if (user.photo_url) {
+                avatarDiv.innerHTML = `<img src="${user.photo_url}" alt="${(user.first_name||'Foydalanuvchi')}" class="avatar-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'gradient-avatar\\'></div>'">`;
+            } else {
+                avatarDiv.innerHTML = '<div class="gradient-avatar"></div>';
             }
-            .avatar-image { 
-                position:absolute; 
-                top:50%; 
-                left:50%; 
-                transform:translate(-50%,-50%); 
-                min-width:100%; 
-                min-height:100%; 
-                object-fit:cover; 
-                display:block; 
-            }
-            .gradient-avatar { 
-                width:100%; 
-                height:100%; 
-                background:linear-gradient(135deg,#0096ff,#0066cc); 
-                border-radius:50%; 
-                display:flex; 
-                align-items:center; 
-                justify-content:center; 
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Asosiy ilovani ishga tushirish
-        async function initializeApp() {
-            try {
-                // Telegramni ishga tushirish
-                initTelegram();
-                
-                // AdsGram SDK ni ishga tushirish
-                initializeAdsGram();
-                
-                // UI elementlarini bog'lash
-                bindUI();
-                
-                // Foydalanuvchini yuklash
-                const user = await loadOrCreateUser();
-                if (user) {
-                    // Real-time yangilanish
-                    const userRef = ref(db, 'users/' + currentUser.user_id);
-                    onValue(userRef, (snap) => {
-                        if (snap.exists()) updateUI(snap.val());
-                    });
-                    
-                    updateUI(user);
-                }
-                
-                // Bot balansini olish
-                if (currentUser) {
-                    await fetchBotBalance();
-                    // Har 30 soniyada yangilash
-                    setInterval(fetchBotBalance, 30000);
-                }
-                
-                // Loading ni yashirish va kontentni ko'rsatish
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('content').classList.remove('hidden');
-                
-                console.log('App initialized successfully');
-                
-            } catch (error) {
-                console.error('App initialization error:', error);
-                document.getElementById('loading').innerHTML = `
-                    <div class="text-center">
-                        <div class="text-7xl mb-6">❌</div>
-                        <p class="text-xl font-semibold text-red-400">Xatolik yuz berdi</p>
-                        <p class="text-white/60 mt-2">Iltimos, qaytadan urinib ko'ring</p>
-                        <button onclick="location.reload()" class="mt-4 px-6 py-2 bg-blue-600 rounded-lg">Qayta yuklash</button>
-                    </div>
-                `;
-            }
+            document.getElementById('user-name').textContent = user.first_name || 'Foydalanuvchi';
+            document.getElementById('user-id').textContent = `ID: ${user.user_id}`;
+            document.getElementById('user-username').textContent = user.username ? `@${user.username}` : '@nousername';
+            document.getElementById('diamond-count').textContent = `${botBalance}`;
         }
 
-        // Ilovani boshlash
+        // App init
+        async function initializeAppMain() {
+            initTelegram();
+            initializeAdsGram(); // Initialize AdsGram SDK
+            bindUI();
+
+            const user = await loadOrCreateUser();
+            if (user) {
+                const userRef = ref(db, 'users/' + currentUser.user_id);
+                onValue(userRef, (snap) => { if (snap.exists()) updateUI(snap.val()); });
+
+                subscribeToUsers();
+
+                if (isAdmin) document.getElementById('admin-panel').classList.remove('hidden');
+            }
+
+            if (currentUser) {
+                await fetchBotBalance();
+                setInterval(fetchBotBalance, 30000);
+            }
+
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('content').classList.remove('hidden');
+            
+            // Show welcome modal after a short delay
+            setTimeout(() => {
+                showWelcomeModal();
+            }, 500);
+        }
+
+        // Start the app
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeApp);
+            document.addEventListener('DOMContentLoaded', initializeAppMain);
         } else {
-            initializeApp();
+            initializeAppMain();
         }
     </script>
 </body>

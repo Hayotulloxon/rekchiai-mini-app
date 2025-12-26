@@ -212,6 +212,23 @@
             color: rgba(255, 255, 255, 0.6);
         }
         
+        /* Kun yangilanganida ko'rinadigan xabar */
+        .new-day-notification {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(21, 128, 61, 0.15));
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+        .new-day-notification h3 {
+            color: #22c55e;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
         /* Telefon uchun optimallashtirishlar */
         @media (max-width: 420px) { 
             .leaderboard-list{ max-height:300px } 
@@ -398,6 +415,13 @@
             </div>
 
             <div class="max-w-lg mx-auto px-4 py-6 space-y-4 content-container">
+                <!-- Kun yangilanganida chiqadigan xabar -->
+                <div id="new-day-notification" class="new-day-notification" style="display: none;">
+                    <h3>🎉 Kun yangilandi!</h3>
+                    <p class="text-white/80">Bugungi 10 ta reklama limiti yangilandi. Yana olmos ishlashingiz mumkin!</p>
+                    <p class="text-xs text-white/60 mt-2">Har kuni ertalab soat 00:00 da limit yangilanadi</p>
+                </div>
+
                 <!-- Earn Section (limit tugamagan vaqtda) -->
                 <div id="earn-section" class="content-section active">
                     <div class="app-card p-5 slide-up">
@@ -505,6 +529,12 @@
                         <p class="text-xs text-white/40 text-center">
                             Do'stingiz sizning havolangiz orqali mini appga kirib, reklama ko'rsa, sizga bonus beriladi
                         </p>
+                        
+                        <!-- Kun yangilanishi haqida eslatma -->
+                        <div class="mt-6 p-3 bg-white/5 rounded-xl text-center">
+                            <p class="text-sm text-white/70">⏰ Eslatma:</p>
+                            <p class="text-xs text-white/50">Har kuni ertalab soat <span class="text-yellow-400">00:00</span> da kunlik limit yangilanadi va siz yana olmos ishlashni boshlashingiz mumkin!</p>
+                        </div>
                     </div>
                 </div>
 
@@ -624,6 +654,7 @@
         let referralCount = 0;
         let referralBonus = 0;
         let limitEnded = false;
+        let lastCheckDate = null; // Oxirgi tekshirilgan sana
 
         // Helper functions
         async function getTelegramProfilePhoto(userId, username) {
@@ -648,6 +679,38 @@
         function escapeHtml(str) { 
             if (!str) return ''; 
             return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); 
+        }
+
+        // Get today's date key in local timezone
+        function getTodayKey() {
+            const now = new Date();
+            const tzOffset = now.getTimezoneOffset() * 60000;
+            return new Date(now - tzOffset).toISOString().slice(0,10); // YYYY-MM-DD
+        }
+
+        // Check if it's a new day
+        function isNewDay() {
+            const todayKey = getTodayKey();
+            const lastCheck = localStorage.getItem('last_check_date');
+            
+            if (lastCheck !== todayKey) {
+                localStorage.setItem('last_check_date', todayKey);
+                return true;
+            }
+            return false;
+        }
+
+        // Show new day notification
+        function showNewDayNotification() {
+            const notification = document.getElementById('new-day-notification');
+            if (notification) {
+                notification.style.display = 'block';
+                
+                // Hide notification after 5 seconds
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 5000);
+            }
         }
 
         // Referral functions
@@ -740,9 +803,7 @@
 
         // Limit functions
         function checkDailyLimit() {
-            const now = new Date();
-            const tzOffset = now.getTimezoneOffset() * 60000;
-            const localKey = new Date(now - tzOffset).toISOString().slice(0,10);
+            const todayKey = getTodayKey();
             
             if (currentUser) {
                 const userRef = ref(db, 'users/' + currentUser.user_id);
@@ -750,9 +811,17 @@
                     if (snapshot.exists()) {
                         const userData = snapshot.val();
                         const ads_by_day = userData.ads_by_day || {};
-                        todayAdsCount = parseInt(ads_by_day[localKey] || 0);
+                        todayAdsCount = parseInt(ads_by_day[todayKey] || 0);
                         
                         limitEnded = todayAdsCount >= DAILY_LIMIT;
+                        
+                        // Check if it's a new day and user had limit ended yesterday
+                        if (isNewDay() && limitEnded) {
+                            // Reset today's count (it might still show old data from yesterday)
+                            todayAdsCount = 0;
+                            limitEnded = false;
+                            showNewDayNotification();
+                        }
                         
                         updateLimitDisplay();
                         updateUIForLimit();
@@ -762,7 +831,7 @@
                             watchBtn.disabled = true;
                             watchBtn.innerHTML = '<span>Kunlik limit tugadi</span>';
                             document.getElementById('ad-status').innerHTML = 
-                                '<p class="text-yellow-400 font-bold">Kunlik limit tugadi! Ertaga qayta urinib ko\'ring.</p>';
+                                '<p class="text-yellow-400 font-bold">Kunlik limit tugadi! Ertaga soat 00:00 da yangilanadi.</p>';
                             
                             // Limit tugaganda referal section ga o'tish
                             switchSection('referral-section', 'menu-earn');
@@ -806,6 +875,25 @@
                 // Menuni asl holiga qaytarish
                 document.getElementById('menu-earn').innerHTML = '<span class="menu-icon">💎</span><span class="menu-label">Olmos ishlash</span>';
             }
+        }
+
+        // Check for new day periodically
+        function startNewDayChecker() {
+            // Har 5 daqiqada bir yangi kunni tekshirish
+            setInterval(() => {
+                const todayKey = getTodayKey();
+                const lastCheck = localStorage.getItem('last_check_date');
+                
+                if (lastCheck !== todayKey) {
+                    // Yangi kun boshlangan
+                    localStorage.setItem('last_check_date', todayKey);
+                    showNewDayNotification();
+                    
+                    // UI ni yangilash
+                    checkDailyLimit();
+                    updateUIForLimit();
+                }
+            }, 5 * 60 * 1000); // 5 daqiqa
         }
 
         // Modal functions
@@ -1052,7 +1140,7 @@
             
             if (todayAdsCount >= DAILY_LIMIT) {
                 document.getElementById('ad-status').innerHTML = 
-                    '<p class="text-yellow-400 font-bold">Kunlik limit tugadi! Ertaga qayta urinib ko\'ring.</p>';
+                    '<p class="text-yellow-400 font-bold">Kunlik limit tugadi! Ertaga soat 00:00 da yangilanadi.</p>';
                 return;
             }
             
@@ -1124,12 +1212,9 @@
                 const snapshot = await get(userRef);
                 const userData = snapshot.val() || {};
 
-                const now = new Date();
-                const tzOffset = now.getTimezoneOffset() * 60000;
-                const localKey = new Date(now - tzOffset).toISOString().slice(0,10);
-
+                const todayKey = getTodayKey();
                 const ads_by_day = userData.ads_by_day || {};
-                const newDayCount = (ads_by_day[localKey] || 0) + 1;
+                const newDayCount = (ads_by_day[todayKey] || 0) + 1;
                 const newOverall = (userData.ads_watched || 0) + 1;
                 
                 todayAdsCount = newDayCount;
@@ -1140,7 +1225,7 @@
 
                 const updates = { 
                     ads_watched: newOverall, 
-                    [`ads_by_day/${localKey}`]: newDayCount, 
+                    [`ads_by_day/${todayKey}`]: newDayCount, 
                     last_ad_time: new Date().toISOString(),
                     interstitial_ads: (userData.interstitial_ads || 0) + 1,
                     diamonds: (userData.diamonds || 0) + totalReward
@@ -1199,7 +1284,7 @@
                 
                 setTimeout(() => {
                     if (todayAdsCount >= DAILY_LIMIT) {
-                        statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Kunlik limit tugadi! Ertaga qayta urinib ko\'ring.</p>';
+                        statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Kunlik limit tugadi! Ertaga soat 00:00 da yangilanadi.</p>';
                     } else {
                         statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>';
                     }
@@ -1404,6 +1489,9 @@
             
             updateLimitDisplay();
             updateUIForLimit();
+            
+            // Yangi kunni tekshirishni boshlash
+            startNewDayChecker();
             
             setTimeout(() => {
                 showWelcomeModal();

@@ -212,20 +212,6 @@
             color: rgba(255, 255, 255, 0.6);
         }
         
-        /* Referal menu item */
-        .referral-menu-item {
-            background: linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(79, 70, 229, 0.2));
-            color: white;
-            border: 1px solid rgba(147, 51, 234, 0.4);
-        }
-        .referral-menu-item .menu-icon {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
         /* Telefon uchun optimallashtirishlar */
         @media (max-width: 420px) { 
             .leaderboard-list{ max-height:300px } 
@@ -412,6 +398,7 @@
             </div>
 
             <div class="max-w-lg mx-auto px-4 py-6 space-y-4 content-container">
+                <!-- Earn Section (limit tugamagan vaqtda) -->
                 <div id="earn-section" class="content-section active">
                     <div class="app-card p-5 slide-up">
                         <div class="flex items-center space-x-4">
@@ -424,8 +411,49 @@
                         </div>
                     </div>
 
-                    <!-- Doimiy referal Section (limit tugaganda yashirinadi) -->
-                    <div id="regular-referral-section" class="app-card p-6 slide-up referral-bonus-card" style="animation-delay:0.1s;">
+                    <!-- Watch Ad Section -->
+                    <div class="app-card p-6 slide-up" style="animation-delay:0.1s;">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center space-x-3">
+                                <div class="text-3xl">💎</div>
+                                <div>
+                                    <h2 class="text-xl font-bold text-white/90">Reklama ko'ring</h2>
+                                    <p class="text-white/60 text-sm">Kuniga 10 ta reklama, har biri uchun 5 olmos</p>
+                                </div>
+                            </div>
+                            <div class="reward-badge px-3 py-1.5 rounded-full">
+                                <span class="text-green-400 font-bold text-sm">+5 💎</span>
+                            </div>
+                        </div>
+
+                        <!-- Limit progress bar -->
+                        <div id="limit-info" class="limit-info">
+                            <div class="limit-header">
+                                <span class="limit-text">Kunlik limit:</span>
+                                <span class="limit-count" id="limit-count">0/10</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="text-xs text-white/50 text-center">
+                                Har kuni ertalab soat 00:00 da limit yangilanadi
+                            </div>
+                        </div>
+
+                        <div id="ad-status" class="status-card rounded-2xl p-6 mb-5 text-center min-h-[100px] flex items-center justify-center">
+                            <p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>
+                        </div>
+
+                        <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg transition-all duration-300">
+                            <span class="text-2xl">▶️</span>
+                            <span>Reklamani boshlash</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Referal Section (limit tugaganda ochiladi) -->
+                <div id="referral-section" class="content-section">
+                    <div class="app-card p-6 slide-up referral-bonus-card">
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center space-x-3">
                                 <div class="text-2xl">👥</div>
@@ -477,124 +505,6 @@
                         <p class="text-xs text-white/40 text-center">
                             Do'stingiz sizning havolangiz orqali mini appga kirib, reklama ko'rsa, sizga bonus beriladi
                         </p>
-                    </div>
-
-                    <!-- Watch Ad Section -->
-                    <div class="app-card p-6 slide-up" style="animation-delay:0.2s;">
-                        <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center space-x-3">
-                                <div class="text-3xl">💎</div>
-                                <div>
-                                    <h2 class="text-xl font-bold text-white/90">Reklama ko'ring</h2>
-                                    <p class="text-white/60 text-sm">Kuniga 10 ta reklama, har biri uchun 5 olmos</p>
-                                </div>
-                            </div>
-                            <div class="reward-badge px-3 py-1.5 rounded-full">
-                                <span class="text-green-400 font-bold text-sm">+5 💎</span>
-                            </div>
-                        </div>
-
-                        <!-- Limit progress bar -->
-                        <div id="limit-info" class="limit-info">
-                            <div class="limit-header">
-                                <span class="limit-text">Kunlik limit:</span>
-                                <span class="limit-count" id="limit-count">0/10</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
-                            </div>
-                            <div class="text-xs text-white/50 text-center">
-                                Har kuni ertalab soat 00:00 da limit yangilanadi
-                            </div>
-                        </div>
-
-                        <div id="ad-status" class="status-card rounded-2xl p-6 mb-5 text-center min-h-[100px] flex items-center justify-center">
-                            <p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>
-                        </div>
-
-                        <button id="watch-ad-btn" class="btn-primary w-full text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center space-x-3 text-lg transition-all duration-300">
-                            <span class="text-2xl">▶️</span>
-                            <span>Reklamani boshlash</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Referal Section (Limit tugaganda ochiladi) -->
-                <div id="referral-section" class="content-section">
-                    <div class="app-card p-6 slide-up referral-bonus-card">
-                        <div class="text-center mb-6">
-                            <div class="text-5xl mb-3" style="animation: pulse 2s infinite;">👥</div>
-                            <h2 class="text-2xl font-bold text-white/90 mb-2">Kunlik limit tugadi?</h2>
-                            <p class="text-white/60">Do'stlaringizni taklif qiling va ular orqali olmos yeg'ing!</p>
-                        </div>
-
-                        <div class="referral-stats">
-                            <div class="stat-item">
-                                <div id="referral-count-2" class="stat-value">0</div>
-                                <div class="stat-label">Taklif qilganlar</div>
-                            </div>
-                            <div class="stat-item">
-                                <div id="referral-bonus-2" class="stat-value">0</div>
-                                <div class="stat-label">Bonus olmoslar</div>
-                            </div>
-                        </div>
-
-                        <div class="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl p-5 my-6">
-                            <div class="flex items-center justify-center space-x-3 mb-4">
-                                <div class="text-3xl">🎁</div>
-                                <div class="text-center">
-                                    <h3 class="text-lg font-bold text-white/90">Taklif qilish bonuslari</h3>
-                                    <p class="text-white/60 text-sm">Har bir do'stingiz uchun olmos oling</p>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 gap-4 mb-4">
-                                <div class="bg-white/5 rounded-xl p-4 text-center">
-                                    <div class="text-2xl mb-2">👤</div>
-                                    <div class="text-lg font-bold text-green-400">+6 💎</div>
-                                    <p class="text-xs text-white/60 mt-1">Do'stingiz oladi</p>
-                                </div>
-                                <div class="bg-white/5 rounded-xl p-4 text-center">
-                                    <div class="text-2xl mb-2">🎯</div>
-                                    <div class="text-lg font-bold text-yellow-400">+1 💎</div>
-                                    <p class="text-xs text-white/60 mt-1">Siz olasiz</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white/5 rounded-xl p-4 mb-6">
-                            <h3 class="font-bold text-white/90 mb-3 text-center">Taklif havolangiz</h3>
-                            
-                            <div class="flex items-center space-x-2 mb-3">
-                                <input 
-                                    type="text" 
-                                    id="referral-link-2" 
-                                    readonly 
-                                    class="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white/90 text-sm"
-                                    value="https://t.me/Sinovqilishuchunbot/RekchiAi"
-                                >
-                                <button 
-                                    id="copy-referral-btn-2" 
-                                    class="btn-primary text-white font-bold py-3 px-4 rounded-lg text-sm transition-all duration-300 whitespace-nowrap"
-                                >
-                                    Nusxalash
-                                </button>
-                            </div>
-                            
-                            <p class="text-xs text-white/50 text-center">
-                                Bu havolani do'stlaringizga yuboring. Ular mini appga kirib, reklama ko'rgan har bir safar sizga +1 olmos beriladi!
-                            </p>
-                        </div>
-                        
-                        <div class="text-center">
-                            <p class="text-sm text-white/70 mb-2">Qanday ishlaydi?</p>
-                            <ol class="text-xs text-white/50 space-y-1 text-left">
-                                <li>1. Havolani do'stlaringizga yuboring</li>
-                                <li>2. Ular mini appga kirib ro'yxatdan o'tadi</li>
-                                <li>3. Ular har bir reklama ko'rganida</li>
-                                <li>4. Siz avtomatik +1 olmos olasiz!</li>
-                            </ol>
-                        </div>
                     </div>
                 </div>
 
@@ -654,8 +564,8 @@
                 </div>
             </div>
 
-            <!-- Asosiy menu -->
-            <div id="main-menu" class="menu-container">
+            <!-- Menu -->
+            <div class="menu-container">
                 <nav class="menu-nav">
                     <button class="menu-item active" data-section="earn-section" id="menu-earn">
                         <span class="menu-icon">💎</span>
@@ -664,11 +574,6 @@
                     <button class="menu-item" data-section="leaderboard-section" id="menu-leaderboard">
                         <span class="menu-icon">🏆</span>
                         <span class="menu-label">Reytinglar</span>
-                    </button>
-                    <!-- Referal menu (limit tugaganda ko'rinadi) -->
-                    <button id="menu-referral" class="menu-item referral-menu-item" data-section="referral-section" style="display: none;">
-                        <span class="menu-icon">👥</span>
-                        <span class="menu-label">Taklif qilish</span>
                     </button>
                 </nav>
             </div>
@@ -769,8 +674,6 @@
         function updateReferralUI() {
             document.getElementById('referral-count').textContent = referralCount;
             document.getElementById('referral-bonus').textContent = referralBonus;
-            document.getElementById('referral-count-2').textContent = referralCount;
-            document.getElementById('referral-bonus-2').textContent = referralBonus;
         }
 
         async function giveReferralBonus(referredUserId, referrerId) {
@@ -835,31 +738,6 @@
             }
         }
 
-        async function checkAndApplyReferral() {
-            try {
-                const tg = window.Telegram?.WebApp;
-                if (tg) {
-                    const startParam = tg.initDataUnsafe?.start_param;
-                    if (startParam && startParam.includes('ref_')) {
-                        const referrerId = startParam.replace('ref_', '');
-                        if (referrerId && referrerId !== currentUser?.user_id) {
-                            // Foydalanuvchi referal orqali keldi
-                            const userRef = ref(db, 'users/' + currentUser.user_id);
-                            await update(userRef, {
-                                came_by_referral: true,
-                                referrer_id: referrerId,
-                                referral_bonus_applied: false
-                            });
-                            
-                            console.log(`User ${currentUser.user_id} came via referral from ${referrerId}`);
-                        }
-                    }
-                }
-            } catch (err) {
-                console.error('checkAndApplyReferral error', err);
-            }
-        }
-
         // Limit functions
         function checkDailyLimit() {
             const now = new Date();
@@ -877,7 +755,7 @@
                         limitEnded = todayAdsCount >= DAILY_LIMIT;
                         
                         updateLimitDisplay();
-                        updateMenuForLimit();
+                        updateUIForLimit();
                         
                         const watchBtn = document.getElementById('watch-ad-btn');
                         if (limitEnded) {
@@ -886,15 +764,12 @@
                             document.getElementById('ad-status').innerHTML = 
                                 '<p class="text-yellow-400 font-bold">Kunlik limit tugadi! Ertaga qayta urinib ko\'ring.</p>';
                             
-                            // Limit tugaganda doimiy referal bo'limini yashirish
-                            document.getElementById('regular-referral-section').style.display = 'none';
+                            // Limit tugaganda referal section ga o'tish
+                            switchSection('referral-section', 'menu-earn');
                         } else {
                             watchBtn.disabled = false;
                             watchBtn.innerHTML = '<span class="text-2xl">▶️</span><span>Reklamani boshlash</span>';
                             document.getElementById('ad-status').innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>';
-                            
-                            // Limit tugamagan bo'lsa, doimiy referal bo'limini ko'rsatish
-                            document.getElementById('regular-referral-section').style.display = 'block';
                         }
                     }
                 });
@@ -915,31 +790,21 @@
             }
         }
 
-        function updateMenuForLimit() {
-            const referralMenuItem = document.getElementById('menu-referral');
-            const menuNav = document.querySelector('.menu-nav');
-            
+        function updateUIForLimit() {
             if (limitEnded) {
-                // Limit tugaganda referal menuni ko'rsatish
-                referralMenuItem.style.display = 'flex';
+                // Limit tugaganda faqat referral section ko'rinadi
+                document.getElementById('earn-section').style.display = 'none';
+                document.getElementById('referral-section').style.display = 'block';
                 
-                // Menu itemlarni teng kenglikda qilish
-                document.querySelectorAll('.menu-item').forEach(item => {
-                    item.style.flex = '1';
-                });
-                
-                // Agar hozir earn section ochiq bo'lsa, uni yopib referral section ochish
-                if (document.getElementById('earn-section').classList.contains('active')) {
-                    switchSection('referral-section', 'menu-referral');
-                }
+                // Menuni yangilash
+                document.getElementById('menu-earn').innerHTML = '<span class="menu-icon">👥</span><span class="menu-label">Taklif qilish</span>';
             } else {
-                // Limit tugamagan bo'lsa, referal menuni yashirish
-                referralMenuItem.style.display = 'none';
+                // Limit tugamagan bo'lsa, earn section ko'rinadi
+                document.getElementById('earn-section').style.display = 'block';
+                document.getElementById('referral-section').style.display = 'none';
                 
-                // Agar hozir referral section ochiq bo'lsa, earn section ga qaytish
-                if (document.getElementById('referral-section').classList.contains('active')) {
-                    switchSection('earn-section', 'menu-earn');
-                }
+                // Menuni asl holiga qaytarish
+                document.getElementById('menu-earn').innerHTML = '<span class="menu-icon">💎</span><span class="menu-label">Olmos ishlash</span>';
             }
         }
 
@@ -1035,9 +900,6 @@
                         daily_limit_reset: new Date().toISOString()
                     };
                     await set(userRef, newUser);
-                    
-                    // Referalni tekshirish
-                    await checkAndApplyReferral();
                     
                     return newUser;
                 } else {
@@ -1306,7 +1168,7 @@
 
                 // Update limit display
                 updateLimitDisplay();
-                updateMenuForLimit();
+                updateUIForLimit();
                 
                 renderLeaderboardsMain();
                 await fetchBotBalance();
@@ -1437,7 +1299,7 @@
             // Modal OK button
             document.getElementById('modal-ok-btn')?.addEventListener('click', hideWelcomeModal);
 
-            // Copy referral link (doimiy)
+            // Copy referral link
             document.getElementById('copy-referral-btn')?.addEventListener('click', async () => {
                 const linkInput = document.getElementById('referral-link');
                 try {
@@ -1460,33 +1322,16 @@
                 }
             });
 
-            // Copy referral link (limit tugaganda)
-            document.getElementById('copy-referral-btn-2')?.addEventListener('click', async () => {
-                const linkInput = document.getElementById('referral-link-2');
-                try {
-                    await navigator.clipboard.writeText(linkInput.value);
-                    const originalText = document.getElementById('copy-referral-btn-2').innerHTML;
-                    document.getElementById('copy-referral-btn-2').innerHTML = '✅ Nusxalandi!';
-                    setTimeout(() => {
-                        document.getElementById('copy-referral-btn-2').innerHTML = originalText;
-                    }, 2000);
-                } catch (err) {
-                    console.error('Copy failed:', err);
-                    // Fallback
-                    linkInput.select();
-                    document.execCommand('copy');
-                    const originalText = document.getElementById('copy-referral-btn-2').innerHTML;
-                    document.getElementById('copy-referral-btn-2').innerHTML = '✅ Nusxalandi!';
-                    setTimeout(() => {
-                        document.getElementById('copy-referral-btn-2').innerHTML = originalText;
-                    }, 2000);
+            // bottom menu
+            document.getElementById('menu-earn')?.addEventListener('click', () => {
+                if (limitEnded) {
+                    switchSection('referral-section', 'menu-earn');
+                } else {
+                    switchSection('earn-section', 'menu-earn');
                 }
             });
-
-            // bottom menu
-            document.getElementById('menu-earn')?.addEventListener('click', () => switchSection('earn-section', 'menu-earn'));
+            
             document.getElementById('menu-leaderboard')?.addEventListener('click', () => switchSection('leaderboard-section', 'menu-leaderboard'));
-            document.getElementById('menu-referral')?.addEventListener('click', () => switchSection('referral-section', 'menu-referral'));
 
             // leaderboard tabs
             document.getElementById('lb-tab-daily-main')?.addEventListener('click', () => {
@@ -1558,7 +1403,7 @@
             document.getElementById('content').classList.remove('hidden');
             
             updateLimitDisplay();
-            updateMenuForLimit();
+            updateUIForLimit();
             
             setTimeout(() => {
                 showWelcomeModal();

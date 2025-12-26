@@ -433,7 +433,7 @@
         </div>
     </div>
 
-    <!-- REKLAMA SKRIPTLARI -->
+    <!-- REKLAMA SKRIPTI -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
     <!-- Script -->
@@ -460,7 +460,8 @@
         const BOT_API_GET_URL = 'https://68ed1ab05ca4e.myxvest1.ru/get_balance.php';
         const BOT_API_KEY = '4564123:hkjhfadfhieapkdnga';
         
-        // Interstitial reklama blockId
+        // Interstitial reklama blockId - bu yerda sizning haqiqiy blockId'ingiz bo'lishi kerak
+        // "int-20018" bu faqat misol, sizning to'g'ri blockId'ingizni qo'ying
         const INTERSTITIAL_BLOCK_ID = "int-20018";
 
         let currentUser = null;
@@ -471,20 +472,6 @@
         let isWatchingAd = false;
         let interstitialAdController = null;
         let hasShownWelcomeModal = false;
-
-        // REKLAMA NAVBATI - Faqat Interstitial
-        let adQueue = {
-            currentProvider: 'interstitial', // Faqat Interstitial
-            getNextProvider: function() {
-                this.currentProvider = 'interstitial'; // Har doim Interstitial
-                console.log('Keyingi provider:', this.currentProvider);
-                return this.currentProvider;
-            },
-            
-            getCurrentProvider: function() {
-                return this.currentProvider;
-            }
-        };
 
         // Helpers
         async function getTelegramProfilePhoto(userId, username) {
@@ -606,8 +593,6 @@
                         last_verified_click: null,
                         avg_click_duration: 0,
                         external_clicks: 0,
-                        sonar_ads: 0,
-                        adsgram_ads: 0,
                         interstitial_ads: 0
                     };
                     await set(userRef, newUser);
@@ -752,7 +737,7 @@
                 `).join('');
         }
 
-        // REKLAMA NAVBATI - Faqat Interstitial reklama
+        // INTERSTITIAL REKLAMANI KO'RSATISH - YOPISH TUGMASIZ
         async function watchAd() {
             if (!currentUser || isWatchingAd) return;
             
@@ -765,11 +750,42 @@
             statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Interstitial reklama tayyorlanmoqda...</p>';
             
             try {
-                // Faqat Interstitial reklama
-                await showInterstitialAd();
+                // AdsGram Interstitial reklama controller ni yaratish
+                if (!interstitialAdController) {
+                    try {
+                        interstitialAdController = window.Adsgram.init({ 
+                            blockId: INTERSTITIAL_BLOCK_ID 
+                        });
+                    } catch (e) {
+                        console.error('AdsGram init xatosi:', e);
+                        statusDiv.innerHTML = '<p class="text-red-400">Reklama tizimi ishga tushmadi.</p>';
+                        resetWatchButton();
+                        return;
+                    }
+                }
                 
-                // Keyingi reklama uchun providerni o'zgartirish
-                adQueue.getNextProvider();
+                statusDiv.innerHTML = '<p class="text-green-400 font-bold">Interstitial reklama ochildi!</p>';
+                
+                // Interstitial reklamani ko'rsatish
+                interstitialAdController.show().then((result) => {
+                    console.log('Interstitial reklama natijasi:', result);
+                    
+                    // INTERSTITIAL: Reklama to'liq ko'rilganda yoki foydalanuvchi yopganda bonus berish
+                    statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yakunlandi, bonus berilmoqda...</p>';
+                    
+                    // INTERSTITIAL uchun bonus berish
+                    setTimeout(async () => {
+                        await giveBonusToUser('interstitial');
+                    }, 1500);
+                    
+                }).catch((errorResult) => {
+                    console.error('Interstitial reklama xatosi:', errorResult);
+                    statusDiv.innerHTML = '<p class="text-red-400">Reklama xatosi.</p>';
+                    resetWatchButton();
+                    setTimeout(() => { 
+                        statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
+                    }, 3000);
+                });
                 
             } catch (err) {
                 console.error('Xatolik:', err);
@@ -779,48 +795,6 @@
                     statusDiv.innerHTML = '<p class="text-white/70">Reklama tayyor. Tugmani bosing! 🚀</p>'; 
                 }, 3000);
             }
-        }
-
-        // INTERSTITIAL REKLAMASI - REKLAMA KO'RILGAN YOKI YOPILGANDA MUKOFO
-        async function showInterstitialAd() {
-            return new Promise((resolve, reject) => {
-                const statusDiv = document.getElementById('ad-status');
-                
-                // AdsGram controller ni yaratish
-                if (!interstitialAdController) {
-                    try {
-                        interstitialAdController = window.Adsgram.init({ blockId: INTERSTITIAL_BLOCK_ID });
-                    } catch (e) {
-                        console.error('AdsGram init xatosi:', e);
-                        statusDiv.innerHTML = '<p class="text-red-400">Reklama tizimi ishga tushmadi.</p>';
-                        resetWatchButton();
-                        reject(e);
-                        return;
-                    }
-                }
-                
-                statusDiv.innerHTML = '<p class="text-green-400 font-bold">Interstitial reklama ochildi!</p>';
-                
-                // Interstitial reklama ko'rsatish
-                interstitialAdController.show().then((result) => {
-                    console.log('Interstitial reklama natijasi:', result);
-                    
-                    // INTERSTITIAL: Reklama ko'rilgan yoki yopilganda bonus berish
-                    statusDiv.innerHTML = '<p class="text-yellow-400 font-bold">Reklama yakunlandi, bonus berilmoqda...</p>';
-                    
-                    // INTERSTITIAL uchun bonus berish
-                    setTimeout(async () => {
-                        await giveBonusToUser('interstitial');
-                        resolve(result);
-                    }, 1500);
-                    
-                }).catch((errorResult) => {
-                    console.error('Interstitial reklama xatosi:', errorResult);
-                    statusDiv.innerHTML = '<p class="text-red-400">Reklama xatosi.</p>';
-                    resetWatchButton();
-                    reject(new Error('Ad error'));
-                });
-            });
         }
 
         // BONUS BERISH - INTERSTITIAL REKLAMA KO'RILGAN YOKI YOPILGANDA
